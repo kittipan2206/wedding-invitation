@@ -1,0 +1,225 @@
+/* ══════════════════════════════
+   RSVP SECTION
+   ══════════════════════════════ */
+
+#rsvp {
+  text-align: center;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+.rsvp-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 5vw, 42px);
+  font-weight: 400;
+  font-style: italic;
+  margin-bottom: 12px;
+  color: var(--color-text);
+}
+
+.rsvp-sub {
+  font-size: 14px;
+  color: var(--color-muted);
+  margin-bottom: 48px;
+}
+
+.rsvp-form {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 24px;
+  padding: clamp(32px, 6vw, 56px) clamp(24px, 5vw, 48px);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-card);
+  text-align: left;
+}
+
+/* ── Form rows ── */
+.form-row {
+  margin-bottom: 28px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 10px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  border: 1.5px solid rgba(201, 184, 232, 0.45);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.75);
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--color-lavender);
+  box-shadow: 0 0 0 4px rgba(201, 184, 232, 0.18);
+}
+
+.form-input.error,
+.form-select.error,
+.form-textarea.error {
+  border-color: #e8a0a0;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ── Select wrapper with arrow ── */
+.form-select-wrapper {
+  position: relative;
+}
+
+.form-select-wrapper::after {
+  content: '';
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--color-muted);
+  border-bottom: 2px solid var(--color-muted);
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
+}
+
+/* ── Radio buttons ── */
+.radio-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.radio-option {
+  flex: 1;
+  min-width: 120px;
+}
+
+.radio-option input[type="radio"] {
+  display: none;
+}
+
+.radio-option label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(201, 184, 232, 0.45);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-muted);
+  background: rgba(255, 255, 255, 0.5);
+  transition: all 0.22s ease;
+  user-select: none;
+}
+
+.radio-option input[type="radio"]:checked + label {
+  border-color: var(--color-lavender);
+  background: linear-gradient(135deg, rgba(249, 200, 212, 0.28), rgba(201, 184, 232, 0.28));
+  color: var(--color-text);
+  box-shadow: 0 2px 12px rgba(201, 184, 232, 0.25);
+}
+
+.radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.radio-option input[type="radio"]:checked + label .radio-dot {
+  opacity: 1;
+  background: var(--color-lavender);
+  filter: brightness(0.78);
+}
+
+/* ── Submit button ── */
+.btn-submit {
+  width: 100%;
+  padding: 18px 32px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #e8b4c4, #c4a8de, #a8cee8);
+  background-size: 200% 200%;
+  animation: btnGradient 6s ease infinite;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.18s;
+  box-shadow: 0 4px 24px rgba(196, 168, 222, 0.4);
+  margin-top: 8px;
+}
+
+.btn-submit:hover  { opacity: 0.88; transform: translateY(-1px); }
+.btn-submit:active { transform: translateY(0); }
+
+/* ── Field error ── */
+.field-error {
+  font-size: 12px;
+  color: #c8888a;
+  margin-top: 6px;
+  display: none;
+}
+
+/* ── Thank you state ── */
+.thank-you {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+  gap: 20px;
+  animation: fadeInUp 0.7s ease both;
+}
+
+.thank-you-heart {
+  width: 64px;
+  height: 64px;
+  animation: heartPop 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.thank-you h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 5vw, 36px);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-text);
+}
+
+.thank-you p {
+  font-size: 15px;
+  color: var(--color-muted);
+  max-width: 340px;
+  line-height: 1.7;
+}

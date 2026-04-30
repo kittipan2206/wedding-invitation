@@ -1,0 +1,140 @@
+/* ══════════════════════════════
+   DIGITAL CARD PAGE
+   ══════════════════════════════ */
+
+body.card-page {
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f8f4ff;
+  font-family: var(--font-sans);
+}
+
+.card-viewport {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 16px 0 80px;
+}
+
+.card-canvas {
+  width: 1080px;
+  height: 1080px;
+  transform-origin: top center;
+  background: linear-gradient(145deg, #fff0f5, #f5f0ff, #f0f5ff, #f0fff8);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.12);
+}
+
+.card-floral-top {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.card-floral-bottom {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%) scaleY(-1);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.card-badge {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 48px;
+}
+
+.card-names {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 140px;
+  line-height: 0.9;
+  color: var(--color-text);
+}
+
+.card-names .ampersand {
+  display: block;
+  font-style: italic;
+  font-size: 0.5em;
+  color: var(--color-lavender);
+  filter: brightness(0.78);
+  line-height: 1.8;
+}
+
+.card-date {
+  margin-top: 40px;
+  font-family: var(--font-serif);
+  font-size: 32px;
+  color: var(--color-muted);
+  letter-spacing: 0.14em;
+}
+
+.card-divider {
+  width: 160px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-lavender), transparent);
+  margin: 36px auto;
+  opacity: 0.6;
+}
+
+.card-tagline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 28px;
+  color: var(--color-muted);
+  opacity: 0.75;
+}
+
+/* ── Share button ── */
+.share-btn-wrapper {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.btn-share {
+  padding: 16px 48px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #e8b4c4, #c4a8de, #a8cee8);
+  background-size: 200%;
+  animation: btnGradient 6s ease infinite;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(196, 168, 222, 0.45);
+  transition: opacity 0.2s, transform 0.18s;
+}
+
+.btn-share:hover {
+  opacity: 0.88;
+  transform: translateY(-2px);
+}

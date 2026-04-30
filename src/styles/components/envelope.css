@@ -1,0 +1,120 @@
+/* ══════════════════════════════
+   ENVELOPE OVERLAY
+   ══════════════════════════════ */
+
+#envelope-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(253, 252, 251, 0.98);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+}
+
+/* ── Envelope container (holds perspective for child 3D transforms) ── */
+.envelope-body {
+  position: relative;
+  width: 280px;
+  height: 200px;
+  cursor: pointer;
+  perspective: 1000px;
+  perspective-origin: 50% 40%;
+  user-select: none;
+  transition: transform 0.25s ease;
+}
+
+.envelope-body:hover {
+  transform: scale(1.025);
+}
+
+/* Static SVG body */
+.env-body-svg {
+  display: block;
+  filter: drop-shadow(0 6px 28px rgba(201, 184, 232, 0.25));
+  transition: filter 0.25s ease;
+}
+
+.envelope-body:hover .env-body-svg {
+  filter: drop-shadow(0 10px 36px rgba(201, 184, 232, 0.42));
+}
+
+/* ── Flap: CSS div that pivots at its bottom edge (the fold line) ──
+   Fold line is at y = 112px from the envelope top.
+   The div is 112px tall → its bottom edge sits exactly on the fold line.
+   transform-origin: center bottom  =  pivot at (140px, 112px).            */
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 112px;
+
+  /* Triangle: base at bottom (fold line), tip near top-center */
+  /* clip-path: polygon(0 100%, 50% 3%, 100% 100%); */
+
+  /* Triangle: base at top, tip near bottom-center (more natural for folding) */
+  clip-path: polygon(0 0, 50% 100%, 100% 0);
+
+  background: linear-gradient(168deg, #f3eefe 0%, #e8d8f8 55%, #dac8f0 100%);
+
+  /* Pivot at the fold line (bottom of this div) */
+  transform-origin: center top;
+  transform-style: preserve-3d;
+  /* backface-visibility: hidden; */
+
+  z-index: 2;
+}
+
+/* ── Floral dots on flap ── */
+.flap-dot {
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* Positions verified to fall inside the clip-path triangle */
+.flap-dot-c {
+  width: 8px;
+  height: 8px;
+  background: rgba(249, 200, 212, 0.9);
+  top: 32%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.flap-dot-l {
+  width: 6px;
+  height: 6px;
+  background: rgba(184, 232, 216, 0.85);
+  top: 50%;
+  left: 37%;
+  transform: translate(-50%, -50%);
+}
+
+.flap-dot-r {
+  width: 6px;
+  height: 6px;
+  background: rgba(184, 216, 248, 0.85);
+  top: 50%;
+  left: 63%;
+  transform: translate(-50%, -50%);
+}
+
+/* ── Label below envelope ── */
+.envelope-label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  text-align: center;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 0.8s forwards;
+}
+
+/* Music button playing state */
+#music-btn.is-playing {
+  animation: musicPulse 2s ease-in-out infinite;
+}
