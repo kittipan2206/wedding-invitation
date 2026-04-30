@@ -26,43 +26,12 @@
   flex-wrap: wrap;
 }
 
-.countdown-unit {
+/* ── Flip unit wrapper ── */
+.flip-unit {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-}
-
-.countdown-box {
-  width: clamp(72px, 18vw, 108px);
-  height: clamp(72px, 18vw, 108px);
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: clamp(32px, 7vw, 52px);
-  color: var(--color-text);
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
-  border: 1.5px solid rgba(255, 255, 255, 0.9);
-  transition: transform 0.2s ease;
-}
-
-.countdown-unit:nth-child(1) .countdown-box {
-  background: linear-gradient(145deg, rgba(249, 200, 212, 0.35), rgba(255, 255, 255, 0.72));
-}
-.countdown-unit:nth-child(2) .countdown-box {
-  background: linear-gradient(145deg, rgba(201, 184, 232, 0.35), rgba(255, 255, 255, 0.72));
-}
-.countdown-unit:nth-child(3) .countdown-box {
-  background: linear-gradient(145deg, rgba(184, 232, 216, 0.35), rgba(255, 255, 255, 0.72));
-}
-.countdown-unit:nth-child(4) .countdown-box {
-  background: linear-gradient(145deg, rgba(184, 216, 248, 0.35), rgba(255, 255, 255, 0.72));
+  gap: 12px;
 }
 
 .countdown-label {
@@ -70,4 +39,149 @@
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-muted);
+}
+
+/* ── Flip card container ── */
+.flip-card {
+  position: relative;
+  width: clamp(72px, 18vw, 100px);
+  height: clamp(80px, 20vw, 112px);
+  perspective: 600px;
+  border-radius: 16px;
+}
+
+/* ── All four faces ── */
+.flip-card__upper,
+.flip-card__lower,
+.flip-card__flip--top,
+.flip-card__flip--bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+}
+
+/* Static top half */
+.flip-card__upper {
+  top: 0;
+  height: 50%;
+  align-items: flex-end;
+  border-radius: 16px 16px 0 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Static bottom half */
+.flip-card__lower {
+  bottom: 0;
+  height: 50%;
+  align-items: flex-start;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* Animated flap — top half, flips away revealing new upper */
+.flip-card__flip--top {
+  top: 0;
+  height: 50%;
+  align-items: flex-end;
+  border-radius: 16px 16px 0 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  transform-origin: bottom center;
+  transform: rotateX(0deg);
+  z-index: 2;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Animated flap — bottom half, rotates in from below */
+.flip-card__flip--bottom {
+  bottom: 0;
+  height: 50%;
+  align-items: flex-start;
+  border-radius: 0 0 16px 16px;
+  transform-origin: top center;
+  transform: rotateX(90deg);
+  z-index: 2;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Number text inside each face */
+.flip-card__upper span,
+.flip-card__flip--top span {
+  display: block;
+  transform: translateY(50%);
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(34px, 8vw, 54px);
+  color: var(--color-text);
+  line-height: 1;
+  user-select: none;
+}
+
+.flip-card__lower span,
+.flip-card__flip--bottom span {
+  display: block;
+  transform: translateY(-50%);
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(34px, 8vw, 54px);
+  color: var(--color-text);
+  line-height: 1;
+  user-select: none;
+}
+
+/* ── Flip animations ── */
+.flip-card.flipping .flip-card__flip--top {
+  animation: flip-top 0.28s ease-in forwards;
+}
+
+.flip-card.flipping .flip-card__flip--bottom {
+  animation: flip-bottom 0.28s ease-out 0.28s forwards;
+}
+
+@keyframes flip-top {
+  from { transform: rotateX(0deg); }
+  to   { transform: rotateX(-90deg); }
+}
+
+@keyframes flip-bottom {
+  from { transform: rotateX(90deg); }
+  to   { transform: rotateX(0deg); }
+}
+
+/* ── Per-unit accent gradients ── */
+.flip-unit:nth-child(1) .flip-card__upper,
+.flip-unit:nth-child(1) .flip-card__lower,
+.flip-unit:nth-child(1) .flip-card__flip--top,
+.flip-unit:nth-child(1) .flip-card__flip--bottom {
+  background: linear-gradient(145deg, rgba(249, 200, 212, 0.45), rgba(255, 255, 255, 0.82));
+}
+
+.flip-unit:nth-child(2) .flip-card__upper,
+.flip-unit:nth-child(2) .flip-card__lower,
+.flip-unit:nth-child(2) .flip-card__flip--top,
+.flip-unit:nth-child(2) .flip-card__flip--bottom {
+  background: linear-gradient(145deg, rgba(201, 184, 232, 0.45), rgba(255, 255, 255, 0.82));
+}
+
+.flip-unit:nth-child(3) .flip-card__upper,
+.flip-unit:nth-child(3) .flip-card__lower,
+.flip-unit:nth-child(3) .flip-card__flip--top,
+.flip-unit:nth-child(3) .flip-card__flip--bottom {
+  background: linear-gradient(145deg, rgba(184, 232, 216, 0.45), rgba(255, 255, 255, 0.82));
+}
+
+.flip-unit:nth-child(4) .flip-card__upper,
+.flip-unit:nth-child(4) .flip-card__lower,
+.flip-unit:nth-child(4) .flip-card__flip--top,
+.flip-unit:nth-child(4) .flip-card__flip--bottom {
+  background: linear-gradient(145deg, rgba(184, 216, 248, 0.45), rgba(255, 255, 255, 0.82));
 }

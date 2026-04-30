@@ -1,29 +1,72 @@
 export function initCountdown() {
   const wedding = new Date('2027-03-15T11:00:00+07:00');
   const pad = n => String(n).padStart(2, '0');
-  const dEl = document.getElementById('cd-days');
-  const hEl = document.getElementById('cd-hours');
-  const mEl = document.getElementById('cd-mins');
-  const sEl = document.getElementById('cd-secs');
-  if (!dEl) return;
 
-  function setVal(el, val) {
-    const v = pad(val);
-    if (el.textContent !== v) {
-      el.style.transform = 'scale(1.12)';
-      el.textContent = v;
-      setTimeout(() => { el.style.transform = 'scale(1)'; }, 150);
-    }
+  const ids = ['cd-days', 'cd-hours', 'cd-mins', 'cd-secs'];
+  const els = ids.map(id => document.getElementById(id));
+  if (!els[0]) return;
+
+  function setFlip(card, newVal) {
+    const v = pad(newVal);
+    const upperSpan = card.querySelector('.flip-card__upper span');
+    if (upperSpan.textContent === v) return;
+
+    const oldVal = upperSpan.textContent;
+    const lowerSpan = card.querySelector('.flip-card__lower span');
+    const flipTopSpan = card.querySelector('.flip-card__flip--top span');
+    const flipBotSpan = card.querySelector('.flip-card__flip--bottom span');
+
+    // Front of top flap = old value (flips away)
+    flipTopSpan.textContent = oldVal;
+    // Front of bottom flap = new value (comes in)
+    flipBotSpan.textContent = v;
+    // Update static upper immediately (hidden behind top flap during animation)
+    upperSpan.textContent = v;
+
+    // Reset then trigger animation
+    card.classList.remove('flipping');
+    void card.offsetWidth;
+    card.classList.add('flipping');
+
+    // After both halves finish (~580ms), update lower and clean up
+    setTimeout(() => {
+      lowerSpan.textContent = v;
+      card.classList.remove('flipping');
+    }, 620);
   }
 
   function tick() {
     const diff = wedding - new Date();
-    if (diff <= 0) { [dEl, hEl, mEl, sEl].forEach(e => e.textContent = '00'); return; }
-    setVal(dEl, Math.floor(diff / 86400000));
-    setVal(hEl, Math.floor((diff % 86400000) / 3600000));
-    setVal(mEl, Math.floor((diff % 3600000) / 60000));
-    setVal(sEl, Math.floor((diff % 60000) / 1000));
+    if (diff <= 0) {
+      els.forEach(el => {
+        el.querySelector('.flip-card__upper span').textContent = '00';
+        el.querySelector('.flip-card__lower span').textContent = '00';
+      });
+      return;
+    }
+    const values = [
+      Math.floor(diff / 86400000),
+      Math.floor((diff % 86400000) / 3600000),
+      Math.floor((diff % 3600000) / 60000),
+      Math.floor((diff % 60000) / 1000),
+    ];
+    els.forEach((el, i) => setFlip(el, values[i]));
   }
-  tick();
+
+  // Init static display without animation on first load
+  const diff0 = wedding - new Date();
+  if (diff0 > 0) {
+    const v0 = [
+      Math.floor(diff0 / 86400000),
+      Math.floor((diff0 % 86400000) / 3600000),
+      Math.floor((diff0 % 3600000) / 60000),
+      Math.floor((diff0 % 60000) / 1000),
+    ];
+    els.forEach((el, i) => {
+      const s = pad(v0[i]);
+      el.querySelectorAll('span').forEach(span => span.textContent = s);
+    });
+  }
+
   setInterval(tick, 1000);
 }

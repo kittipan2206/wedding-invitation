@@ -1,12 +1,14 @@
 import './styles/main.css';
-import { initEnvelope }  from './js/envelope.js';
-import { initPetals }    from './js/petals.js';
-import { initCountdown } from './js/countdown.js';
-import { initReveal }    from './js/reveal.js';
-import { initRsvp }      from './js/rsvp.js';
-import { initMusic }     from './js/music.js';
-import { initScrollNav } from './js/scroll-nav.js';
-import { initShare }     from './js/share.js';
+import { initEnvelope }      from './js/envelope.js';
+import { initPetals }        from './js/petals.js';
+import { initCountdown }     from './js/countdown.js';
+import { initReveal }        from './js/reveal.js';
+import { initRsvp }          from './js/rsvp.js';
+import { initMusic }         from './js/music.js';
+import { initScrollNav }     from './js/scroll-nav.js';
+import { initShare }         from './js/share.js';
+import { initCursorSparkle } from './js/cursor-sparkle.js';
+import { initFullscreen }    from './js/fullscreen.js';
 
 function afterEnvelope() {
   initPetals();
@@ -34,5 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initRsvp();
   initScrollNav();
   initShare();
+  initCursorSparkle();
+  initFullscreen();
   initEnvelope(afterEnvelope);
 });
