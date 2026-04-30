@@ -37,11 +37,9 @@
   --transition-slow: 0.85s var(--transition-ease);
 }
 
-html {
-  scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
-  overflow-y: scroll;
+html, body {
   height: 100%;
+  overflow: hidden;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -49,10 +47,18 @@ body {
   font-family: var(--font-sans);
   color: var(--color-text);
   background: var(--color-white);
-  overflow-x: hidden;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scroll snap container ── */
+.snap-wrap {
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
 }
 
 img, svg {

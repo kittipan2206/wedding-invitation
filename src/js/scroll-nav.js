@@ -11,7 +11,9 @@ export function initScrollNav() {
     dot.className = 'scroll-nav-dot';
     dot.setAttribute('aria-label', labels[i]);
     dot.addEventListener('click', () => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      const target = document.getElementById(id);
+      const wrap = document.querySelector('.snap-wrap');
+      if (target && wrap) wrap.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
     });
     nav.appendChild(dot);
     return dot;
