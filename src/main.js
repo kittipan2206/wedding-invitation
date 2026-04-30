@@ -6,6 +6,7 @@ import { initReveal }    from './js/reveal.js';
 import { initRsvp }      from './js/rsvp.js';
 import { initMusic }     from './js/music.js';
 import { initScrollNav } from './js/scroll-nav.js';
+import { initShare }     from './js/share.js';
 
 function afterEnvelope() {
   initPetals();
@@ -32,5 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initReveal();
   initRsvp();
   initScrollNav();
+  initShare();
   initEnvelope(afterEnvelope);
 });

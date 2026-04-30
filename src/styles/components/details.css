@@ -115,3 +115,25 @@
   border: 1.5px solid rgba(201, 184, 232, 0.7);
   box-shadow: 0 2px 10px rgba(201, 184, 232, 0.2);
 }
+
+/* ── Dress code color palette ── */
+.dress-palette {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.dress-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+  cursor: default;
+}
+
+.dress-swatch:hover {
+  transform: scale(1.25);
+}
