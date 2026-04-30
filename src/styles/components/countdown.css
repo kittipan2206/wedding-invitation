@@ -94,7 +94,7 @@
   border-radius: 16px 16px 0 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.07);
   transform-origin: bottom center;
-  transform: rotateX(0deg);
+  transform: rotateX(-90deg); /* hidden by default, animation sets from:0 */
   z-index: 2;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
