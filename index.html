@@ -7,8 +7,13 @@
   <title>นนท์ &amp; เมย์ — Wedding Invitation</title>
   <meta name="description" content="ขอเรียนเชิญร่วมงานแต่งงาน นนท์ &amp; เมย์ วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569" />
   <meta property="og:title" content="นนท์ &amp; เมย์ — Wedding Invitation" />
-  <meta property="og:description" content="วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569" />
-  <meta property="og:image" content="./og-image.png" />
+  <meta property="og:description" content="ขอเรียนเชิญร่วมงานแต่งงาน นนท์ &amp; เมย์ วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569" />
+  <meta property="og:image" content="/og-image.svg" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="นนท์ &amp; เมย์ — Wedding Invitation" />
+  <meta name="twitter:description" content="ขอเรียนเชิญร่วมงานแต่งงาน นนท์ &amp; เมย์ วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569" />
+  <meta name="twitter:image" content="/og-image.svg" />
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -196,7 +201,14 @@
               <path d="M8 2c0 1.657 1.343 3 3 3s3-1.343 3-3" stroke="#4A4340" stroke-width="1.5" />
             </svg></div>
           <h3>การแต่งกาย</h3>
-          <p>Pastel Formal<br />สีโทนพาสเทล</p>
+          <p>Pastel Formal</p>
+          <div class="dress-palette">
+            <span class="dress-swatch" style="background:#F9C8D4" title="ชมพู Pastel"></span>
+            <span class="dress-swatch" style="background:#C9B8E8" title="ม่วง Pastel"></span>
+            <span class="dress-swatch" style="background:#B8D8F8" title="ฟ้า Pastel"></span>
+            <span class="dress-swatch" style="background:#B8E8D8" title="เขียว Pastel"></span>
+            <span class="dress-swatch" style="background:#F8E8B8" title="เหลือง Pastel"></span>
+          </div>
         </div>
       </div>
     </section>
@@ -280,16 +292,30 @@
     </footer>
   </div><!-- /.snap-wrap -->
 
-  <!-- MUSIC BUTTON (hidden until envelope opens) -->
-  <button id="music-btn" aria-label="เปิด/ปิดเพลง" title="เปิด/ปิดเพลง" style="
-    display:none;
+  <!-- FIXED BUTTONS (music + share) -->
+  <div id="fixed-actions" style="
     position:fixed; bottom:24px; right:24px; z-index:100;
-    width:48px; height:48px; border-radius:50%; border:none;
-    background:rgba(255,255,255,0.82); backdrop-filter:blur(12px);
-    color:#8A7F7A; cursor:pointer; align-items:center; justify-content:center;
-    box-shadow:0 4px 20px rgba(201,184,232,0.35);
-    transition: box-shadow 0.3s;
-  "></button>
+    display:flex; flex-direction:column; gap:10px; align-items:center;
+  ">
+    <button id="share-btn" aria-label="แชร์การ์ด" title="แชร์การ์ด" style="
+      width:48px; height:48px; border-radius:50%; border:none;
+      background:rgba(255,255,255,0.82); backdrop-filter:blur(12px);
+      color:#8A7F7A; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 20px rgba(201,184,232,0.35); transition: box-shadow 0.3s, transform 0.2s;
+    ">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+    </button>
+    <button id="music-btn" aria-label="เปิด/ปิดเพลง" title="เปิด/ปิดเพลง" style="
+      display:none;
+      width:48px; height:48px; border-radius:50%; border:none;
+      background:rgba(255,255,255,0.82); backdrop-filter:blur(12px);
+      color:#8A7F7A; cursor:pointer; align-items:center; justify-content:center;
+      box-shadow:0 4px 20px rgba(201,184,232,0.35); transition: box-shadow 0.3s;
+    "></button>
+  </div>
 
 </body>
 
