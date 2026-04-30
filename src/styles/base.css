@@ -39,6 +39,9 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100%;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -91,6 +94,25 @@ a {
   50%  { background-position: 100% 100%; }
   75%  { background-position: 0% 100%; }
   100% { background-position: 0% 50%; }
+}
+
+/* ── Scroll snap sections ── */
+#hero,
+#countdown,
+#details,
+#rsvp,
+footer {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+footer {
+  min-height: auto;
+  scroll-snap-align: end;
 }
 
 /* Shared section wrapper */

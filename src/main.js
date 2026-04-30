@@ -5,6 +5,7 @@ import { initCountdown } from './js/countdown.js';
 import { initReveal }    from './js/reveal.js';
 import { initRsvp }      from './js/rsvp.js';
 import { initMusic }     from './js/music.js';
+import { initScrollNav } from './js/scroll-nav.js';
 
 function afterEnvelope() {
   initPetals();
@@ -30,5 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initCountdown();
   initReveal();
   initRsvp();
+  initScrollNav();
   initEnvelope(afterEnvelope);
 });
