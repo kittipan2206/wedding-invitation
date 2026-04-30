@@ -120,17 +120,41 @@
       <span class="section-label reveal">นับถอยหลังสู่วันพิเศษ</span>
       <h2 class="countdown-heading reveal reveal-delay-1">ยังมีเวลาอีก…</h2>
       <div class="countdown-grid reveal reveal-delay-2">
-        <div class="countdown-unit">
-          <div class="countdown-box" id="cd-days">—</div><span class="countdown-label">วัน</span>
+        <div class="flip-unit">
+          <div class="flip-card" id="cd-days">
+            <div class="flip-card__upper"><span>00</span></div>
+            <div class="flip-card__lower"><span>00</span></div>
+            <div class="flip-card__flip flip-card__flip--top"><span>00</span></div>
+            <div class="flip-card__flip flip-card__flip--bottom"><span>00</span></div>
+          </div>
+          <span class="countdown-label">วัน</span>
         </div>
-        <div class="countdown-unit">
-          <div class="countdown-box" id="cd-hours">—</div><span class="countdown-label">ชั่วโมง</span>
+        <div class="flip-unit">
+          <div class="flip-card" id="cd-hours">
+            <div class="flip-card__upper"><span>00</span></div>
+            <div class="flip-card__lower"><span>00</span></div>
+            <div class="flip-card__flip flip-card__flip--top"><span>00</span></div>
+            <div class="flip-card__flip flip-card__flip--bottom"><span>00</span></div>
+          </div>
+          <span class="countdown-label">ชั่วโมง</span>
         </div>
-        <div class="countdown-unit">
-          <div class="countdown-box" id="cd-mins">—</div><span class="countdown-label">นาที</span>
+        <div class="flip-unit">
+          <div class="flip-card" id="cd-mins">
+            <div class="flip-card__upper"><span>00</span></div>
+            <div class="flip-card__lower"><span>00</span></div>
+            <div class="flip-card__flip flip-card__flip--top"><span>00</span></div>
+            <div class="flip-card__flip flip-card__flip--bottom"><span>00</span></div>
+          </div>
+          <span class="countdown-label">นาที</span>
         </div>
-        <div class="countdown-unit">
-          <div class="countdown-box" id="cd-secs">—</div><span class="countdown-label">วินาที</span>
+        <div class="flip-unit">
+          <div class="flip-card" id="cd-secs">
+            <div class="flip-card__upper"><span>00</span></div>
+            <div class="flip-card__lower"><span>00</span></div>
+            <div class="flip-card__flip flip-card__flip--top"><span>00</span></div>
+            <div class="flip-card__flip flip-card__flip--bottom"><span>00</span></div>
+          </div>
+          <span class="countdown-label">วินาที</span>
         </div>
       </div>
     </section>
@@ -297,6 +321,17 @@
     position:fixed; bottom:24px; right:24px; z-index:100;
     display:flex; flex-direction:column; gap:10px; align-items:center;
   ">
+    <button id="fullscreen-btn" aria-label="เต็มหน้าจอ" title="เต็มหน้าจอ" style="
+      width:48px; height:48px; border-radius:50%; border:none;
+      background:rgba(255,255,255,0.82); backdrop-filter:blur(12px);
+      color:#8A7F7A; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 20px rgba(201,184,232,0.35); transition: box-shadow 0.3s, transform 0.2s;
+    ">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+        <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+      </svg>
+    </button>
     <button id="share-btn" aria-label="แชร์การ์ด" title="แชร์การ์ด" style="
       width:48px; height:48px; border-radius:50%; border:none;
       background:rgba(255,255,255,0.82); backdrop-filter:blur(12px);
