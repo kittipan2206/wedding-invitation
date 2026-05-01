@@ -257,6 +257,10 @@
 
         /* ── QR Code (fixed bottom-right) ── */
         #display-qr-wrap {
+            position: fixed;
+            bottom: clamp(16px, 3vh, 32px);
+            right: clamp(16px, 2vw, 36px);
+            z-index: 20;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -266,9 +270,8 @@
             -webkit-backdrop-filter: blur(12px);
             border: var(--border-glass);
             border-radius: 16px;
-            padding: clamp(6px, 1vh, 12px);
+            padding: clamp(8px, 1.2vh, 14px);
             box-shadow: var(--shadow-card);
-            flex-shrink: 0;
         }
 
         #display-qr-wrap img {
@@ -427,15 +430,9 @@
         /* ── Footer ── */
         .display-footer {
             display: grid;
-            grid-template-columns: 1fr auto auto;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
             gap: 16px;
-        }
-
-        .display-footer-right {
-            display: flex;
-            align-items: center;
-            gap: clamp(10px, 1.5vw, 20px);
         }
 
         .display-subtitle {
@@ -618,14 +615,14 @@
         <footer class="display-footer">
             <p class="display-subtitle">ฝากคำอวยพรให้นนท์ &amp; เมย์</p>
             <div id="display-pages" class="display-pages"></div>
-            <div class="display-footer-right">
-                <p id="display-updated" class="display-updated"></p>
-                <div id="display-qr-wrap">
-                    <img id="display-qr" src="" alt="QR Code ฝากคำอวยพร" />
-                    <p class="qr-label">ฝากคำอวยพร</p>
-                </div>
-            </div>
+            <p id="display-updated" class="display-updated"></p>
         </footer>
+    </div>
+
+    <!-- QR Code: links to guestbook deep link -->
+    <div id="display-qr-wrap">
+        <img id="display-qr" src="" alt="QR Code ฝากคำอวยพร" />
+        <p class="qr-label">ฝากคำอวยพร</p>
     </div>
 </body>
 
