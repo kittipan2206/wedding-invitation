@@ -39,7 +39,12 @@
 .gallery-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(249,200,212,0.28), rgba(201,184,232,0.22), rgba(184,216,248,0.22));
+  background: linear-gradient(
+    135deg,
+    rgba(249, 200, 212, 0.28),
+    rgba(201, 184, 232, 0.22),
+    rgba(184, 216, 248, 0.22)
+  );
   border-radius: var(--radius-md);
   border: 1.5px dashed rgba(201, 184, 232, 0.5);
   display: flex;
@@ -49,7 +54,12 @@
 }
 
 .gallery-placeholder:hover {
-  background: linear-gradient(135deg, rgba(249,200,212,0.38), rgba(201,184,232,0.32), rgba(184,216,248,0.32));
+  background: linear-gradient(
+    135deg,
+    rgba(249, 200, 212, 0.38),
+    rgba(201, 184, 232, 0.32),
+    rgba(184, 216, 248, 0.32)
+  );
 }
 
 .gallery-note {
@@ -57,6 +67,187 @@
   color: var(--color-muted);
   letter-spacing: 0.04em;
   font-style: italic;
+}
+
+/* Footer row under the grid */
+.gallery-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.gallery-view-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--color-text);
+  text-decoration: none;
+  padding: 8px 22px;
+  border: 1.5px solid rgba(201, 184, 232, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.gallery-view-all-btn:hover {
+  border-color: var(--color-lavender);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* Live photo items (replace placeholders) */
+.gallery-item {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  height: 100%;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.gallery-item img.loading {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.gallery-item img:not(.loading) {
+  opacity: 1;
+}
+.gallery-item:hover img {
+  transform: scale(1.04);
+}
+
+.gallery-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.45) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+}
+.gallery-item:hover .gallery-item-overlay {
+  opacity: 1;
+}
+
+.gallery-item-caption {
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Loading / empty state */
+.gallery-status {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--color-muted);
+  opacity: 0.6;
+}
+
+/* ── Lightbox ───────────────────────────────── */
+#lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(0, 0, 0, 0.88);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#lightbox.lightbox--open {
+  display: flex;
+}
+
+#lightbox-img {
+  max-width: min(90vw, 900px);
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 10px;
+  display: block;
+}
+
+#lightbox-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+#lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#lightbox-prev,
+#lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+#lightbox-prev:hover,
+#lightbox-next:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+#lightbox-prev:disabled,
+#lightbox-next:disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+#lightbox-prev {
+  left: clamp(10px, 2vw, 24px);
+}
+#lightbox-next {
+  right: clamp(10px, 2vw, 24px);
+}
+
+.lightbox-info {
+  margin-top: 14px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+}
+.lightbox-info p {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+#lightbox-counter {
+  font-size: 12px;
+  opacity: 0.55;
 }
 
 @media (max-width: 480px) {

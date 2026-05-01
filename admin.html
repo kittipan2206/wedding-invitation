@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin — จัดการรูปภาพ</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap"
+        rel="stylesheet" />
+    <script type="module" src="/src/js/admin.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --color-pink: #F9C8D4;
+            --color-lavender: #C9B8E8;
+            --color-text: #2e2a28;
+            --color-muted: #8A7F7A;
+            --glass-bg: rgba(255, 255, 255, 0.82);
+            --border-glass: 1.5px solid rgba(255, 255, 255, 0.9);
+            --shadow-card: 0 4px 36px rgba(0, 0, 0, 0.06);
+            --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-sans: 'DM Sans', system-ui, sans-serif;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            font-family: var(--font-sans);
+            color: var(--color-text);
+            -webkit-font-smoothing: antialiased;
+            background: linear-gradient(135deg, #fff8fa 0%, #fdf0ff 50%, #f0f8ff 100%);
+        }
+
+        /* ── Auth Screen ── */
+        #auth-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .auth-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--border-glass);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.09);
+            border-radius: var(--radius-lg);
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .auth-title {
+            font-family: var(--font-serif);
+            font-size: 28px;
+            font-weight: 400;
+            font-style: italic;
+            margin-bottom: 6px;
+        }
+
+        .auth-sub {
+            font-size: 13px;
+            color: var(--color-muted);
+            margin-bottom: 32px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid rgba(201, 184, 232, 0.4);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-family: var(--font-sans);
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--color-text);
+            outline: none;
+            text-align: center;
+            letter-spacing: 0.2em;
+            margin-bottom: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .auth-input:focus {
+            border-color: var(--color-lavender);
+        }
+
+        .auth-error {
+            font-size: 13px;
+            color: #c8888a;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
+            border: none;
+            border-radius: var(--radius-md);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.88;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ── Admin Screen ── */
+        #admin-screen {
+            display: none;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: clamp(24px, 4vw, 48px) clamp(16px, 4vw, 48px) 80px;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .admin-title {
+            font-family: var(--font-serif);
+            font-size: clamp(22px, 3vw, 32px);
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .back-link {
+            font-size: 13px;
+            color: var(--color-muted);
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1.5px solid rgba(201, 184, 232, 0.4);
+            border-radius: 999px;
+            background: var(--glass-bg);
+            transition: border-color 0.2s;
+        }
+
+        .back-link:hover {
+            border-color: var(--color-lavender);
+            color: var(--color-text);
+        }
+
+        /* ── Add Photo Form ── */
+        .add-form-section {
+            background: var(--glass-bg);
+            border: var(--border-glass);
+            box-shadow: var(--shadow-card);
+            border-radius: var(--radius-lg);
+            padding: 28px 28px 24px;
+            margin-bottom: 28px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--color-muted);
+            margin-bottom: 20px;
+        }
+
+        .add-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 560px) {
+            .add-form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .add-form-url {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--color-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid rgba(201, 184, 232, 0.35);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: var(--font-sans);
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--color-text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: var(--color-lavender);
+        }
+
+        .url-preview-wrap {
+            grid-column: 1 / -1;
+            display: none;
+        }
+
+        .url-preview-wrap.visible {
+            display: block;
+        }
+
+        #url-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: var(--border-glass);
+        }
+
+        .add-form-footer {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
+
+        .btn-add {
+            padding: 10px 28px;
+            background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
+            border: none;
+            border-radius: 999px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+
+        .btn-add:hover {
+            opacity: 0.88;
+        }
+
+        .btn-add:active {
+            transform: scale(0.97);
+        }
+
+        .btn-add:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ── Photo List ── */
+        .photo-list-section {
+            background: var(--glass-bg);
+            border: var(--border-glass);
+            box-shadow: var(--shadow-card);
+            border-radius: var(--radius-lg);
+            padding: 24px 24px 12px;
+        }
+
+        .photo-list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        #photo-count {
+            font-size: 13px;
+            color: var(--color-muted);
+        }
+
+        .refresh-btn {
+            font-size: 13px;
+            color: var(--color-lavender);
+            background: none;
+            border: 1.5px solid rgba(201, 184, 232, 0.4);
+            border-radius: 999px;
+            padding: 5px 14px;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            transition: background 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(201, 184, 232, 0.12);
+        }
+
+        #photo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .admin-status {
+            text-align: center;
+            padding: 32px;
+            font-family: var(--font-serif);
+            font-size: 18px;
+            font-style: italic;
+            color: var(--color-muted);
+            opacity: 0.6;
+        }
+
+        /* ── Photo Item ── */
+        .photo-item {
+            display: grid;
+            grid-template-columns: 72px 1fr auto;
+            gap: 14px;
+            align-items: center;
+            padding: 12px 14px;
+            border: 1.5px solid rgba(201, 184, 232, 0.2);
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.55);
+            transition: opacity 0.2s, border-color 0.2s;
+        }
+
+        .photo-item--hidden {
+            opacity: 0.45;
+        }
+
+        .photo-item:hover {
+            border-color: rgba(201, 184, 232, 0.45);
+        }
+
+        .photo-thumb {
+            width: 72px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: rgba(201, 184, 232, 0.2);
+            display: block;
+        }
+
+        .photo-thumb-placeholder {
+            width: 72px;
+            height: 56px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(249, 200, 212, 0.3), rgba(201, 184, 232, 0.25));
+            border: 1.5px dashed rgba(201, 184, 232, 0.4);
+        }
+
+        .photo-info {
+            min-width: 0;
+        }
+
+        .photo-caption-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 3px;
+        }
+
+        .photo-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .photo-category-badge {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            padding: 2px 9px;
+            border-radius: 999px;
+            background: rgba(201, 184, 232, 0.22);
+            color: var(--color-muted);
+            white-space: nowrap;
+        }
+
+        .photo-order {
+            font-size: 11px;
+            color: var(--color-muted);
+            opacity: 0.6;
+        }
+
+        .photo-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1.5px solid rgba(201, 184, 232, 0.3);
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--color-muted);
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+
+        .action-btn:hover {
+            background: rgba(201, 184, 232, 0.18);
+            border-color: var(--color-lavender);
+            color: var(--color-text);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.25;
+            pointer-events: none;
+        }
+
+        .action-btn--del:hover {
+            background: rgba(200, 136, 138, 0.14);
+            border-color: #c8888a;
+            color: #c8888a;
+        }
+
+        .action-btn--vis.active {
+            background: rgba(201, 184, 232, 0.2);
+            color: var(--color-text);
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(16px);
+            background: rgba(46, 42, 40, 0.9);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 999px;
+            font-size: 13px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 999;
+            white-space: nowrap;
+        }
+
+        .toast.toast--show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Auth Gate -->
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h1 class="auth-title">จัดการรูปภาพ</h1>
+            <p class="auth-sub">นนท์ &amp; เมย์</p>
+            <form id="auth-form" novalidate>
+                <input class="auth-input" type="password" id="admin-password" placeholder="รหัสผ่าน"
+                    autocomplete="current-password" />
+                <p class="auth-error" id="auth-error">รหัสผ่านไม่ถูกต้อง</p>
+                <button type="submit" class="btn-primary">เข้าสู่ระบบ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-screen">
+        <div class="admin-header">
+            <h1 class="admin-title">จัดการรูปภาพ</h1>
+            <a href="/gallery.html" class="back-link">ดู Gallery →</a>
+        </div>
+
+        <!-- Add Photo -->
+        <div class="add-form-section">
+            <p class="section-title">เพิ่มรูปใหม่</p>
+            <form id="add-photo-form" novalidate>
+                <div class="add-form-grid">
+                    <div class="add-form-url">
+                        <label class="form-label" for="new-url">URL รูปภาพ</label>
+                        <input class="form-input" type="url" id="new-url"
+                            placeholder="https://lh3.googleusercontent.com/..." />
+                    </div>
+                    <div class="url-preview-wrap" id="url-preview-wrap">
+                        <img id="url-preview" src="" alt="preview" />
+                    </div>
+                    <div>
+                        <label class="form-label" for="new-caption">Caption</label>
+                        <input class="form-input" type="text" id="new-caption" placeholder="คำบรรยายรูป (ถ้ามี)" />
+                    </div>
+                    <div>
+                        <label class="form-label" for="new-category">หมวดหมู่</label>
+                        <select class="form-select" id="new-category">
+                            <option value="pre-wedding">Pre-wedding</option>
+                            <option value="wedding">วันงาน</option>
+                            <option value="">ไม่มีหมวด</option>
+                        </select>
+                    </div>
+                    <div class="add-form-footer">
+                        <button type="submit" class="btn-add" id="btn-add-photo">+ เพิ่มรูป</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Photo List -->
+        <div class="photo-list-section">
+            <div class="photo-list-header">
+                <p class="section-title" style="margin-bottom:0">รูปภาพทั้งหมด</p>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <span id="photo-count"></span>
+                    <button class="refresh-btn" id="refresh-btn">↻ รีเฟรช</button>
+                </div>
+            </div>
+            <div id="photo-list">
+                <p class="admin-status">กำลังโหลด…</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+</body>
+
+</html>
