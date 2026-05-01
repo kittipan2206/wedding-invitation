@@ -13,6 +13,7 @@ import { initTypewriter } from "./js/typewriter.js";
 import { initGuestbook } from "./js/guestbook.js";
 import { initParallax } from "./js/parallax.js";
 import { initGalleryPreview } from "./js/gallery.js";
+import { fetchConfig, injectConfig } from "./js/config.js";
 
 function afterEnvelope() {
   initPetals();
@@ -21,8 +22,13 @@ function afterEnvelope() {
   initTypewriter(".hero-date", { startDelay: 400, charDelay: 55 });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Hide loader once fonts are ready (covers both first-visit and refresh cases)
+document.addEventListener("DOMContentLoaded", async () => {
+  // Fetch remote config first — injects dynamic content, sets window.__weddingConfig
+  // Falls back to defaults silently if GAS is unreachable
+  const cfg = await fetchConfig();
+  injectConfig(cfg);
+
+  // Hide loader once fonts are ready
   document.fonts.ready.then(() => {
     const loader = document.getElementById("page-loader");
     if (loader) loader.classList.add("loader--hidden");

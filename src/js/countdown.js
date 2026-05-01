@@ -1,5 +1,8 @@
 export function initCountdown() {
-  const wedding = new Date('2027-03-15T11:00:00+07:00');
+  const cfg = window.__weddingConfig;
+  const isoDate = cfg?.event_date_iso || '2026-03-15';
+  const time = cfg?.event_time_ceremony || '11:00';
+  const wedding = new Date(`${isoDate}T${time}:00+07:00`);
   const pad = n => String(n).padStart(2, '0');
 
   const ids = ['cd-days', 'cd-hours', 'cd-mins', 'cd-secs'];
