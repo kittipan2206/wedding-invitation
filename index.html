@@ -411,8 +411,8 @@
         <form id="rsvp-form" novalidate>
           <div class="form-row">
             <label class="form-label" for="guest-name">ชื่อของท่าน <span style="color:#c8888a">*</span></label>
-            <input class="form-input" type="text" id="guest-name" name="ชื่อ" placeholder="กรุณาใส่ชื่อ-นามสกุล"
-              autocomplete="name" />
+            <input class="form-input" type="text" id="guest-name" name="ชื่อ"
+              placeholder="กรุณาใส่ชื่อเล่นหรือชื่อจริงก็ได้" autocomplete="name" />
             <p class="field-error" id="err-name">กรุณากรอกชื่อของท่าน</p>
           </div>
           <div class="form-row">
@@ -447,13 +447,14 @@
             <p class="field-error" id="err-attend">กรุณาเลือกการเข้าร่วมงาน</p>
           </div>
           <div class="form-row">
-            <label class="form-label" for="guest-contact">เบอร์โทร / Line ID <span
+            <label class="form-label" for="guest-contact">เบอร์โทร / Line ID / Facebook <span
                 class="form-label-optional">(ไม่บังคับ)</span></label>
-            <input class="form-input" type="text" id="guest-contact" name="ติดต่อ" placeholder="เบอร์โทรหรือ Line ID"
-              autocomplete="tel" />
+            <input class="form-input" type="text" id="guest-contact" name="ติดต่อ"
+              placeholder="เบอร์โทรหรือ Line ID หรือ Facebook" autocomplete="tel" />
           </div>
           <div class="form-row">
-            <label class="form-label" for="guest-note">ข้อความถึงเจ้าบ่าวเจ้าสาว</label>
+            <label class="form-label" for="guest-note">ข้อความถึงเจ้าบ่าวเจ้าสาว <span
+                class="form-label-optional">(ไม่บังคับ)</span></label>
             <textarea class="form-textarea" id="guest-note" name="ข้อความ" placeholder="ฝากคำอวยพร หรือข้อความพิเศษ…"
               maxlength="300"></textarea>
             <p class="char-counter" id="rsvp-char-counter">0 / 300 ตัวอักษร</p>
@@ -489,7 +490,8 @@
         <form id="guestbook-form" novalidate>
           <div class="form-row">
             <label class="form-label" for="gb-name">ชื่อของท่าน <span style="color:#c8888a">*</span></label>
-            <input class="form-input" type="text" id="gb-name" placeholder="ชื่อ-นามสกุล" autocomplete="name" />
+            <input class="form-input" type="text" id="gb-name" placeholder="ใส่ชื่อที่ต้องการให้แสดง"
+              autocomplete="name" />
             <p class="field-error" id="gb-err-name">กรุณากรอกชื่อของท่าน</p>
           </div>
           <div class="form-row">
