@@ -1,15 +1,6 @@
-const ENVELOPE_KEY = "envelope_opened";
-
 export function initEnvelope(onComplete) {
   const overlay = document.getElementById("envelope-overlay");
   if (!overlay) {
-    onComplete();
-    return;
-  }
-
-  // If already opened this session, skip animation immediately
-  if (sessionStorage.getItem(ENVELOPE_KEY) === "1") {
-    overlay.style.display = "none";
     onComplete();
     return;
   }
@@ -36,7 +27,6 @@ export function initEnvelope(onComplete) {
       overlay.style.animation = "overlayFadeOut 0.5s ease forwards";
       setTimeout(() => {
         overlay.style.display = "none";
-        sessionStorage.setItem(ENVELOPE_KEY, "1");
         onComplete();
       }, 500);
     }, 1200);
