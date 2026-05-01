@@ -15,7 +15,9 @@ let tabLoaded = {};
 // ── Bootstrap config (inject names into auth screen / topbar) ─────────────────
 async function bootstrapConfig() {
   try {
-    const res = await fetch(`${SHEET_URL}?type=config&_t=${Date.now()}`, { redirect: "follow" });
+    const res = await fetch(`${SHEET_URL}?type=config&_t=${Date.now()}`, {
+      redirect: "follow",
+    });
     if (!res.ok) return;
     const data = await res.json();
     if (!data || typeof data !== "object") return;
@@ -26,7 +28,9 @@ async function bootstrapConfig() {
     if (authSub) authSub.textContent = couple;
     const adminBrand = document.getElementById("admin-brand");
     if (adminBrand) adminBrand.textContent = `Admin — ${couple}`;
-  } catch { /* silent fail — names just stay as default */ }
+  } catch {
+    /* silent fail — names just stay as default */
+  }
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -64,10 +68,12 @@ function initAuth() {
 // ── Tab Navigation ────────────────────────────────────────────────────────────
 function showTab(name) {
   // P4-2: Warn if event tab has unsaved changes
-  if (activeTab === 'event' && name !== 'event') {
-    const unsaved = document.getElementById('ev-unsaved');
-    if (unsaved?.classList.contains('visible')) {
-      const leave = confirm('ยังมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก ออกจากหน้านี้?');
+  if (activeTab === "event" && name !== "event") {
+    const unsaved = document.getElementById("ev-unsaved");
+    if (unsaved?.classList.contains("visible")) {
+      const leave = confirm(
+        "ยังมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก ออกจากหน้านี้?",
+      );
       if (!leave) return;
     }
   }
@@ -217,13 +223,13 @@ const EV_FIELDS = {
 };
 
 async function loadEventConfig() {
-  const retryEl = document.getElementById('ev-error');
-  if (retryEl) retryEl.style.display = 'none';
+  const retryEl = document.getElementById("ev-error");
+  if (retryEl) retryEl.style.display = "none";
   try {
-    cfgData = await apiGet({ type: 'config' });
+    cfgData = await apiGet({ type: "config" });
   } catch {
-    if (retryEl) retryEl.style.display = 'flex';
-    showToast('โหลด config ไม่ได้', 'error');
+    if (retryEl) retryEl.style.display = "flex";
+    showToast("โหลด config ไม่ได้", "error");
     cfgData = {};
     return;
   }
@@ -281,20 +287,20 @@ function initEventTab() {
 // ── Gallery Tab ───────────────────────────────────────────────────────────────
 async function loadPhotos() {
   setListContent('<p class="admin-status">กำลังโหลด…</p>');
-  const retryEl = document.getElementById('gallery-error');
-  if (retryEl) retryEl.style.display = 'none';
+  const retryEl = document.getElementById("gallery-error");
+  if (retryEl) retryEl.style.display = "none";
   try {
-    const data = await apiGet({ type: 'photos_all' });
+    const data = await apiGet({ type: "photos_all" });
     photos = Array.isArray(data)
       ? data.filter(
-          (p) => p && typeof p.url === 'string' && p.url.startsWith('http'),
+          (p) => p && typeof p.url === "string" && p.url.startsWith("http"),
         )
       : [];
   } catch {
     photos = [];
-    setListContent('');
-    if (retryEl) retryEl.style.display = 'flex';
-    showToast('โหลดรูปไม่ได้', 'error');
+    setListContent("");
+    if (retryEl) retryEl.style.display = "flex";
+    showToast("โหลดรูปไม่ได้", "error");
     return;
   }
   renderPhotoList();
@@ -481,14 +487,14 @@ function eyeOffIcon() {
 async function loadRsvp() {
   document.getElementById("rsvp-loading").style.display = "block";
   document.getElementById("rsvp-empty").style.display = "none";
-  const retryEl = document.getElementById('rsvp-error');
-  if (retryEl) retryEl.style.display = 'none';
+  const retryEl = document.getElementById("rsvp-error");
+  if (retryEl) retryEl.style.display = "none";
   try {
-    rsvpData = await apiGet({ type: 'rsvp_all' });
+    rsvpData = await apiGet({ type: "rsvp_all" });
     if (!Array.isArray(rsvpData)) rsvpData = [];
   } catch {
     rsvpData = [];
-    if (retryEl) retryEl.style.display = 'flex';
+    if (retryEl) retryEl.style.display = "flex";
     showToast("โหลด RSVP ไม่ได้", "error");
   }
   document.getElementById("rsvp-loading").style.display = "none";
@@ -598,14 +604,14 @@ function initRsvpTab() {
 async function loadGuestbook() {
   document.getElementById("guestbook-loading").style.display = "block";
   document.getElementById("guestbook-empty").style.display = "none";
-  const retryEl = document.getElementById('guestbook-error');
-  if (retryEl) retryEl.style.display = 'none';
+  const retryEl = document.getElementById("guestbook-error");
+  if (retryEl) retryEl.style.display = "none";
   try {
-    gbData = await apiGet({ type: 'guestbook_all' });
+    gbData = await apiGet({ type: "guestbook_all" });
     if (!Array.isArray(gbData)) gbData = [];
   } catch {
     gbData = [];
-    if (retryEl) retryEl.style.display = 'flex';
+    if (retryEl) retryEl.style.display = "flex";
     showToast("โหลด Guestbook ไม่ได้", "error");
   }
   document.getElementById("guestbook-loading").style.display = "none";

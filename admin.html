@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,30 +8,39 @@
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap"
+    rel="stylesheet" />
   <script type="module" src="/src/js/admin.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --pink:       #F9C8D4;
-      --lavender:   #C9B8E8;
-      --mint:       #B8E8D8;
-      --peach:      #F8D8B8;
-      --text:       #2e2a28;
-      --muted:      #8A7F7A;
-      --glass:      rgba(255,255,255,0.82);
-      --glass-border: 1.5px solid rgba(255,255,255,0.9);
-      --shadow:     0 4px 36px rgba(0,0,0,0.06);
-      --radius-md:  14px;
-      --radius-lg:  20px;
-      --serif:      'Cormorant Garamond', Georgia, serif;
-      --sans:       'DM Sans', system-ui, sans-serif;
-      --sidebar-w:  220px;
-      --bnav-h:     64px;
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    html, body {
+    :root {
+      --pink: #F9C8D4;
+      --lavender: #C9B8E8;
+      --mint: #B8E8D8;
+      --peach: #F8D8B8;
+      --text: #2e2a28;
+      --muted: #8A7F7A;
+      --glass: rgba(255, 255, 255, 0.82);
+      --glass-border: 1.5px solid rgba(255, 255, 255, 0.9);
+      --shadow: 0 4px 36px rgba(0, 0, 0, 0.06);
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+      --sidebar-w: 220px;
+      --bnav-h: 64px;
+    }
+
+    html,
+    body {
       min-height: 100%;
       font-family: var(--sans);
       color: var(--text);
@@ -46,41 +56,88 @@
       justify-content: center;
       padding: 24px;
     }
+
     .auth-card {
       background: var(--glass);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: var(--glass-border);
-      box-shadow: 0 24px 80px rgba(0,0,0,0.09);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.09);
       border-radius: var(--radius-lg);
       padding: 48px 40px;
       width: 100%;
       max-width: 380px;
       text-align: center;
     }
-    .auth-title { font-family: var(--serif); font-size: 28px; font-weight: 400; font-style: italic; margin-bottom: 6px; }
-    .auth-sub   { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+
+    .auth-title {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 400;
+      font-style: italic;
+      margin-bottom: 6px;
+    }
+
+    .auth-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
     .auth-input {
-      width: 100%; padding: 12px 16px;
-      border: 1.5px solid rgba(201,184,232,0.4); border-radius: var(--radius-md);
-      font-size: 15px; font-family: var(--sans); background: rgba(255,255,255,0.7);
-      color: var(--text); outline: none; text-align: center; letter-spacing: 0.2em; margin-bottom: 14px;
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid rgba(201, 184, 232, 0.4);
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-family: var(--sans);
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--text);
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.2em;
+      margin-bottom: 14px;
       transition: border-color 0.2s;
     }
-    .auth-input:focus { border-color: var(--lavender); }
-    .auth-error { font-size: 13px; color: #c8888a; margin-bottom: 10px; display: none; }
-    .btn-primary {
-      width: 100%; padding: 12px;
-      background: linear-gradient(135deg, var(--pink), var(--lavender));
-      border: none; border-radius: var(--radius-md);
-      color: #fff; font-size: 15px; font-weight: 600; font-family: var(--sans);
-      cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+
+    .auth-input:focus {
+      border-color: var(--lavender);
     }
-    .btn-primary:hover { opacity: 0.88; }
-    .btn-primary:active { transform: scale(0.97); }
+
+    .auth-error {
+      font-size: 13px;
+      color: #c8888a;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--pink), var(--lavender));
+      border: none;
+      border-radius: var(--radius-md);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: var(--sans);
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.97);
+    }
 
     /* ── Admin Layout ────────────────────────────────────────── */
-    #admin-screen { display: none; min-height: 100vh; }
+    #admin-screen {
+      display: none;
+      min-height: 100vh;
+    }
 
     .admin-topbar {
       display: none;
@@ -91,9 +148,16 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: var(--glass-border);
-      position: sticky; top: 0; z-index: 50;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
-    .admin-brand { font-family: var(--serif); font-size: 18px; font-style: italic; }
+
+    .admin-brand {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-style: italic;
+    }
 
     .admin-layout {
       display: flex;
@@ -117,65 +181,146 @@
       overflow-y: auto;
       flex-shrink: 0;
     }
+
     .sidebar-logo {
       font-family: var(--serif);
       font-size: 17px;
       font-style: italic;
       color: var(--text);
       padding: 0 10px 24px;
-      border-bottom: 1px solid rgba(201,184,232,0.2);
+      border-bottom: 1px solid rgba(201, 184, 232, 0.2);
       margin-bottom: 16px;
     }
-    .sidebar-logo span { display: block; font-size: 11px; font-style: normal; font-family: var(--sans); color: var(--muted); margin-top: 2px; letter-spacing: 0.04em; }
 
-    .tab-nav { list-style: none; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .sidebar-logo span {
+      display: block;
+      font-size: 11px;
+      font-style: normal;
+      font-family: var(--sans);
+      color: var(--muted);
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    .tab-nav {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
     .tab-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px; border-radius: 12px; cursor: pointer;
-      color: var(--muted); font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
       transition: background 0.18s, color 0.18s;
       user-select: none;
     }
-    .tab-item:hover { background: rgba(201,184,232,0.12); color: var(--text); }
-    .tab-item.active {
-      background: linear-gradient(135deg, rgba(249,200,212,0.28), rgba(201,184,232,0.28));
-      color: var(--text); font-weight: 500;
-    }
-    .tab-item svg { flex-shrink: 0; opacity: 0.7; }
-    .tab-item.active svg { opacity: 1; }
 
-    .sidebar-footer { padding-top: 16px; border-top: 1px solid rgba(201,184,232,0.2); }
-    .sidebar-back {
-      display: block; text-align: center; font-size: 12px; color: var(--muted);
-      text-decoration: none; padding: 8px; border-radius: 10px;
-      transition: background 0.15s, color 0.15s; margin-bottom: 6px;
+    .tab-item:hover {
+      background: rgba(201, 184, 232, 0.12);
+      color: var(--text);
     }
-    .sidebar-back:hover { background: rgba(201,184,232,0.12); color: var(--text); }
+
+    .tab-item.active {
+      background: linear-gradient(135deg, rgba(249, 200, 212, 0.28), rgba(201, 184, 232, 0.28));
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .tab-item svg {
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .tab-item.active svg {
+      opacity: 1;
+    }
+
+    .sidebar-footer {
+      padding-top: 16px;
+      border-top: 1px solid rgba(201, 184, 232, 0.2);
+    }
+
+    .sidebar-back {
+      display: block;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px;
+      border-radius: 10px;
+      transition: background 0.15s, color 0.15s;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-back:hover {
+      background: rgba(201, 184, 232, 0.12);
+      color: var(--text);
+    }
+
     .sidebar-logout {
-      width: 100%; padding: 8px; background: none;
-      border: 1.5px solid rgba(201,184,232,0.35); border-radius: 10px;
-      font-size: 12px; color: var(--muted); cursor: pointer; font-family: var(--sans);
+      width: 100%;
+      padding: 8px;
+      background: none;
+      border: 1.5px solid rgba(201, 184, 232, 0.35);
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--sans);
       transition: background 0.15s, color 0.15s;
     }
-    .sidebar-logout:hover { background: rgba(200,136,138,0.1); border-color: #c8888a; color: #c8888a; }
+
+    .sidebar-logout:hover {
+      background: rgba(200, 136, 138, 0.1);
+      border-color: #c8888a;
+      color: #c8888a;
+    }
 
     /* ── Main Content ────────────────────────────────────────── */
     .admin-content {
       flex: 1;
-      padding: clamp(24px,4vw,48px) clamp(16px,4vw,48px) 80px;
+      padding: clamp(24px, 4vw, 48px) clamp(16px, 4vw, 48px) 80px;
       min-width: 0;
     }
 
-    .tab-panel { display: block; }
-    .tab-panel--hidden { display: none; }
+    .tab-panel {
+      display: block;
+    }
+
+    .tab-panel--hidden {
+      display: none;
+    }
 
     /* ── Panel Header ────────────────────────────────────────── */
     .panel-header {
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 12px; margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
     }
-    .panel-title { font-family: var(--serif); font-size: clamp(22px,3vw,30px); font-weight: 400; font-style: italic; }
-    .panel-desc { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    .panel-title {
+      font-family: var(--serif);
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .panel-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
 
     /* ── Cards ───────────────────────────────────────────────── */
     .form-card {
@@ -188,643 +333,1174 @@
       padding: 28px;
       margin-bottom: 20px;
     }
+
     .card-title {
-      font-size: 13px; font-weight: 600; letter-spacing: 0.05em;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
     }
 
     /* ── Form Elements ───────────────────────────────────────── */
-    .field-group { margin-bottom: 18px; }
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field-group {
+      margin-bottom: 18px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
     .form-label {
-      display: block; font-size: 12px; font-weight: 600;
-      letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
     }
-    .form-input, .form-select, .form-textarea {
-      width: 100%; padding: 10px 14px;
-      border: 1.5px solid rgba(201,184,232,0.35); border-radius: 10px;
-      font-size: 14px; font-family: var(--sans); background: rgba(255,255,255,0.7);
-      color: var(--text); outline: none; transition: border-color 0.2s;
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid rgba(201, 184, 232, 0.35);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: var(--sans);
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
     }
-    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--lavender); }
-    .form-textarea { resize: vertical; min-height: 80px; }
-    .form-input.error, .form-textarea.error { border-color: #c8888a; }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--lavender);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-input.error,
+    .form-textarea.error {
+      border-color: #c8888a;
+    }
 
     .form-actions {
-      display: flex; align-items: center; justify-content: flex-end;
-      gap: 12px; margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 8px;
     }
+
     .unsaved-badge {
-      font-size: 12px; color: #b07a30; background: rgba(248,216,184,0.5);
-      padding: 4px 10px; border-radius: 999px; display: none;
+      font-size: 12px;
+      color: #b07a30;
+      background: rgba(248, 216, 184, 0.5);
+      padding: 4px 10px;
+      border-radius: 999px;
+      display: none;
     }
-    .unsaved-badge.visible { display: block; }
+
+    .unsaved-badge.visible {
+      display: block;
+    }
 
     /* ── Buttons ─────────────────────────────────────────────── */
     .btn-save {
       padding: 10px 28px;
       background: linear-gradient(135deg, var(--pink), var(--lavender));
-      border: none; border-radius: 999px;
-      color: #fff; font-size: 14px; font-weight: 600; font-family: var(--sans);
-      cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+      border: none;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--sans);
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
     }
-    .btn-save:hover { opacity: 0.88; }
-    .btn-save:active { transform: scale(0.97); }
-    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-save:hover {
+      opacity: 0.88;
+    }
+
+    .btn-save:active {
+      transform: scale(0.97);
+    }
+
+    .btn-save:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
     .btn-outline {
-      padding: 9px 20px; background: transparent;
-      border: 1.5px solid rgba(201,184,232,0.5); border-radius: 999px;
-      font-size: 13px; color: var(--muted); font-family: var(--sans);
-      cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+      padding: 9px 20px;
+      background: transparent;
+      border: 1.5px solid rgba(201, 184, 232, 0.5);
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: var(--sans);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
-    .btn-outline:hover { background: rgba(201,184,232,0.12); border-color: var(--lavender); color: var(--text); }
+
+    .btn-outline:hover {
+      background: rgba(201, 184, 232, 0.12);
+      border-color: var(--lavender);
+      color: var(--text);
+    }
 
     .btn-danger {
-      padding: 6px 14px; background: transparent;
-      border: 1.5px solid rgba(200,136,138,0.4); border-radius: 8px;
-      font-size: 13px; color: #c8888a; font-family: var(--sans);
-      cursor: pointer; transition: background 0.15s;
+      padding: 6px 14px;
+      background: transparent;
+      border: 1.5px solid rgba(200, 136, 138, 0.4);
+      border-radius: 8px;
+      font-size: 13px;
+      color: #c8888a;
+      font-family: var(--sans);
+      cursor: pointer;
+      transition: background 0.15s;
     }
-    .btn-danger:hover { background: rgba(200,136,138,0.1); }
+
+    .btn-danger:hover {
+      background: rgba(200, 136, 138, 0.1);
+    }
 
     .btn-icon {
-      width: 32px; height: 32px; border-radius: 8px;
-      border: 1.5px solid rgba(201,184,232,0.3); background: transparent;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-size: 14px; color: var(--muted); transition: background 0.15s, border-color 0.15s, color 0.15s;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(201, 184, 232, 0.3);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--muted);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
-    .btn-icon:hover { background: rgba(201,184,232,0.18); border-color: var(--lavender); color: var(--text); }
-    .btn-icon:disabled { opacity: 0.25; pointer-events: none; }
-    .btn-icon--del:hover { background: rgba(200,136,138,0.14); border-color: #c8888a; color: #c8888a; }
-    .btn-icon--vis.active { background: rgba(201,184,232,0.2); color: var(--text); }
+
+    .btn-icon:hover {
+      background: rgba(201, 184, 232, 0.18);
+      border-color: var(--lavender);
+      color: var(--text);
+    }
+
+    .btn-icon:disabled {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    .btn-icon--del:hover {
+      background: rgba(200, 136, 138, 0.14);
+      border-color: #c8888a;
+      color: #c8888a;
+    }
+
+    .btn-icon--vis.active {
+      background: rgba(201, 184, 232, 0.2);
+      color: var(--text);
+    }
 
     /* ── Summary Cards (RSVP) ────────────────────────────────── */
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px,1fr));
-      gap: 14px; margin-bottom: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
     }
+
     .summary-card {
-      background: var(--glass); border: var(--glass-border); box-shadow: var(--shadow);
-      border-radius: var(--radius-md); padding: 20px 16px; text-align: center;
+      background: var(--glass);
+      border: var(--glass-border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius-md);
+      padding: 20px 16px;
+      text-align: center;
     }
-    .summary-num { display: block; font-size: 32px; font-weight: 600; line-height: 1.1; }
-    .summary-label { font-size: 12px; color: var(--muted); margin-top: 4px; display: block; }
-    .summary-card--coming .summary-num   { color: #4CAF50; }
-    .summary-card--notcoming .summary-num { color: #c8888a; }
-    .summary-card--guests .summary-num   { color: #7b5ea7; }
+
+    .summary-num {
+      display: block;
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+
+    .summary-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      display: block;
+    }
+
+    .summary-card--coming .summary-num {
+      color: #4CAF50;
+    }
+
+    .summary-card--notcoming .summary-num {
+      color: #c8888a;
+    }
+
+    .summary-card--guests .summary-num {
+      color: #7b5ea7;
+    }
 
     /* ── Table ───────────────────────────────────────────────── */
     .table-card {
-      background: var(--glass); border: var(--glass-border); box-shadow: var(--shadow);
-      border-radius: var(--radius-lg); overflow: hidden;
+      background: var(--glass);
+      border: var(--glass-border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
     }
+
     .table-controls {
-      display: flex; gap: 10px; padding: 16px 20px;
-      border-bottom: 1px solid rgba(201,184,232,0.15); flex-wrap: wrap;
+      display: flex;
+      gap: 10px;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(201, 184, 232, 0.15);
+      flex-wrap: wrap;
     }
-    .table-search { flex: 1; min-width: 140px; }
-    .table-filter { width: 140px; }
-    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    .table-search {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .table-filter {
+      width: 140px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
     .data-table th {
-      padding: 10px 16px; text-align: left; background: rgba(255,255,255,0.5);
-      font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
-      color: var(--muted); white-space: nowrap; border-bottom: 1px solid rgba(201,184,232,0.15);
+      padding: 10px 16px;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.5);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(201, 184, 232, 0.15);
     }
+
     .data-table td {
-      padding: 11px 16px; border-bottom: 1px solid rgba(201,184,232,0.08);
-      vertical-align: middle; max-width: 220px;
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(201, 184, 232, 0.08);
+      vertical-align: middle;
+      max-width: 220px;
     }
-    .data-table tr:last-child td { border-bottom: none; }
-    .data-table tr:hover td { background: rgba(255,255,255,0.4); }
-    .td-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; display: block; }
-    .td-actions { display: flex; gap: 6px; align-items: center; }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .td-truncate {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+      display: block;
+    }
+
+    .td-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
 
     .status-badge {
-      font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
-      letter-spacing: 0.03em; white-space: nowrap;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
     }
-    .status-badge--coming    { background: rgba(76,175,80,0.15);  color: #3d8b41; }
-    .status-badge--notcoming { background: rgba(200,136,138,0.15); color: #a05050; }
-    .status-badge--hidden    { background: rgba(201,184,232,0.2);  color: var(--muted); }
+
+    .status-badge--coming {
+      background: rgba(76, 175, 80, 0.15);
+      color: #3d8b41;
+    }
+
+    .status-badge--notcoming {
+      background: rgba(200, 136, 138, 0.15);
+      color: #a05050;
+    }
+
+    .status-badge--hidden {
+      background: rgba(201, 184, 232, 0.2);
+      color: var(--muted);
+    }
 
     /* ── Empty & Loading states ──────────────────────────────── */
     .empty-state {
-      text-align: center; padding: 48px 24px;
-      font-family: var(--serif); font-size: 18px; font-style: italic; color: var(--muted); opacity: 0.6;
+      text-align: center;
+      padding: 48px 24px;
+      font-family: var(--serif);
+      font-size: 18px;
+      font-style: italic;
+      color: var(--muted);
+      opacity: 0.6;
     }
-    .admin-status { text-align: center; padding: 32px; color: var(--muted); font-size: 14px; font-style: italic; opacity: 0.7; }
+
+    .admin-status {
+      text-align: center;
+      padding: 32px;
+      color: var(--muted);
+      font-size: 14px;
+      font-style: italic;
+      opacity: 0.7;
+    }
+
     /* ── Error + retry state ───────────────────── */
     .error-state {
-      display: none; align-items: center; justify-content: center; flex-direction: column;
-      gap: 12px; padding: 36px 24px; text-align: center;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      padding: 36px 24px;
+      text-align: center;
     }
-    .error-state-msg { font-size: 14px; color: #a05050; }
+
+    .error-state-msg {
+      font-size: 14px;
+      color: #a05050;
+    }
+
     .btn-retry {
-      font-size: 13px; padding: 7px 20px; border-radius: 999px;
-      background: none; border: 1.5px solid rgba(200,136,138,0.5);
-      color: #a05050; cursor: pointer; font-family: var(--sans);
+      font-size: 13px;
+      padding: 7px 20px;
+      border-radius: 999px;
+      background: none;
+      border: 1.5px solid rgba(200, 136, 138, 0.5);
+      color: #a05050;
+      cursor: pointer;
+      font-family: var(--sans);
       transition: background 0.2s;
     }
-    .btn-retry:hover { background: rgba(200,136,138,0.08); }
+
+    .btn-retry:hover {
+      background: rgba(200, 136, 138, 0.08);
+    }
+
     /* ── Gallery tab (migrated styles) ──────────────────────── */
-    .add-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .add-form-url { grid-column: 1 / -1; }
-    .url-preview-wrap { grid-column: 1 / -1; display: none; }
-    .url-preview-wrap.visible { display: block; }
-    #url-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; border: var(--glass-border); }
-    .add-form-footer { grid-column: 1 / -1; display: flex; justify-content: flex-end; margin-top: 4px; }
-    @media (max-width: 560px) { .add-form-grid { grid-template-columns: 1fr; } }
+    .add-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .add-form-url {
+      grid-column: 1 / -1;
+    }
+
+    .url-preview-wrap {
+      grid-column: 1 / -1;
+      display: none;
+    }
+
+    .url-preview-wrap.visible {
+      display: block;
+    }
+
+    #url-preview {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: var(--glass-border);
+    }
+
+    .add-form-footer {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 560px) {
+      .add-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
     .photo-list-section {
-      background: var(--glass); border: var(--glass-border); box-shadow: var(--shadow);
-      border-radius: var(--radius-lg); padding: 24px 24px 12px;
+      background: var(--glass);
+      border: var(--glass-border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius-lg);
+      padding: 24px 24px 12px;
     }
-    .photo-list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    #photo-count { font-size: 13px; color: var(--muted); }
+
+    .photo-list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    #photo-count {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
     .refresh-btn {
-      font-size: 13px; color: var(--lavender); background: none;
-      border: 1.5px solid rgba(201,184,232,0.4); border-radius: 999px; padding: 5px 14px;
-      cursor: pointer; font-family: var(--sans); transition: background 0.2s;
+      font-size: 13px;
+      color: var(--lavender);
+      background: none;
+      border: 1.5px solid rgba(201, 184, 232, 0.4);
+      border-radius: 999px;
+      padding: 5px 14px;
+      cursor: pointer;
+      font-family: var(--sans);
+      transition: background 0.2s;
     }
-    .refresh-btn:hover { background: rgba(201,184,232,0.12); }
-    #photo-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .refresh-btn:hover {
+      background: rgba(201, 184, 232, 0.12);
+    }
+
+    #photo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
     .photo-item {
-      display: grid; grid-template-columns: 72px 1fr auto;
-      gap: 14px; align-items: center; padding: 12px 14px;
-      border: 1.5px solid rgba(201,184,232,0.2); border-radius: var(--radius-md);
-      background: rgba(255,255,255,0.55); transition: opacity 0.2s, border-color 0.2s;
+      display: grid;
+      grid-template-columns: 72px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 14px;
+      border: 1.5px solid rgba(201, 184, 232, 0.2);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.55);
+      transition: opacity 0.2s, border-color 0.2s;
     }
-    .photo-item--hidden { opacity: 0.45; }
-    .photo-item:hover { border-color: rgba(201,184,232,0.45); }
-    .photo-thumb { width: 72px; height: 56px; object-fit: cover; border-radius: 8px; background: rgba(201,184,232,0.2); display: block; }
-    .photo-thumb-placeholder { width: 72px; height: 56px; border-radius: 8px; background: linear-gradient(135deg,rgba(249,200,212,0.3),rgba(201,184,232,0.25)); border: 1.5px dashed rgba(201,184,232,0.4); }
-    .photo-info { min-width: 0; }
-    .photo-caption-text { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
-    .photo-meta { display: flex; gap: 8px; align-items: center; }
-    .photo-category-badge { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: rgba(201,184,232,0.22); color: var(--muted); }
-    .photo-order { font-size: 11px; color: var(--muted); opacity: 0.6; }
-    .photo-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+    .photo-item--hidden {
+      opacity: 0.45;
+    }
+
+    .photo-item:hover {
+      border-color: rgba(201, 184, 232, 0.45);
+    }
+
+    .photo-thumb {
+      width: 72px;
+      height: 56px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: rgba(201, 184, 232, 0.2);
+      display: block;
+    }
+
+    .photo-thumb-placeholder {
+      width: 72px;
+      height: 56px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(249, 200, 212, 0.3), rgba(201, 184, 232, 0.25));
+      border: 1.5px dashed rgba(201, 184, 232, 0.4);
+    }
+
+    .photo-info {
+      min-width: 0;
+    }
+
+    .photo-caption-text {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 3px;
+    }
+
+    .photo-meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .photo-category-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: rgba(201, 184, 232, 0.22);
+      color: var(--muted);
+    }
+
+    .photo-order {
+      font-size: 11px;
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    .photo-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
 
     /* ── Travel items in Music tab ───────────────────────────── */
-    .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 700px) { .two-col-grid { grid-template-columns: 1fr; } }
+    .two-col-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
 
-    .travel-edit-item { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 14px; }
-    .travel-edit-item textarea { flex: 1; }
-    .travel-edit-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 6px; display: block; }
+    @media (max-width: 700px) {
+      .two-col-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .travel-edit-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .travel-edit-item textarea {
+      flex: 1;
+    }
+
+    .travel-edit-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+    }
 
     /* ── Confirm Dialog ──────────────────────────────────────── */
     .confirm-overlay {
-      position: fixed; inset: 0; background: rgba(46,42,40,0.35);
-      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 900; padding: 24px;
+      position: fixed;
+      inset: 0;
+      background: rgba(46, 42, 40, 0.35);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 900;
+      padding: 24px;
     }
+
     .confirm-dialog {
-      background: var(--glass); border: var(--glass-border); box-shadow: 0 24px 80px rgba(0,0,0,0.12);
-      border-radius: var(--radius-lg); padding: 32px 28px; width: 100%; max-width: 340px; text-align: center;
+      background: var(--glass);
+      border: var(--glass-border);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
     }
-    .confirm-msg { font-size: 15px; line-height: 1.5; margin-bottom: 24px; }
-    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+
+    .confirm-msg {
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
 
     /* ── Bottom nav (mobile) ─────────────────────────────────── */
     .admin-bottom-nav {
       display: none;
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-top: var(--glass-border);
-      padding: 4px 0 env(safe-area-inset-bottom,0px);
-      z-index: 100; justify-content: space-around;
+      padding: 4px 0 env(safe-area-inset-bottom, 0px);
+      z-index: 100;
+      justify-content: space-around;
     }
+
     .bnav-item {
-      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-      padding: 8px 4px; background: none; border: none; cursor: pointer;
-      font-size: 10px; color: var(--muted); font-family: var(--sans);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 8px 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 10px;
+      color: var(--muted);
+      font-family: var(--sans);
       transition: color 0.15s;
     }
-    .bnav-item.active { color: #7b5ea7; }
-    .bnav-item svg { opacity: 0.6; }
-    .bnav-item.active svg { opacity: 1; }
+
+    .bnav-item.active {
+      color: #7b5ea7;
+    }
+
+    .bnav-item svg {
+      opacity: 0.6;
+    }
+
+    .bnav-item.active svg {
+      opacity: 1;
+    }
 
     /* ── Toast ───────────────────────────────────────────────── */
     .toast {
-      position: fixed; bottom: calc(var(--bnav-h) + 12px); left: 50%;
+      position: fixed;
+      bottom: calc(var(--bnav-h) + 12px);
+      left: 50%;
       transform: translateX(-50%) translateY(16px);
-      padding: 10px 22px; border-radius: 999px;
-      font-size: 13px; pointer-events: none; opacity: 0;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: 13px;
+      pointer-events: none;
+      opacity: 0;
       transition: opacity 0.25s ease, transform 0.25s ease;
-      z-index: 999; white-space: nowrap;
+      z-index: 999;
+      white-space: nowrap;
     }
-    .toast--success { background: rgba(46,42,40,0.9); color: #fff; }
-    .toast--error   { background: rgba(200,136,138,0.95); color: #fff; }
-    .toast--show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .toast--success {
+      background: rgba(46, 42, 40, 0.9);
+      color: #fff;
+    }
+
+    .toast--error {
+      background: rgba(200, 136, 138, 0.95);
+      color: #fff;
+    }
+
+    .toast--show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
 
     /* ── Responsive ──────────────────────────────────────────── */
     @media (max-width: 768px) {
-      .admin-topbar { display: flex; }
-      .admin-sidebar { display: none; }
-      .admin-bottom-nav { display: flex; }
-      .admin-content { padding: 20px 16px calc(var(--bnav-h) + 20px); }
-      .field-row { grid-template-columns: 1fr; }      /* Table horizontal scroll on mobile */
-      .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      .data-table { min-width: 480px; }
+      .admin-topbar {
+        display: flex;
+      }
+
+      .admin-sidebar {
+        display: none;
+      }
+
+      .admin-bottom-nav {
+        display: flex;
+      }
+
+      .admin-content {
+        padding: 20px 16px calc(var(--bnav-h) + 20px);
+      }
+
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+
+      /* Table horizontal scroll on mobile */
+      .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .data-table {
+        min-width: 480px;
+      }
+
       /* Hide less critical columns on mobile */
       .data-table th:nth-child(5),
       .data-table td:nth-child(5),
       .data-table th:nth-child(7),
-      .data-table td:nth-child(7) { display: none; }    }
+      .data-table td:nth-child(7) {
+        display: none;
+      }
+    }
   </style>
 </head>
+
 <body>
 
-<!-- Auth Gate -->
-<div id="auth-screen">
-  <div class="auth-card">
-    <h1 class="auth-title">Admin</h1>
-    <p id="auth-sub" class="auth-sub">นนท์ &amp; เมย์</p>
-    <form id="auth-form" novalidate>
-      <input class="auth-input" type="password" id="admin-password" placeholder="รหัสผ่าน" autocomplete="current-password" />
-      <p class="auth-error" id="auth-error">รหัสผ่านไม่ถูกต้อง</p>
-      <button type="submit" class="btn-primary">เข้าสู่ระบบ</button>
-    </form>
-  </div>
-</div>
-
-<!-- Admin Dashboard -->
-<div id="admin-screen">
-
-  <!-- Mobile topbar -->
-  <header class="admin-topbar">
-    <span id="admin-brand" class="admin-brand">Admin — นนท์ &amp; เมย์</span>
-    <a href="/" class="btn-outline" style="font-size:12px;padding:6px 14px">ดูเว็บหลัก →</a>
-  </header>
-
-  <div class="admin-layout">
-
-    <!-- Sidebar (desktop) -->
-    <nav class="admin-sidebar">
-      <div class="sidebar-logo">
-        Admin Panel
-        <span>นนท์ &amp; เมย์</span>
-      </div>
-      <ul class="tab-nav">
-        <li class="tab-item active" data-tab="event">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M3 9h18M8 3v2M16 3v2"/></svg>
-          Event Info
-        </li>
-        <li class="tab-item" data-tab="gallery">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          Gallery
-        </li>
-        <li class="tab-item" data-tab="rsvp">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          RSVP
-        </li>
-        <li class="tab-item" data-tab="guestbook">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Guestbook
-        </li>
-        <li class="tab-item" data-tab="music">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-          Music &amp; Travel
-        </li>
-      </ul>
-      <div class="sidebar-footer">
-        <a href="/" class="sidebar-back">← ดูเว็บหลัก</a>
-        <button class="sidebar-logout" id="sidebar-logout">ออกจากระบบ</button>
-      </div>
-    </nav>
-
-    <!-- Bottom nav (mobile) -->
-    <nav class="admin-bottom-nav" id="admin-bottom-nav">
-      <button class="bnav-item active" data-tab="event">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M3 9h18M8 3v2M16 3v2"/></svg>
-        งาน
-      </button>
-      <button class="bnav-item" data-tab="gallery">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        รูป
-      </button>
-      <button class="bnav-item" data-tab="rsvp">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        RSVP
-      </button>
-      <button class="bnav-item" data-tab="guestbook">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Book
-      </button>
-      <button class="bnav-item" data-tab="music">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        Music
-      </button>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="admin-content">
-
-      <!-- ── Tab: Event Info ── -->
-      <section class="tab-panel" id="tab-event">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Event Info</h2>
-            <p class="panel-desc">ข้อมูลงานแต่งงานที่แสดงบนเว็บ</p>
-          </div>
-        </div>
-        <div class="form-card">
-          <p class="card-title">ชื่อคู่บ่าวสาว</p>
-          <div class="field-row">
-            <div class="field-group">
-              <label class="form-label" for="ev-groom">เจ้าบ่าว</label>
-              <input class="form-input" type="text" id="ev-groom" placeholder="นนท์" />
-            </div>
-            <div class="field-group">
-              <label class="form-label" for="ev-bride">เจ้าสาว</label>
-              <input class="form-input" type="text" id="ev-bride" placeholder="เมย์" />
-            </div>
-          </div>
-        </div>
-        <div class="form-card">
-          <p class="card-title">วันและเวลา</p>
-          <div class="field-group">
-            <label class="form-label" for="ev-date-iso">วันที่งาน (ISO)</label>
-            <input class="form-input" type="date" id="ev-date-iso" />
-          </div>
-          <div class="field-group">
-            <label class="form-label" for="ev-date-display">วันที่แสดงบนเว็บ</label>
-            <input class="form-input" type="text" id="ev-date-display" placeholder="วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569" />
-          </div>
-          <div class="field-row">
-            <div class="field-group">
-              <label class="form-label" for="ev-time-ceremony">เวลาเริ่มพิธี</label>
-              <input class="form-input" type="time" id="ev-time-ceremony" />
-            </div>
-            <div class="field-group">
-              <label class="form-label" for="ev-time-lunch">เวลาอาหาร</label>
-              <input class="form-input" type="time" id="ev-time-lunch" />
-            </div>
-          </div>
-        </div>
-        <div class="form-card">
-          <p class="card-title">สถานที่</p>
-          <div class="field-group">
-            <label class="form-label" for="ev-venue">ชื่อสถานที่ / ที่อยู่</label>
-            <input class="form-input" type="text" id="ev-venue" placeholder="ตำบลแป-ระ อำเภอท่าแพ จังหวัดสตูล" />
-          </div>
-          <div class="field-group">
-            <label class="form-label" for="ev-maps-url">Google Maps URL (ปุ่มนำทาง)</label>
-            <input class="form-input" type="url" id="ev-maps-url" placeholder="https://maps.app.goo.gl/..." />
-          </div>
-          <div class="field-group">
-            <label class="form-label" for="ev-maps-embed">Google Maps Embed URL (แผนที่ใน iframe)</label>
-            <input class="form-input" type="url" id="ev-maps-embed" placeholder="https://maps.google.com/maps?q=...&output=embed" />
-          </div>
-        </div>
-        <div class="form-card">
-          <p class="card-title">อื่นๆ</p>
-          <div class="field-group">
-            <label class="form-label" for="ev-dress">Dress Code</label>
-            <input class="form-input" type="text" id="ev-dress" placeholder="Pastel Formal" />
-          </div>
-          <div class="field-row">
-            <div class="field-group">
-              <label class="form-label" for="ev-rsvp-iso">RSVP Deadline (ISO)</label>
-              <input class="form-input" type="date" id="ev-rsvp-iso" />
-            </div>
-            <div class="field-group">
-              <label class="form-label" for="ev-rsvp-display">RSVP Deadline (แสดง)</label>
-              <input class="form-input" type="text" id="ev-rsvp-display" placeholder="28 กุมภาพันธ์ 2569" />
-            </div>
-          </div>
-          <div class="form-actions">
-            <span class="unsaved-badge" id="ev-unsaved">มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก</span>
-            <button class="btn-save" id="btn-save-event">บันทึก Event Info</button>
-          </div>
-          <div id="ev-error" class="error-state">
-            <p class="error-state-msg">โหลดข้อมูลไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
-            <button class="btn-retry" onclick="tabLoaded.event=false;loadEventConfig()">↻ ลองใหม่</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── Tab: Gallery ── -->
-      <section class="tab-panel tab-panel--hidden" id="tab-gallery">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Gallery</h2>
-            <p class="panel-desc">จัดการรูปภาพในเว็บ</p>
-          </div>
-        </div>
-        <!-- Add Photo -->
-        <div class="form-card">
-          <p class="card-title">เพิ่มรูปใหม่</p>
-          <form id="add-photo-form" novalidate>
-            <div class="add-form-grid">
-              <div class="add-form-url">
-                <label class="form-label" for="new-url">URL รูปภาพ</label>
-                <input class="form-input" type="url" id="new-url" placeholder="https://lh3.googleusercontent.com/..." />
-              </div>
-              <div class="url-preview-wrap" id="url-preview-wrap">
-                <img id="url-preview" src="" alt="preview" />
-              </div>
-              <div>
-                <label class="form-label" for="new-caption">Caption</label>
-                <input class="form-input" type="text" id="new-caption" placeholder="คำบรรยายรูป (ถ้ามี)" />
-              </div>
-              <div>
-                <label class="form-label" for="new-category">หมวดหมู่</label>
-                <select class="form-select" id="new-category">
-                  <option value="pre-wedding">Pre-wedding</option>
-                  <option value="wedding">วันงาน</option>
-                  <option value="">ไม่มีหมวด</option>
-                </select>
-              </div>
-              <div class="add-form-footer">
-                <button type="submit" class="btn-save" id="btn-add-photo">+ เพิ่มรูป</button>
-              </div>
-            </div>
-          </form>
-        </div>
-        <!-- Photo List -->
-        <div class="photo-list-section">
-          <div class="photo-list-header">
-            <p class="card-title" style="margin-bottom:0">รูปภาพทั้งหมด</p>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span id="photo-count"></span>
-              <button class="refresh-btn" id="refresh-btn">↻ รีเฟรช</button>
-            </div>
-          </div>
-          <div id="photo-list"><p class="admin-status">กำลังโหลด…</p></div>
-          <div id="gallery-error" class="error-state">
-            <p class="error-state-msg">โหลดรูปไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
-            <button class="btn-retry" onclick="tabLoaded.gallery=false;loadPhotos()">↻ ลองใหม่</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── Tab: RSVP ── -->
-      <section class="tab-panel tab-panel--hidden" id="tab-rsvp">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">RSVP</h2>
-            <p class="panel-desc">รายชื่อผู้ตอบรับ</p>
-          </div>
-          <button class="btn-outline" id="btn-export-rsvp">↓ Export CSV</button>
-        </div>
-        <div class="summary-grid">
-          <div class="summary-card summary-card--coming">
-            <span class="summary-num" id="rsvp-count-coming">—</span>
-            <span class="summary-label">มาร่วมงาน</span>
-          </div>
-          <div class="summary-card summary-card--notcoming">
-            <span class="summary-num" id="rsvp-count-notcoming">—</span>
-            <span class="summary-label">ไม่สะดวก</span>
-          </div>
-          <div class="summary-card summary-card--guests">
-            <span class="summary-num" id="rsvp-count-guests">—</span>
-            <span class="summary-label">แขกรวม (คน)</span>
-          </div>
-          <div class="summary-card">
-            <span class="summary-num" id="rsvp-count-total">—</span>
-            <span class="summary-label">ตอบรับทั้งหมด</span>
-          </div>
-        </div>
-        <div class="table-card">
-          <div class="table-controls">
-            <input class="form-input table-search" type="search" id="rsvp-search" placeholder="ค้นหาชื่อ…" />
-            <select class="form-select table-filter" id="rsvp-filter">
-              <option value="">ทั้งหมด</option>
-              <option value="ยินดีเข้าร่วม">มา</option>
-              <option value="ไม่สะดวกเข้าร่วม">ไม่มา</option>
-            </select>
-          </div>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>ชื่อ</th>
-                  <th>สถานะ</th>
-                  <th>แขก</th>
-                  <th>ติดต่อ</th>
-                  <th>ข้อความ</th>
-                  <th>เวลา</th>
-                </tr>
-              </thead>
-              <tbody id="rsvp-tbody"></tbody>
-            </table>
-          </div>
-          <div id="rsvp-empty" class="empty-state" style="display:none">ยังไม่มีผู้ตอบรับ</div>
-          <div id="rsvp-loading" class="admin-status">กำลังโหลด…</div>
-          <div id="rsvp-error" class="error-state">
-            <p class="error-state-msg">โหลด RSVP ไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
-            <button class="btn-retry" onclick="tabLoaded.rsvp=false;loadRsvp()">↻ ลองใหม่</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── Tab: Guestbook ── -->
-      <section class="tab-panel tab-panel--hidden" id="tab-guestbook">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Guestbook</h2>
-            <p class="panel-desc">จัดการคำอวยพร</p>
-          </div>
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer">
-            <input type="checkbox" id="show-hidden-entries" />
-            แสดงที่ซ่อน
-          </label>
-        </div>
-        <div class="table-card">
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>ชื่อ</th>
-                  <th>ข้อความ</th>
-                  <th>เวลา</th>
-                  <th>สถานะ</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="guestbook-tbody"></tbody>
-            </table>
-          </div>
-          <div id="guestbook-empty" class="empty-state" style="display:none">ยังไม่มีข้อความ</div>
-          <div id="guestbook-loading" class="admin-status">กำลังโหลด…</div>
-          <div id="guestbook-error" class="error-state">
-            <p class="error-state-msg">โหลด Guestbook ไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
-            <button class="btn-retry" onclick="tabLoaded.guestbook=false;loadGuestbook()">↻ ลองใหม่</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── Tab: Music & Travel ── -->
-      <section class="tab-panel tab-panel--hidden" id="tab-music">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Music &amp; Travel</h2>
-            <p class="panel-desc">เพลงประกอบและข้อมูลการเดินทาง</p>
-          </div>
-        </div>
-        <div class="two-col-grid">
-          <!-- Music -->
-          <div class="form-card">
-            <p class="card-title">เพลงประกอบ</p>
-            <div class="field-group">
-              <label class="form-label" for="music-url">URL เพลง (mp3 หรือ path)</label>
-              <input class="form-input" type="text" id="music-url" placeholder="/music.mp3" />
-            </div>
-            <div class="form-actions">
-              <span class="unsaved-badge" id="music-unsaved">ยังไม่ได้บันทึก</span>
-              <button class="btn-save" id="btn-save-music">บันทึก</button>
-            </div>
-          </div>
-          <!-- Travel -->
-          <div class="form-card">
-            <p class="card-title">ข้อมูลการเดินทาง</p>
-            <div class="field-group">
-              <label class="travel-edit-label">สนามบิน</label>
-              <textarea class="form-textarea" id="travel-airport" rows="2" placeholder="ระยะทางประมาณ 1 ชั่วโมงครึ่ง จากสนามบิน"></textarea>
-            </div>
-            <div class="field-group">
-              <label class="travel-edit-label">ที่พักแนะนำ</label>
-              <textarea class="form-textarea" id="travel-hotel" rows="2" placeholder="โรงแรมในตัวเมืองสตูล ห่างจากงาน ~20 นาที"></textarea>
-            </div>
-            <div class="field-group">
-              <label class="travel-edit-label">ที่จอดรถ</label>
-              <textarea class="form-textarea" id="travel-car" rows="2" placeholder="มีที่จอดรถสำหรับแขกเพียงพอ ไม่มีค่าใช้จ่าย"></textarea>
-            </div>
-            <div class="form-actions">
-              <span class="unsaved-badge" id="travel-unsaved">ยังไม่ได้บันทึก</span>
-              <button class="btn-save" id="btn-save-travel">บันทึก</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </main>
-  </div>
-</div>
-
-<!-- Confirm Dialog -->
-<div class="confirm-overlay" id="confirm-overlay" style="display:none">
-  <div class="confirm-dialog">
-    <p class="confirm-msg" id="confirm-msg">ต้องการดำเนินการนี้?</p>
-    <div class="confirm-actions">
-      <button class="btn-outline" id="confirm-cancel">ยกเลิก</button>
-      <button class="btn-danger" id="confirm-ok">ยืนยัน</button>
+  <!-- Auth Gate -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <h1 class="auth-title">Admin</h1>
+      <p id="auth-sub" class="auth-sub">นนท์ &amp; เมย์</p>
+      <form id="auth-form" novalidate>
+        <input class="auth-input" type="password" id="admin-password" placeholder="รหัสผ่าน"
+          autocomplete="current-password" />
+        <p class="auth-error" id="auth-error">รหัสผ่านไม่ถูกต้อง</p>
+        <button type="submit" class="btn-primary">เข้าสู่ระบบ</button>
+      </form>
     </div>
   </div>
-</div>
 
-<!-- Toast -->
-<div class="toast toast--success" id="toast"></div>
+  <!-- Admin Dashboard -->
+  <div id="admin-screen">
+
+    <!-- Mobile topbar -->
+    <header class="admin-topbar">
+      <span id="admin-brand" class="admin-brand">Admin — นนท์ &amp; เมย์</span>
+      <a href="/" class="btn-outline" style="font-size:12px;padding:6px 14px">ดูเว็บหลัก →</a>
+    </header>
+
+    <div class="admin-layout">
+
+      <!-- Sidebar (desktop) -->
+      <nav class="admin-sidebar">
+        <div class="sidebar-logo">
+          Admin Panel
+          <span>นนท์ &amp; เมย์</span>
+        </div>
+        <ul class="tab-nav">
+          <li class="tab-item active" data-tab="event">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round">
+              <rect x="3" y="4" width="18" height="18" rx="3" />
+              <path d="M3 9h18M8 3v2M16 3v2" />
+            </svg>
+            Event Info
+          </li>
+          <li class="tab-item" data-tab="gallery">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+            Gallery
+          </li>
+          <li class="tab-item" data-tab="rsvp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            RSVP
+          </li>
+          <li class="tab-item" data-tab="guestbook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            Guestbook
+          </li>
+          <li class="tab-item" data-tab="music">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round">
+              <path d="M9 18V5l12-2v13" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="18" cy="16" r="3" />
+            </svg>
+            Music &amp; Travel
+          </li>
+        </ul>
+        <div class="sidebar-footer">
+          <a href="/" class="sidebar-back">← ดูเว็บหลัก</a>
+          <button class="sidebar-logout" id="sidebar-logout">ออกจากระบบ</button>
+        </div>
+      </nav>
+
+      <!-- Bottom nav (mobile) -->
+      <nav class="admin-bottom-nav" id="admin-bottom-nav">
+        <button class="bnav-item active" data-tab="event">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round">
+            <rect x="3" y="4" width="18" height="18" rx="3" />
+            <path d="M3 9h18M8 3v2M16 3v2" />
+          </svg>
+          งาน
+        </button>
+        <button class="bnav-item" data-tab="gallery">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          รูป
+        </button>
+        <button class="bnav-item" data-tab="rsvp">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          RSVP
+        </button>
+        <button class="bnav-item" data-tab="guestbook">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          Book
+        </button>
+        <button class="bnav-item" data-tab="music">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round">
+            <path d="M9 18V5l12-2v13" />
+            <circle cx="6" cy="18" r="3" />
+            <circle cx="18" cy="16" r="3" />
+          </svg>
+          Music
+        </button>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="admin-content">
+
+        <!-- ── Tab: Event Info ── -->
+        <section class="tab-panel" id="tab-event">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Event Info</h2>
+              <p class="panel-desc">ข้อมูลงานแต่งงานที่แสดงบนเว็บ</p>
+            </div>
+          </div>
+          <div class="form-card">
+            <p class="card-title">ชื่อคู่บ่าวสาว</p>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="form-label" for="ev-groom">เจ้าบ่าว</label>
+                <input class="form-input" type="text" id="ev-groom" placeholder="นนท์" />
+              </div>
+              <div class="field-group">
+                <label class="form-label" for="ev-bride">เจ้าสาว</label>
+                <input class="form-input" type="text" id="ev-bride" placeholder="เมย์" />
+              </div>
+            </div>
+          </div>
+          <div class="form-card">
+            <p class="card-title">วันและเวลา</p>
+            <div class="field-group">
+              <label class="form-label" for="ev-date-iso">วันที่งาน (ISO)</label>
+              <input class="form-input" type="date" id="ev-date-iso" />
+            </div>
+            <div class="field-group">
+              <label class="form-label" for="ev-date-display">วันที่แสดงบนเว็บ</label>
+              <input class="form-input" type="text" id="ev-date-display"
+                placeholder="วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569" />
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="form-label" for="ev-time-ceremony">เวลาเริ่มพิธี</label>
+                <input class="form-input" type="time" id="ev-time-ceremony" />
+              </div>
+              <div class="field-group">
+                <label class="form-label" for="ev-time-lunch">เวลาอาหาร</label>
+                <input class="form-input" type="time" id="ev-time-lunch" />
+              </div>
+            </div>
+          </div>
+          <div class="form-card">
+            <p class="card-title">สถานที่</p>
+            <div class="field-group">
+              <label class="form-label" for="ev-venue">ชื่อสถานที่ / ที่อยู่</label>
+              <input class="form-input" type="text" id="ev-venue" placeholder="ตำบลแป-ระ อำเภอท่าแพ จังหวัดสตูล" />
+            </div>
+            <div class="field-group">
+              <label class="form-label" for="ev-maps-url">Google Maps URL (ปุ่มนำทาง)</label>
+              <input class="form-input" type="url" id="ev-maps-url" placeholder="https://maps.app.goo.gl/..." />
+            </div>
+            <div class="field-group">
+              <label class="form-label" for="ev-maps-embed">Google Maps Embed URL (แผนที่ใน iframe)</label>
+              <input class="form-input" type="url" id="ev-maps-embed"
+                placeholder="https://maps.google.com/maps?q=...&output=embed" />
+            </div>
+          </div>
+          <div class="form-card">
+            <p class="card-title">อื่นๆ</p>
+            <div class="field-group">
+              <label class="form-label" for="ev-dress">Dress Code</label>
+              <input class="form-input" type="text" id="ev-dress" placeholder="Pastel Formal" />
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="form-label" for="ev-rsvp-iso">RSVP Deadline (ISO)</label>
+                <input class="form-input" type="date" id="ev-rsvp-iso" />
+              </div>
+              <div class="field-group">
+                <label class="form-label" for="ev-rsvp-display">RSVP Deadline (แสดง)</label>
+                <input class="form-input" type="text" id="ev-rsvp-display" placeholder="28 กุมภาพันธ์ 2569" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <span class="unsaved-badge" id="ev-unsaved">มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก</span>
+              <button class="btn-save" id="btn-save-event">บันทึก Event Info</button>
+            </div>
+            <div id="ev-error" class="error-state">
+              <p class="error-state-msg">โหลดข้อมูลไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
+              <button class="btn-retry" onclick="tabLoaded.event=false;loadEventConfig()">↻ ลองใหม่</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Tab: Gallery ── -->
+        <section class="tab-panel tab-panel--hidden" id="tab-gallery">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Gallery</h2>
+              <p class="panel-desc">จัดการรูปภาพในเว็บ</p>
+            </div>
+          </div>
+          <!-- Add Photo -->
+          <div class="form-card">
+            <p class="card-title">เพิ่มรูปใหม่</p>
+            <form id="add-photo-form" novalidate>
+              <div class="add-form-grid">
+                <div class="add-form-url">
+                  <label class="form-label" for="new-url">URL รูปภาพ</label>
+                  <input class="form-input" type="url" id="new-url"
+                    placeholder="https://lh3.googleusercontent.com/..." />
+                </div>
+                <div class="url-preview-wrap" id="url-preview-wrap">
+                  <img id="url-preview" src="" alt="preview" />
+                </div>
+                <div>
+                  <label class="form-label" for="new-caption">Caption</label>
+                  <input class="form-input" type="text" id="new-caption" placeholder="คำบรรยายรูป (ถ้ามี)" />
+                </div>
+                <div>
+                  <label class="form-label" for="new-category">หมวดหมู่</label>
+                  <select class="form-select" id="new-category">
+                    <option value="pre-wedding">Pre-wedding</option>
+                    <option value="wedding">วันงาน</option>
+                    <option value="">ไม่มีหมวด</option>
+                  </select>
+                </div>
+                <div class="add-form-footer">
+                  <button type="submit" class="btn-save" id="btn-add-photo">+ เพิ่มรูป</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <!-- Photo List -->
+          <div class="photo-list-section">
+            <div class="photo-list-header">
+              <p class="card-title" style="margin-bottom:0">รูปภาพทั้งหมด</p>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span id="photo-count"></span>
+                <button class="refresh-btn" id="refresh-btn">↻ รีเฟรช</button>
+              </div>
+            </div>
+            <div id="photo-list">
+              <p class="admin-status">กำลังโหลด…</p>
+            </div>
+            <div id="gallery-error" class="error-state">
+              <p class="error-state-msg">โหลดรูปไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
+              <button class="btn-retry" onclick="tabLoaded.gallery=false;loadPhotos()">↻ ลองใหม่</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Tab: RSVP ── -->
+        <section class="tab-panel tab-panel--hidden" id="tab-rsvp">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">RSVP</h2>
+              <p class="panel-desc">รายชื่อผู้ตอบรับ</p>
+            </div>
+            <button class="btn-outline" id="btn-export-rsvp">↓ Export CSV</button>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-card summary-card--coming">
+              <span class="summary-num" id="rsvp-count-coming">—</span>
+              <span class="summary-label">มาร่วมงาน</span>
+            </div>
+            <div class="summary-card summary-card--notcoming">
+              <span class="summary-num" id="rsvp-count-notcoming">—</span>
+              <span class="summary-label">ไม่สะดวก</span>
+            </div>
+            <div class="summary-card summary-card--guests">
+              <span class="summary-num" id="rsvp-count-guests">—</span>
+              <span class="summary-label">แขกรวม (คน)</span>
+            </div>
+            <div class="summary-card">
+              <span class="summary-num" id="rsvp-count-total">—</span>
+              <span class="summary-label">ตอบรับทั้งหมด</span>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-controls">
+              <input class="form-input table-search" type="search" id="rsvp-search" placeholder="ค้นหาชื่อ…" />
+              <select class="form-select table-filter" id="rsvp-filter">
+                <option value="">ทั้งหมด</option>
+                <option value="ยินดีเข้าร่วม">มา</option>
+                <option value="ไม่สะดวกเข้าร่วม">ไม่มา</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>ชื่อ</th>
+                    <th>สถานะ</th>
+                    <th>แขก</th>
+                    <th>ติดต่อ</th>
+                    <th>ข้อความ</th>
+                    <th>เวลา</th>
+                  </tr>
+                </thead>
+                <tbody id="rsvp-tbody"></tbody>
+              </table>
+            </div>
+            <div id="rsvp-empty" class="empty-state" style="display:none">ยังไม่มีผู้ตอบรับ</div>
+            <div id="rsvp-loading" class="admin-status">กำลังโหลด…</div>
+            <div id="rsvp-error" class="error-state">
+              <p class="error-state-msg">โหลด RSVP ไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
+              <button class="btn-retry" onclick="tabLoaded.rsvp=false;loadRsvp()">↻ ลองใหม่</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Tab: Guestbook ── -->
+        <section class="tab-panel tab-panel--hidden" id="tab-guestbook">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Guestbook</h2>
+              <p class="panel-desc">จัดการคำอวยพร</p>
+            </div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer">
+              <input type="checkbox" id="show-hidden-entries" />
+              แสดงที่ซ่อน
+            </label>
+          </div>
+          <div class="table-card">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>ชื่อ</th>
+                    <th>ข้อความ</th>
+                    <th>เวลา</th>
+                    <th>สถานะ</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="guestbook-tbody"></tbody>
+              </table>
+            </div>
+            <div id="guestbook-empty" class="empty-state" style="display:none">ยังไม่มีข้อความ</div>
+            <div id="guestbook-loading" class="admin-status">กำลังโหลด…</div>
+            <div id="guestbook-error" class="error-state">
+              <p class="error-state-msg">โหลด Guestbook ไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
+              <button class="btn-retry" onclick="tabLoaded.guestbook=false;loadGuestbook()">↻ ลองใหม่</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Tab: Music & Travel ── -->
+        <section class="tab-panel tab-panel--hidden" id="tab-music">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Music &amp; Travel</h2>
+              <p class="panel-desc">เพลงประกอบและข้อมูลการเดินทาง</p>
+            </div>
+          </div>
+          <div class="two-col-grid">
+            <!-- Music -->
+            <div class="form-card">
+              <p class="card-title">เพลงประกอบ</p>
+              <div class="field-group">
+                <label class="form-label" for="music-url">URL เพลง (mp3 หรือ path)</label>
+                <input class="form-input" type="text" id="music-url" placeholder="/music.mp3" />
+              </div>
+              <div class="form-actions">
+                <span class="unsaved-badge" id="music-unsaved">ยังไม่ได้บันทึก</span>
+                <button class="btn-save" id="btn-save-music">บันทึก</button>
+              </div>
+            </div>
+            <!-- Travel -->
+            <div class="form-card">
+              <p class="card-title">ข้อมูลการเดินทาง</p>
+              <div class="field-group">
+                <label class="travel-edit-label">สนามบิน</label>
+                <textarea class="form-textarea" id="travel-airport" rows="2"
+                  placeholder="ระยะทางประมาณ 1 ชั่วโมงครึ่ง จากสนามบิน"></textarea>
+              </div>
+              <div class="field-group">
+                <label class="travel-edit-label">ที่พักแนะนำ</label>
+                <textarea class="form-textarea" id="travel-hotel" rows="2"
+                  placeholder="โรงแรมในตัวเมืองสตูล ห่างจากงาน ~20 นาที"></textarea>
+              </div>
+              <div class="field-group">
+                <label class="travel-edit-label">ที่จอดรถ</label>
+                <textarea class="form-textarea" id="travel-car" rows="2"
+                  placeholder="มีที่จอดรถสำหรับแขกเพียงพอ ไม่มีค่าใช้จ่าย"></textarea>
+              </div>
+              <div class="form-actions">
+                <span class="unsaved-badge" id="travel-unsaved">ยังไม่ได้บันทึก</span>
+                <button class="btn-save" id="btn-save-travel">บันทึก</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div class="confirm-overlay" id="confirm-overlay" style="display:none">
+    <div class="confirm-dialog">
+      <p class="confirm-msg" id="confirm-msg">ต้องการดำเนินการนี้?</p>
+      <div class="confirm-actions">
+        <button class="btn-outline" id="confirm-cancel">ยกเลิก</button>
+        <button class="btn-danger" id="confirm-ok">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast toast--success" id="toast"></div>
 
 </body>
+
 </html>
