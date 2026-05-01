@@ -16,6 +16,27 @@ export function initRsvp() {
     return;
   }
 
+  // Deadline check — disable form if past rsvp_deadline_iso
+  const deadlineIso = window.__weddingConfig?.rsvp_deadline_iso;
+  if (deadlineIso) {
+    const deadline = new Date(`${deadlineIso}T23:59:59+07:00`);
+    if (new Date() > deadline) {
+      const banner = document.getElementById('rsvp-closed-banner');
+      const closedDate = document.getElementById('rsvp-closed-date');
+      if (banner) banner.style.display = 'flex';
+      if (closedDate) {
+        const display = window.__weddingConfig?.rsvp_deadline_display || deadlineIso;
+        closedDate.textContent = `หมดเขตวันที่ ${display}`;
+      }
+      // Gray out all interactive elements
+      form.classList.add('rsvp-form--closed');
+      form.querySelectorAll('input, select, textarea, button').forEach(el => {
+        el.disabled = true;
+      });
+      return;
+    }
+  }
+
   function showError(id, show) {
     const el = document.getElementById(id);
     if (el) el.style.display = show ? 'block' : 'none';

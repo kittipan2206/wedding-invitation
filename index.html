@@ -251,6 +251,13 @@
           <span class="countdown-label">วินาที</span>
         </div>
       </div>
+      <!-- Shown after ceremony time has passed -->
+      <div id="countdown-ended" style="display:none">
+        <div class="countdown-ended-heart">♡</div>
+        <p class="countdown-ended-thanks">ขอบคุณทุกท่านที่มาร่วมงาน</p>
+        <p class="countdown-ended-names"></p>
+        <p class="countdown-ended-sub">รู้สึกอบอุ่นและมีความสุข ♡</p>
+      </div>
     </section>
 
     <!-- DETAILS -->
@@ -392,6 +399,14 @@
       <span class="section-label reveal">ตอบรับการเข้าร่วม</span>
       <h2 class="rsvp-heading reveal reveal-delay-1">RSVP</h2>
       <p class="rsvp-sub reveal reveal-delay-2" id="rsvp-deadline-text">กรุณาตอบรับภายในวันที่ 28 กุมภาพันธ์ 2569</p>
+      <!-- Shown when rsvp_deadline_iso has passed -->
+      <div id="rsvp-closed-banner" style="display:none">
+        <span class="rsvp-closed-icon">🔒</span>
+        <div>
+          <p class="rsvp-closed-title">หมดเขตตอบรับแล้ว</p>
+          <p class="rsvp-closed-sub" id="rsvp-closed-date"></p>
+        </div>
+      </div>
       <div class="rsvp-form reveal reveal-delay-3">
         <form id="rsvp-form" novalidate>
           <div class="form-row">
