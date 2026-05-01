@@ -63,7 +63,9 @@
   color: var(--color-text);
   background: rgba(255, 255, 255, 0.75);
   outline: none;
-  transition: border-color 0.25s, box-shadow 0.25s;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
   appearance: none;
   -webkit-appearance: none;
 }
@@ -92,7 +94,7 @@
 }
 
 .form-select-wrapper::after {
-  content: '';
+  content: "";
   position: absolute;
   right: 18px;
   top: 50%;
@@ -139,7 +141,11 @@
 
 .radio-option input[type="radio"]:checked + label {
   border-color: var(--color-lavender);
-  background: linear-gradient(135deg, rgba(249, 200, 212, 0.28), rgba(201, 184, 232, 0.28));
+  background: linear-gradient(
+    135deg,
+    rgba(249, 200, 212, 0.28),
+    rgba(201, 184, 232, 0.28)
+  );
   color: var(--color-text);
   box-shadow: 0 2px 12px rgba(201, 184, 232, 0.25);
 }
@@ -175,13 +181,20 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.18s;
+  transition:
+    opacity 0.2s,
+    transform 0.18s;
   box-shadow: 0 4px 24px rgba(196, 168, 222, 0.4);
   margin-top: 8px;
 }
 
-.btn-submit:hover  { opacity: 0.88; transform: translateY(-1px); }
-.btn-submit:active { transform: translateY(0); }
+.btn-submit:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+.btn-submit:active {
+  transform: translateY(0);
+}
 
 /* ── Field error ── */
 .field-error {
@@ -283,4 +296,3 @@
   user-select: none;
   filter: grayscale(0.3);
 }
-
