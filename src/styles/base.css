@@ -15,12 +15,12 @@
   --color-peach:    #F8D8B8;
   --color-sky:      #B8D8F8;
   --color-white:    #FDFCFB;
-  --color-text:     #4A4340;
+  --color-text:     #2e2a28;
   --color-muted:    #8A7F7A;
   --glass-bg:       rgba(255, 255, 255, 0.72);
 
   --font-serif:     'Cormorant Garamond', Georgia, serif;
-  --font-sans:      'Nunito', system-ui, sans-serif;
+  --font-sans:      'DM Sans', system-ui, sans-serif;
 
   --radius-sm:  8px;
   --radius-md:  16px;
@@ -57,7 +57,7 @@ body {
   height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
   scroll-behavior: smooth;
 }
 
@@ -108,9 +108,9 @@ a {
 #details,
 #rsvp,
 #guestbook,
+#gallery,
 footer {
   scroll-snap-align: start;
-  scroll-snap-stop: always;
   min-height: 100svh;
   display: flex;
   flex-direction: column;

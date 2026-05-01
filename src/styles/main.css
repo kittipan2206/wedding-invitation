@@ -8,5 +8,7 @@
 @import './components/details.css';
 @import './components/rsvp.css';
 @import './components/guestbook.css';
+@import './components/gallery.css';
+@import './components/share-modal.css';
 @import './components/footer.css';
 @import './components/scroll-nav.css';
