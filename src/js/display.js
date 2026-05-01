@@ -6,9 +6,9 @@ const PAGE_ROTATE_MS = 20_000; // auto-rotate every 20 s
 
 function getPageSize() {
   const w = window.innerWidth;
-  if (w <= 700) return 3;   // mobile: 1 col × 3 rows
-  if (w <= 1024) return 4;  // tablet: 2 col × 2 rows
-  return 6;                  // TV/desktop: 3 col × 2 rows
+  if (w <= 700) return 3; // mobile: 1 col × 3 rows
+  if (w <= 1024) return 4; // tablet: 2 col × 2 rows
+  return 6; // TV/desktop: 3 col × 2 rows
 }
 
 let PAGE_SIZE = getPageSize();
