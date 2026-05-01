@@ -63,6 +63,11 @@
 
     </div>
     <p class="envelope-label">แตะเพื่อเปิด</p>
+
+    <div class="env-controls">
+      <button id="env-music-btn" aria-label="เปิดเพลง" title="เปิดเพลง"></button>
+      <button id="env-fullscreen-btn" aria-label="เต็มหน้าจอ" title="เต็มหน้าจอ"></button>
+    </div>
   </div>
 
   <div class="snap-wrap">
@@ -167,6 +172,15 @@
       <hr class="divider" />
       <span class="section-label reveal">รายละเอียดงาน</span>
       <h2 class="details-heading reveal reveal-delay-1">วันและสถานที่</h2>
+      <div class="map-embed reveal">
+        <iframe
+          src="https://maps.google.com/maps?q=ตำบลแป-ระ+อำเภอท่าแพ+จังหวัดสตูล&output=embed&hl=th&z=13"
+          title="แผนที่สถานที่จัดงาน"
+          loading="lazy"
+          allowfullscreen
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
       <div class="map-actions reveal">
         <a class="map-btn map-btn--navigate" href="https://maps.app.goo.gl/aLVbEzWyUAovEDtC8" target="_blank"
           rel="noopener noreferrer">
@@ -304,11 +318,51 @@
       </div>
     </section>
 
+    <!-- GUESTBOOK -->
+    <section id="guestbook">
+      <hr class="divider" />
+      <span class="section-label reveal">สมุดเยี่ยม</span>
+      <h2 class="guestbook-heading reveal reveal-delay-1">ฝากคำอวยพร</h2>
+      <p class="guestbook-sub reveal reveal-delay-2">ฝากความรู้สึกดีๆ ให้กับนนท์ &amp; เมย์</p>
+      <div class="guestbook-card reveal reveal-delay-3">
+        <form id="guestbook-form" novalidate>
+          <div class="form-row">
+            <label class="form-label" for="gb-name">ชื่อของท่าน <span style="color:#c8888a">*</span></label>
+            <input class="form-input" type="text" id="gb-name" placeholder="ชื่อ-นามสกุล" autocomplete="name" />
+            <p class="field-error" id="gb-err-name">กรุณากรอกชื่อของท่าน</p>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="gb-message">คำอวยพร <span style="color:#c8888a">*</span></label>
+            <textarea class="form-textarea" id="gb-message" placeholder="ขอให้รักกันยาวนาน…" rows="4"></textarea>
+            <p class="field-error" id="gb-err-msg">กรุณากรอกคำอวยพร</p>
+          </div>
+          <button type="submit" class="btn-submit">ส่งคำอวยพร</button>
+        </form>
+        <div class="guestbook-thanks" id="guestbook-thanks" style="display:none">
+          <div class="guestbook-thanks-icon">
+            <svg width="26" height="26" viewBox="0 0 64 64" fill="none">
+              <path d="M32 54S8 38 8 22a12 12 0 0 1 24 0 12 12 0 0 1 24 0c0 16-24 32-24 32Z" fill="white" opacity="0.9"/>
+            </svg>
+          </div>
+          <h3>ขอบคุณมากนะคะ</h3>
+          <p>คำอวยพรของท่านส่งถึงนนท์ &amp; เมย์ แล้ว</p>
+        </div>
+      </div>
+    </section>
+
     <!-- FOOTER -->
     <footer class="reveal">
       <div class="footer-divider"></div>
       <p class="footer-text">With love, <span class="footer-names">นนท์ &amp; เมย์</span></p>
       <p class="footer-sub">15 · 03 · 2569</p>
+      <button id="share-btn" class="footer-share-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        แชร์การ์ดนี้
+      </button>
       <div class="footer-petals" aria-hidden="true">
         <div class="petal"></div>
         <div class="petal"></div>
@@ -319,48 +373,14 @@
     </footer>
   </div><!-- /.snap-wrap -->
 
-  <!-- FIXED BUTTONS (music + share) -->
-  <div id="fixed-actions" style="
-    position:fixed; bottom:24px; right:24px; z-index:100;
-    display:flex; flex-direction:column; gap:10px; align-items:center;
-  ">
-    <button id="fullscreen-btn" aria-label="เต็มหน้าจอ" title="เต็มหน้าจอ" style="
-      width:48px; height:48px; border-radius:50%; border:none;
-      background:rgba(255,255,255,0.82); backdrop-filter:blur(12px);
-      color:#8A7F7A; cursor:pointer; display:flex; align-items:center; justify-content:center;
-      box-shadow:0 4px 20px rgba(201,184,232,0.35); transition: box-shadow 0.3s, transform 0.2s;
-    ">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-        stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 3 21 3 21 9" />
-        <polyline points="9 21 3 21 3 15" />
-        <line x1="21" y1="3" x2="14" y2="10" />
-        <line x1="3" y1="21" x2="10" y2="14" />
-      </svg>
-    </button>
-    <button id="share-btn" aria-label="แชร์การ์ด" title="แชร์การ์ด" style="
-      width:48px; height:48px; border-radius:50%; border:none;
-      background:rgba(255,255,255,0.82); backdrop-filter:blur(12px);
-      color:#8A7F7A; cursor:pointer; display:flex; align-items:center; justify-content:center;
-      box-shadow:0 4px 20px rgba(201,184,232,0.35); transition: box-shadow 0.3s, transform 0.2s;
-    ">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-        stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="18" cy="5" r="3" />
-        <circle cx="6" cy="12" r="3" />
-        <circle cx="18" cy="19" r="3" />
-        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-      </svg>
-    </button>
-    <button id="music-btn" aria-label="เปิด/ปิดเพลง" title="เปิด/ปิดเพลง" style="
-      display:none;
-      width:48px; height:48px; border-radius:50%; border:none;
-      background:rgba(255,255,255,0.82); backdrop-filter:blur(12px);
-      color:#8A7F7A; cursor:pointer; align-items:center; justify-content:center;
-      box-shadow:0 4px 20px rgba(201,184,232,0.35); transition: box-shadow 0.3s;
-    "></button>
-  </div>
+  <!-- FIXED BUTTON (music only) -->
+  <button id="music-btn" aria-label="เปิด/ปิดเพลง" title="เปิด/ปิดเพลง" style="
+    display:none; position:fixed; bottom:24px; right:24px; z-index:100;
+    width:48px; height:48px; border-radius:50%; border:none;
+    background:rgba(255,255,255,0.82); backdrop-filter:blur(12px);
+    color:#8A7F7A; cursor:pointer; align-items:center; justify-content:center;
+    box-shadow:0 4px 20px rgba(201,184,232,0.35); transition: box-shadow 0.3s;
+  "></button>
 
 </body>
 

@@ -45,6 +45,31 @@ footer {
   opacity: 0.6;
 }
 
+.footer-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 24px;
+  padding: 8px 16px;
+  border-radius: 50px;
+  border: 1px solid rgba(201, 184, 232, 0.45);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--color-muted);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.footer-share-btn:hover {
+  opacity: 0.75;
+  transform: translateY(-1px);
+}
+
 .footer-petals {
   display: flex;
   justify-content: center;

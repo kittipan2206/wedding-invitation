@@ -1,6 +1,6 @@
 export function initScrollNav() {
-  const sections = ['hero', 'countdown', 'details', 'rsvp'];
-  const labels = ['เริ่มต้น', 'นับถอยหลัง', 'รายละเอียด', 'RSVP'];
+  const sections = ['hero', 'countdown', 'details', 'rsvp', 'guestbook'];
+  const labels = ['เริ่มต้น', 'นับถอยหลัง', 'รายละเอียด', 'RSVP', 'สมุดเยี่ยม'];
 
   const nav = document.createElement('nav');
   nav.className = 'scroll-nav';

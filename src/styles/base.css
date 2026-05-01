@@ -107,6 +107,7 @@ a {
 #countdown,
 #details,
 #rsvp,
+#guestbook,
 footer {
   scroll-snap-align: start;
   scroll-snap-stop: always;

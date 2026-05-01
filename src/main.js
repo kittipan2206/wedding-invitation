@@ -9,16 +9,18 @@ import { initScrollNav }     from './js/scroll-nav.js';
 import { initShare }         from './js/share.js';
 import { initCursorSparkle } from './js/cursor-sparkle.js';
 import { initFullscreen }    from './js/fullscreen.js';
+import { initTypewriter }    from './js/typewriter.js';
+import { initGuestbook }     from './js/guestbook.js';
+import { initParallax }      from './js/parallax.js';
 
 function afterEnvelope() {
   initPetals();
-  initMusic();
   const musicBtn = document.getElementById('music-btn');
   if (musicBtn) musicBtn.style.display = 'flex';
+  initTypewriter('.hero-date', { startDelay: 400, charDelay: 55 });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Guest name personalization
   const params = new URLSearchParams(window.location.search);
   const guestName = params.get('to');
   if (guestName) {
@@ -36,7 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initRsvp();
   initScrollNav();
   initShare();
+  initMusic();
   initCursorSparkle();
   initFullscreen();
+  initGuestbook();
+  initParallax();
   initEnvelope(afterEnvelope);
 });

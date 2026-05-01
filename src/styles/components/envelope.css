@@ -114,7 +114,46 @@
   animation: fadeIn 0.6s ease 0.8s forwards;
 }
 
+/* ── Envelope overlay controls (music + fullscreen) ── */
+.env-controls {
+  position: absolute;
+  bottom: 28px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 28px;
+  pointer-events: none;
+  opacity: 0;
+  animation: fadeIn 0.5s ease 1.2s forwards;
+}
+
+.env-controls button {
+  pointer-events: all;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--color-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(201, 184, 232, 0.2);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0.72;
+}
+
+.env-controls button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
 /* Music button playing state */
-#music-btn.is-playing {
+#music-btn.is-playing,
+#env-music-btn.is-playing {
   animation: musicPulse 2s ease-in-out infinite;
 }

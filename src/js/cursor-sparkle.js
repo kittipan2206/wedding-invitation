@@ -18,22 +18,25 @@ export function initCursorSparkle() {
   const colors = ['#F9C8D4', '#C9B8E8', '#B8E8D8', '#B8D8F8', '#F5E6C8', '#E8C8F0'];
   const particles = [];
 
+  let frame = 0;
   document.addEventListener('mousemove', e => {
-    for (let i = 0; i < 4; i++) {
+    frame++;
+    if (frame % 2 !== 0) return; // spawn every other event to reduce density
+    for (let i = 0; i < 2; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 1.8 + 0.6;
+      const speed = Math.random() * 0.9 + 0.3;
       particles.push({
         x: e.clientX,
         y: e.clientY,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 0.8,
-        r: Math.random() * 5 + 3,
-        alpha: 0.9,
-        decay: Math.random() * 0.025 + 0.018,
+        vy: Math.sin(angle) * speed - 0.5,
+        r: Math.random() * 4 + 2,
+        alpha: 0.75,
+        decay: Math.random() * 0.012 + 0.010,
         color: colors[Math.floor(Math.random() * colors.length)],
         spikes: Math.random() < 0.5 ? 4 : 6,
         rotation: Math.random() * Math.PI,
-        spin: (Math.random() - 0.5) * 0.12,
+        spin: (Math.random() - 0.5) * 0.07,
       });
     }
   });
@@ -58,7 +61,7 @@ export function initCursorSparkle() {
       const p = particles[i];
       p.x += p.vx;
       p.y += p.vy;
-      p.vy += 0.04; // gentle gravity
+      p.vy += 0.02; // gentle gravity
       p.r *= 0.965;
       p.alpha -= p.decay;
       p.rotation += p.spin;
