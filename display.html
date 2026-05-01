@@ -113,8 +113,8 @@
             height: 100vh;
             display: grid;
             grid-template-rows: auto 1fr auto;
-            padding: clamp(24px, 3.5vh, 52px) clamp(32px, 5vw, 96px);
-            gap: clamp(16px, 2.2vh, 32px);
+            padding: clamp(16px, 3.5vh, 52px) clamp(16px, 5vw, 96px);
+            gap: clamp(12px, 2.2vh, 32px);
         }
 
         /* ── Header ── */
@@ -184,6 +184,22 @@
             grid-template-columns: repeat(3, 1fr);
             gap: clamp(12px, 1.6vw, 24px);
             align-content: center;
+        }
+
+        @media (max-width: 700px) {
+            .display-feed {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                align-content: start;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+            }
+        }
+
+        @media (min-width: 701px) and (max-width: 1024px) {
+            .display-feed {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         /* Page transitions */
@@ -385,6 +401,24 @@
             background: rgba(255, 255, 255, 0.38);
         }
 
+        /* Always visible on touch devices */
+        @media (hover: none) {
+            .nav-btn {
+                opacity: 0.45;
+                width: clamp(40px, 11vw, 56px);
+                height: clamp(40px, 11vw, 56px);
+                font-size: clamp(20px, 6vw, 32px);
+            }
+
+            .nav-btn--prev {
+                left: 6px;
+            }
+
+            .nav-btn--next {
+                right: 6px;
+            }
+        }
+
         .nav-btn:active {
             transform: translateY(-50%) scale(0.88);
         }
@@ -392,6 +426,44 @@
         .nav-btn:disabled {
             opacity: 0 !important;
             pointer-events: none;
+        }
+
+        /* ── Mobile header ── */
+        @media (max-width: 700px) {
+            .display-couple {
+                font-size: clamp(22px, 6vw, 36px);
+            }
+
+            .display-badge {
+                font-size: 12px;
+                padding: 6px 14px;
+                gap: 6px;
+            }
+
+            .display-card {
+                padding: 14px 16px;
+                gap: 12px;
+            }
+
+            .display-card-msg {
+                -webkit-line-clamp: 4;
+                line-clamp: 4;
+            }
+
+            .display-footer {
+                grid-template-columns: 1fr auto;
+                grid-template-rows: auto auto;
+            }
+
+            .display-subtitle {
+                grid-column: 1 / -1;
+                text-align: center;
+                font-size: 13px;
+            }
+
+            .display-updated {
+                display: none;
+            }
         }
 
         /* ── Empty state ── */

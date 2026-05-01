@@ -2,8 +2,16 @@ const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 
 const POLL_INTERVAL = 10_000; // poll every 10 s
-const PAGE_SIZE = 6; // 3 × 2 grid
 const PAGE_ROTATE_MS = 20_000; // auto-rotate every 20 s
+
+function getPageSize() {
+  const w = window.innerWidth;
+  if (w <= 700) return 3; // mobile: 1 col × 3 rows
+  if (w <= 1024) return 4; // tablet: 2 col × 2 rows
+  return 6; // TV/desktop: 3 col × 2 rows
+}
+
+let PAGE_SIZE = getPageSize();
 
 let allEntries = [];
 let knownKeys = new Set();
@@ -296,5 +304,18 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("touchend", (e) => {
     const dx = e.changedTouches[0].clientX - touchStartX;
     if (Math.abs(dx) > 50) navigatePage(dx < 0 ? 1 : -1);
+  });
+
+  // Resize / orientation change — recalculate page size and re-render
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      PAGE_SIZE = getPageSize();
+      currentPage = 0;
+      renderPage();
+      updatePageDots();
+      resetPageTimer();
+    }, 150);
   });
 });
