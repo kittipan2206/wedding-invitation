@@ -1,287 +1,351 @@
 const SHEET_URL =
-  "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
+  'https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec';
 
-// Simple password check — client-side only, suitable for personal wedding admin
-const ADMIN_PW = "30122001";
-const AUTH_KEY = "gallery_admin_auth";
+const ADMIN_PW  = '30122001';
+const AUTH_KEY  = 'gallery_admin_auth';
 
-let photos = [];
+// ── State ─────────────────────────────────────────────────────────────────────
+let photos    = [];
+let rsvpData  = [];
+let gbData    = [];
+let cfgData   = {};
+let activeTab = sessionStorage.getItem('admin_tab') || 'event';
+let tabLoaded = {};
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
-
-function isAuthed() {
-  return sessionStorage.getItem(AUTH_KEY) === "1";
-}
+function isAuthed() { return sessionStorage.getItem(AUTH_KEY) === '1'; }
 
 function initAuth() {
-  const authScreen = document.getElementById("auth-screen");
-  const adminScreen = document.getElementById("admin-screen");
+  const authScreen  = document.getElementById('auth-screen');
+  const adminScreen = document.getElementById('admin-screen');
 
   if (isAuthed()) {
-    authScreen.style.display = "none";
-    adminScreen.style.display = "block";
-    loadPhotos();
+    authScreen.style.display  = 'none';
+    adminScreen.style.display = 'block';
+    initAdmin();
     return;
   }
 
-  document.getElementById("auth-form")?.addEventListener("submit", (e) => {
+  document.getElementById('auth-form')?.addEventListener('submit', e => {
     e.preventDefault();
-    const pw = document.getElementById("admin-password")?.value ?? "";
+    const pw = document.getElementById('admin-password')?.value ?? '';
     if (pw === ADMIN_PW) {
-      sessionStorage.setItem(AUTH_KEY, "1");
-      authScreen.style.display = "none";
-      adminScreen.style.display = "block";
-      loadPhotos();
+      sessionStorage.setItem(AUTH_KEY, '1');
+      authScreen.style.display  = 'none';
+      adminScreen.style.display = 'block';
+      initAdmin();
     } else {
-      const err = document.getElementById("auth-error");
-      if (err) err.style.display = "block";
-      document.getElementById("admin-password").value = "";
+      const err = document.getElementById('auth-error');
+      if (err) err.style.display = 'block';
+      document.getElementById('admin-password').value = '';
     }
   });
 }
 
-// ── Fetch all photos (including hidden) ───────────────────────────────────────
+// ── Tab Navigation ────────────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(el => {
+    el.classList.toggle('tab-panel--hidden', el.id !== `tab-${name}`);
+  });
+  document.querySelectorAll('.tab-item, .bnav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === name);
+  });
+  activeTab = name;
+  sessionStorage.setItem('admin_tab', name);
+  loadTabOnce(name);
+}
 
+function loadTabOnce(name) {
+  if (tabLoaded[name]) return;
+  tabLoaded[name] = true;
+  if (name === 'event')     loadEventConfig();
+  if (name === 'gallery')   loadPhotos();
+  if (name === 'rsvp')      loadRsvp();
+  if (name === 'guestbook') loadGuestbook();
+  if (name === 'music')     loadMusicTravel();
+}
+
+function initTabs() {
+  document.querySelectorAll('.tab-item, .bnav-item').forEach(el => {
+    el.addEventListener('click', () => showTab(el.dataset.tab));
+  });
+  showTab(activeTab);
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.className = `toast toast--${type} toast--show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('toast--show'), 2400);
+}
+
+async function apiGet(params) {
+  const url = `${SHEET_URL}?${new URLSearchParams(params)}`;
+  const res = await fetch(url, { redirect: 'follow' });
+  if (!res.ok) throw new Error(`GET failed: ${res.status}`);
+  return res.json();
+}
+
+async function apiPost(payload) {
+  await fetch(SHEET_URL, {
+    method:  'POST',
+    mode:    'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body:    JSON.stringify(payload),
+  });
+}
+
+function confirmDialog(msg) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('confirm-overlay');
+    document.getElementById('confirm-msg').textContent = msg;
+    overlay.style.display = 'flex';
+    const onOk = () => { cleanup(); resolve(true); };
+    const onCancel = () => { cleanup(); resolve(false); };
+    function cleanup() {
+      overlay.style.display = 'none';
+      document.getElementById('confirm-ok').removeEventListener('click', onOk);
+      document.getElementById('confirm-cancel').removeEventListener('click', onCancel);
+    }
+    document.getElementById('confirm-ok').addEventListener('click', onOk);
+    document.getElementById('confirm-cancel').addEventListener('click', onCancel);
+  });
+}
+
+// ── Event Info Tab ────────────────────────────────────────────────────────────
+const EV_FIELDS = {
+  'ev-groom':       'groom_name',
+  'ev-bride':       'bride_name',
+  'ev-date-iso':    'event_date_iso',
+  'ev-date-display':'event_date_display',
+  'ev-time-ceremony':'event_time_ceremony',
+  'ev-time-lunch':  'event_time_lunch',
+  'ev-venue':       'venue_name',
+  'ev-maps-url':    'venue_maps_url',
+  'ev-maps-embed':  'venue_maps_embed',
+  'ev-dress':       'dress_code',
+  'ev-rsvp-iso':    'rsvp_deadline_iso',
+  'ev-rsvp-display':'rsvp_deadline_display',
+};
+
+async function loadEventConfig() {
+  try {
+    cfgData = await apiGet({ type: 'config' });
+  } catch {
+    showToast('โหลด config ไม่ได้', 'error');
+    cfgData = {};
+  }
+  Object.entries(EV_FIELDS).forEach(([elId, key]) => {
+    const el = document.getElementById(elId);
+    if (el && cfgData[key] != null) el.value = cfgData[key];
+  });
+  markEvClean();
+}
+
+function markEvClean() {
+  document.getElementById('ev-unsaved').classList.remove('visible');
+}
+
+function initEventTab() {
+  Object.keys(EV_FIELDS).forEach(elId => {
+    document.getElementById(elId)?.addEventListener('input', () => {
+      document.getElementById('ev-unsaved').classList.add('visible');
+    });
+  });
+
+  document.getElementById('btn-save-event')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btn-save-event');
+    btn.disabled = true;
+    btn.textContent = 'กำลังบันทึก…';
+    let hasChange = false;
+    const posts = [];
+    Object.entries(EV_FIELDS).forEach(([elId, key]) => {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      const val = el.value.trim();
+      if (val !== String(cfgData[key] ?? '')) {
+        posts.push(apiPost({ type: 'config_update', key, value: val }));
+        cfgData[key] = val;
+        hasChange = true;
+      }
+    });
+    await Promise.allSettled(posts);
+    btn.disabled = false;
+    btn.textContent = 'บันทึก Event Info';
+    if (hasChange) { markEvClean(); showToast('บันทึก Event Info แล้ว ✓'); }
+    else showToast('ไม่มีการเปลี่ยนแปลง', 'info');
+  });
+}
+
+// ── Gallery Tab ───────────────────────────────────────────────────────────────
 async function loadPhotos() {
   setListContent('<p class="admin-status">กำลังโหลด…</p>');
   try {
-    const res = await fetch(`${SHEET_URL}?type=photos_all`, {
-      method: "GET",
-      redirect: "follow",
-    });
-    const data = res.ok ? await res.json() : [];
-    // Guard: only accept items that look like photo records
+    const data = await apiGet({ type: 'photos_all' });
     photos = Array.isArray(data)
-      ? data.filter(
-          (item) =>
-            item && typeof item.url === "string" && item.url.startsWith("http"),
-        )
+      ? data.filter(p => p && typeof p.url === 'string' && p.url.startsWith('http'))
       : [];
-  } catch {
-    photos = [];
-  }
+  } catch { photos = []; }
   renderPhotoList();
   updatePhotoCount();
 }
 
 function updatePhotoCount() {
-  const el = document.getElementById("photo-count");
-  if (el) el.textContent = photos.length ? `${photos.length} รูป` : "";
+  const el = document.getElementById('photo-count');
+  if (el) el.textContent = photos.length ? `${photos.length} รูป` : '';
 }
 
-// ── Render list ───────────────────────────────────────────────────────────────
+function setListContent(html) {
+  const list = document.getElementById('photo-list');
+  if (list) list.innerHTML = html;
+}
 
 function renderPhotoList() {
-  const list = document.getElementById("photo-list");
+  const list = document.getElementById('photo-list');
   if (!list) return;
-
   if (photos.length === 0) {
-    list.innerHTML =
-      '<p class="admin-status">ยังไม่มีรูปภาพ — เพิ่มรูปแรกได้เลย</p>';
+    list.innerHTML = '<p class="admin-status">ยังไม่มีรูปภาพ — เพิ่มรูปแรกได้เลย</p>';
     return;
   }
-
-  list.innerHTML = "";
-  photos.forEach((photo, i) => {
-    list.appendChild(buildPhotoItem(photo, i));
-  });
+  list.innerHTML = '';
+  photos.forEach((photo, i) => list.appendChild(buildPhotoItem(photo, i)));
 }
 
 function buildPhotoItem(photo, index) {
-  const item = document.createElement("div");
-  item.className = "photo-item" + (photo.visible ? "" : " photo-item--hidden");
+  const item = document.createElement('div');
+  item.className = 'photo-item' + (photo.visible ? '' : ' photo-item--hidden');
 
   const thumb = photo.url
-    ? `<img class="photo-thumb" src="${getSizedUrl(photo.url, 200)}" alt="" loading="lazy" />`
+    ? `<img class="photo-thumb" src="${getSizedUrl(photo.url,200)}" alt="" loading="lazy" />`
     : `<div class="photo-thumb-placeholder"></div>`;
 
-  const cat = photo.category || "ไม่มีหมวด";
-  const catLabel =
-    cat === "pre-wedding" ? "Pre-wedding" : cat === "wedding" ? "วันงาน" : cat;
+  const cat = photo.category || '';
+  const catLabel = cat === 'pre-wedding' ? 'Pre-wedding' : cat === 'wedding' ? 'วันงาน' : cat || '—';
 
   item.innerHTML = `
     ${thumb}
     <div class="photo-info">
-      <p class="photo-caption-text">${escHtml(photo.caption || "(ไม่มี caption)")}</p>
+      <p class="photo-caption-text">${escHtml(photo.caption || '(ไม่มี caption)')}</p>
       <div class="photo-meta">
         <span class="photo-category-badge">${escHtml(catLabel)}</span>
         <span class="photo-order">#${photo.order ?? index + 1}</span>
       </div>
     </div>
     <div class="photo-actions">
-      <button class="action-btn action-btn--vis${photo.visible ? " active" : ""}"
-        title="${photo.visible ? "ซ่อน" : "แสดง"}">
+      <button class="btn-icon btn-icon--vis${photo.visible ? ' active' : ''}" title="${photo.visible ? 'ซ่อน' : 'แสดง'}">
         ${photo.visible ? eyeIcon() : eyeOffIcon()}
       </button>
-      <button class="action-btn action-btn--up" title="ขึ้น" ${index === 0 ? "disabled" : ""}>↑</button>
-      <button class="action-btn action-btn--down" title="ลง" ${index === photos.length - 1 ? "disabled" : ""}>↓</button>
-      <button class="action-btn action-btn--del" title="ลบ">
+      <button class="btn-icon btn-icon--up" title="ขึ้น" ${index === 0 ? 'disabled' : ''}>↑</button>
+      <button class="btn-icon btn-icon--down" title="ลง" ${index === photos.length - 1 ? 'disabled' : ''}>↓</button>
+      <button class="btn-icon btn-icon--del" title="ลบ">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
         </svg>
       </button>
     </div>`;
 
-  item
-    .querySelector(".action-btn--vis")
-    .addEventListener("click", () =>
-      handleToggleVisible(photo.id, !photo.visible),
-    );
-  item
-    .querySelector(".action-btn--up")
-    .addEventListener("click", () => handleReorder(index, index - 1));
-  item
-    .querySelector(".action-btn--down")
-    .addEventListener("click", () => handleReorder(index, index + 1));
-  item
-    .querySelector(".action-btn--del")
-    .addEventListener("click", () => handleDelete(photo.id));
-
+  item.querySelector('.btn-icon--vis').addEventListener('click', () => handleToggleVisible(photo.id, !photo.visible));
+  item.querySelector('.btn-icon--up').addEventListener('click',  () => handleReorder(index, index - 1));
+  item.querySelector('.btn-icon--down').addEventListener('click',() => handleReorder(index, index + 1));
+  item.querySelector('.btn-icon--del').addEventListener('click', () => handleDeletePhoto(photo.id));
   return item;
 }
 
-// ── Actions (Optimistic UI — update local state first, POST in background) ────
-
 function handleToggleVisible(id, visible) {
-  const idx = photos.findIndex((p) => p.id === id);
+  const idx = photos.findIndex(p => p.id === id);
   if (idx === -1) return;
   photos[idx] = { ...photos[idx], visible };
-  renderPhotoList();
-  updatePhotoCount();
-  showToast(visible ? "แสดงรูปแล้ว" : "ซ่อนรูปแล้ว");
-  post({ type: "photo_update", id, visible }); // fire-and-forget
+  renderPhotoList(); updatePhotoCount();
+  showToast(visible ? 'แสดงรูปแล้ว' : 'ซ่อนรูปแล้ว');
+  apiPost({ type: 'photo_update', id, visible });
 }
 
 function handleReorder(fromIdx, toIdx) {
   if (toIdx < 0 || toIdx >= photos.length) return;
-  const a = photos[fromIdx];
-  const b = photos[toIdx];
-  // Swap in local array
+  const a = photos[fromIdx], b = photos[toIdx];
   [photos[fromIdx], photos[toIdx]] = [photos[toIdx], photos[fromIdx]];
-  // Update order numbers
   photos[fromIdx] = { ...photos[fromIdx], order: a.order ?? fromIdx + 1 };
-  photos[toIdx] = { ...photos[toIdx], order: b.order ?? toIdx + 1 };
+  photos[toIdx]   = { ...photos[toIdx],   order: b.order ?? toIdx + 1 };
   renderPhotoList();
-  // Fire both POSTs in background
-  post({ type: "photo_update", id: a.id, order: b.order ?? toIdx + 1 });
-  post({ type: "photo_update", id: b.id, order: a.order ?? fromIdx + 1 });
+  apiPost({ type: 'photo_update', id: a.id, order: b.order ?? toIdx + 1 });
+  apiPost({ type: 'photo_update', id: b.id, order: a.order ?? fromIdx + 1 });
 }
 
-function handleDelete(id) {
-  if (!confirm("ลบรูปนี้? ไม่สามารถกู้คืนได้")) return;
-  photos = photos.filter((p) => p.id !== id);
-  renderPhotoList();
-  updatePhotoCount();
-  showToast("ลบรูปแล้ว");
-  post({ type: "photo_delete", id }); // fire-and-forget
+async function handleDeletePhoto(id) {
+  const ok = await confirmDialog('ลบรูปนี้? ไม่สามารถกู้คืนได้');
+  if (!ok) return;
+  photos = photos.filter(p => p.id !== id);
+  renderPhotoList(); updatePhotoCount();
+  showToast('ลบรูปแล้ว');
+  apiPost({ type: 'photo_delete', id });
 }
 
-// ── Add form ──────────────────────────────────────────────────────────────────
+function initGalleryTab() {
+  const form      = document.getElementById('add-photo-form');
+  const urlInput  = document.getElementById('new-url');
+  const prevWrap  = document.getElementById('url-preview-wrap');
+  const prevImg   = document.getElementById('url-preview');
 
-function setupAddForm() {
-  const form = document.getElementById("add-photo-form");
-  const urlInput = document.getElementById("new-url");
-  const previewWrap = document.getElementById("url-preview-wrap");
-  const previewImg = document.getElementById("url-preview");
-  const btn = document.getElementById("btn-add-photo");
-
-  urlInput?.addEventListener("input", () => {
+  urlInput?.addEventListener('input', () => {
     const url = urlInput.value.trim();
-    if (url && previewWrap && previewImg) {
-      previewImg.src = getSizedUrl(url, 400);
-      previewWrap.classList.add("visible");
-    } else if (previewWrap) {
-      previewWrap.classList.remove("visible");
+    if (url && prevWrap && prevImg) {
+      prevImg.src = getSizedUrl(url, 400);
+      prevWrap.classList.add('visible');
+    } else if (prevWrap) {
+      prevWrap.classList.remove('visible');
     }
   });
 
-  form?.addEventListener("submit", (e) => {
+  form?.addEventListener('submit', e => {
     e.preventDefault();
     const url = urlInput?.value.trim();
     if (!url) return;
-
     const newPhoto = {
-      id: String(Date.now()),
-      url: cleanUrl(url),
-      caption: document.getElementById("new-caption")?.value.trim() ?? "",
-      category: document.getElementById("new-category")?.value ?? "",
-      order: photos.length + 1,
-      visible: true,
+      id:        String(Date.now()),
+      url:       cleanUrl(url),
+      caption:   document.getElementById('new-caption')?.value.trim() ?? '',
+      category:  document.getElementById('new-category')?.value ?? '',
+      order:     photos.length + 1,
+      visible:   true,
       timestamp: new Date().toISOString(),
     };
-
-    // Optimistic: add to local array and render immediately
     photos.push(newPhoto);
-    renderPhotoList();
-    updatePhotoCount();
-
+    renderPhotoList(); updatePhotoCount();
     form.reset();
-    if (previewWrap) previewWrap.classList.remove("visible");
-    showToast("เพิ่มรูปภาพแล้ว ✓");
+    if (prevWrap) prevWrap.classList.remove('visible');
+    showToast('เพิ่มรูปภาพแล้ว ✓');
+    apiPost({ type: 'photo_add', ...newPhoto });
+  });
 
-    // POST in background
-    post({ type: "photo_add", ...newPhoto });
+  document.getElementById('refresh-btn')?.addEventListener('click', () => {
+    tabLoaded['gallery'] = false;
+    loadPhotos();
   });
 }
 
-// ── HTTP helper ───────────────────────────────────────────────────────────────
-
-async function post(payload) {
-  try {
-    // Use text/plain to avoid CORS preflight — GAS still receives the body via e.postData.contents
-    await fetch(SHEET_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify(payload),
-    });
-  } catch {
-    // no-cors response is always opaque — errors are silent
-  }
-}
-
-// ── Utilities ─────────────────────────────────────────────────────────────────
-
 function getSizedUrl(url, size) {
-  if (!url) return "";
-  // Strip any existing sizing params (=w... including -h...-s-no-gm and ?authuser=N)
-  if (url.includes("googleusercontent.com")) {
-    const base = url.replace(/=w[^?#]+(?:[?#].*)?$/, "");
-    return `${base}=w${size}`;
+  if (!url) return '';
+  if (url.includes('googleusercontent.com')) {
+    return url.replace(/=w[^?#]+(?:[?#].*)?$/, '') + `=w${size}`;
   }
   return url;
 }
 
-/** Return the clean base URL (no size params, no ?authuser) for storage */
 function cleanUrl(url) {
-  if (!url) return "";
-  if (url.includes("googleusercontent.com")) {
-    return url.replace(/=w[^?#]+(?:[?#].*)?$/, "");
+  if (!url) return '';
+  if (url.includes('googleusercontent.com')) {
+    return url.replace(/=w[^?#]+(?:[?#].*)?$/, '');
   }
   return url;
-}
-
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function setListContent(html) {
-  const list = document.getElementById("photo-list");
-  if (list) list.innerHTML = html;
-}
-
-let toastTimer;
-function showToast(msg) {
-  const toast = document.getElementById("toast");
-  if (!toast) return;
-  toast.textContent = msg;
-  toast.classList.add("toast--show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("toast--show"), 2200);
 }
 
 function eyeIcon() {
@@ -291,10 +355,262 @@ function eyeOffIcon() {
   return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// ── RSVP Tab ──────────────────────────────────────────────────────────────────
+async function loadRsvp() {
+  document.getElementById('rsvp-loading').style.display = 'block';
+  document.getElementById('rsvp-empty').style.display = 'none';
+  try {
+    rsvpData = await apiGet({ type: 'rsvp_all' });
+    if (!Array.isArray(rsvpData)) rsvpData = [];
+  } catch {
+    rsvpData = [];
+    showToast('โหลด RSVP ไม่ได้', 'error');
+  }
+  document.getElementById('rsvp-loading').style.display = 'none';
+  renderRsvp();
+}
 
-document.addEventListener("DOMContentLoaded", () => {
-  initAuth();
-  setupAddForm();
-  document.getElementById("refresh-btn")?.addEventListener("click", loadPhotos);
-});
+function renderRsvp() {
+  const search = document.getElementById('rsvp-search')?.value.toLowerCase() || '';
+  const filter = document.getElementById('rsvp-filter')?.value || '';
+
+  const filtered = rsvpData.filter(r => {
+    const name = String(r['ชื่อ'] || '').toLowerCase();
+    const attend = String(r['การเข้าร่วม'] || '');
+    return name.includes(search) && (!filter || attend === filter);
+  });
+
+  // Summary (from all data, not filtered)
+  const coming    = rsvpData.filter(r => String(r['การเข้าร่วม']).includes('ยินดี'));
+  const notcoming = rsvpData.filter(r => String(r['การเข้าร่วม']).includes('ไม่สะดวก'));
+  const guests    = coming.reduce((s, r) => s + (Number(r['จำนวน']) || 0), 0);
+  document.getElementById('rsvp-count-coming').textContent    = coming.length;
+  document.getElementById('rsvp-count-notcoming').textContent = notcoming.length;
+  document.getElementById('rsvp-count-guests').textContent    = guests;
+  document.getElementById('rsvp-count-total').textContent     = rsvpData.length;
+
+  const tbody = document.getElementById('rsvp-tbody');
+  const empty = document.getElementById('rsvp-empty');
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = filtered.map((r, i) => {
+    const attend = String(r['การเข้าร่วม'] || '');
+    const isComing = attend.includes('ยินดี');
+    const badgeClass = isComing ? 'status-badge--coming' : 'status-badge--notcoming';
+    const badgeText  = isComing ? 'มา' : 'ไม่มา';
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><span class="td-truncate" style="max-width:120px" title="${escHtml(r['ชื่อ']||'')}">${escHtml(r['ชื่อ']||'—')}</span></td>
+      <td><span class="status-badge ${badgeClass}">${badgeText}</span></td>
+      <td>${escHtml(r['จำนวน']||'—')}</td>
+      <td><span class="td-truncate" style="max-width:100px" title="${escHtml(r['ติดต่อ']||'')}">${escHtml(r['ติดต่อ']||'—')}</span></td>
+      <td><span class="td-truncate" title="${escHtml(r['ข้อความ']||'')}">${escHtml(r['ข้อความ']||'—')}</span></td>
+      <td style="white-space:nowrap;font-size:11px;color:var(--muted)">${escHtml(r['timestamp']||'')}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportRsvpCsv() {
+  if (!rsvpData.length) { showToast('ไม่มีข้อมูล', 'error'); return; }
+  const headers = ['#','ชื่อ','การเข้าร่วม','จำนวน','ติดต่อ','ข้อความ','เวลา'];
+  const rows = rsvpData.map((r, i) => [
+    i + 1,
+    r['ชื่อ'] || '',
+    r['การเข้าร่วม'] || '',
+    r['จำนวน'] || '',
+    r['ติดต่อ'] || '',
+    r['ข้อความ'] || '',
+    r['timestamp'] || '',
+  ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'rsvp.csv';
+  link.click();
+}
+
+function initRsvpTab() {
+  document.getElementById('rsvp-search')?.addEventListener('input', renderRsvp);
+  document.getElementById('rsvp-filter')?.addEventListener('change', renderRsvp);
+  document.getElementById('btn-export-rsvp')?.addEventListener('click', exportRsvpCsv);
+}
+
+// ── Guestbook Tab ─────────────────────────────────────────────────────────────
+async function loadGuestbook() {
+  document.getElementById('guestbook-loading').style.display = 'block';
+  document.getElementById('guestbook-empty').style.display = 'none';
+  try {
+    gbData = await apiGet({ type: 'guestbook_all' });
+    if (!Array.isArray(gbData)) gbData = [];
+  } catch {
+    gbData = [];
+    showToast('โหลด Guestbook ไม่ได้', 'error');
+  }
+  document.getElementById('guestbook-loading').style.display = 'none';
+  renderGuestbook();
+}
+
+function renderGuestbook() {
+  const showHidden = document.getElementById('show-hidden-entries')?.checked;
+  const filtered = showHidden ? gbData : gbData.filter(e => !e.hidden);
+
+  const tbody = document.getElementById('guestbook-tbody');
+  const empty = document.getElementById('guestbook-empty');
+
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = filtered.map((entry, i) => {
+    const hiddenBadge = entry.hidden
+      ? '<span class="status-badge status-badge--hidden">ซ่อนอยู่</span>' : '';
+    return `<tr data-id="${escHtml(String(entry.id || ''))}">
+      <td>${i + 1}</td>
+      <td><span class="td-truncate" style="max-width:100px" title="${escHtml(entry.name||'')}">${escHtml(entry.name||'—')}</span></td>
+      <td><span class="td-truncate" title="${escHtml(entry.message||'')}">${escHtml(entry.message||'—')}</span></td>
+      <td style="white-space:nowrap;font-size:11px;color:var(--muted)">${escHtml(entry.timestamp||'')}</td>
+      <td>${hiddenBadge}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn-icon btn-gb-hide" title="${entry.hidden ? 'แสดง' : 'ซ่อน'}">${entry.hidden ? eyeIcon() : eyeOffIcon()}</button>
+          <button class="btn-icon btn-icon--del btn-gb-del" title="ลบ">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Attach event listeners
+  tbody.querySelectorAll('.btn-gb-hide').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.closest('tr').dataset.id;
+      const entry = gbData.find(e => String(e.id) === id);
+      if (!entry) return;
+      handleGbHide(id, !entry.hidden);
+    });
+  });
+  tbody.querySelectorAll('.btn-gb-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.closest('tr').dataset.id;
+      handleGbDelete(id);
+    });
+  });
+}
+
+function handleGbHide(id, hidden) {
+  const entry = gbData.find(e => String(e.id) === id);
+  if (!entry) return;
+  entry.hidden = hidden;
+  renderGuestbook();
+  showToast(hidden ? 'ซ่อนข้อความแล้ว' : 'แสดงข้อความแล้ว');
+  apiPost({ type: 'guestbook_hide', id, hidden });
+}
+
+async function handleGbDelete(id) {
+  const ok = await confirmDialog('ลบข้อความนี้ออกจาก Guestbook?');
+  if (!ok) return;
+  gbData = gbData.filter(e => String(e.id) !== id);
+  renderGuestbook();
+  showToast('ลบข้อความแล้ว');
+  apiPost({ type: 'guestbook_delete', id });
+}
+
+function initGuestbookTab() {
+  document.getElementById('show-hidden-entries')?.addEventListener('change', renderGuestbook);
+}
+
+// ── Music & Travel Tab ────────────────────────────────────────────────────────
+async function loadMusicTravel() {
+  try {
+    const cfg = await apiGet({ type: 'config' });
+    cfgData = { ...cfgData, ...cfg };
+  } catch {}
+  const musicUrl = document.getElementById('music-url');
+  if (musicUrl) musicUrl.value = cfgData['music_url'] || '/music.mp3';
+
+  const travelAirport = document.getElementById('travel-airport');
+  if (travelAirport) travelAirport.value = cfgData['travel_airport'] || '';
+
+  const travelHotel = document.getElementById('travel-hotel');
+  if (travelHotel) travelHotel.value = cfgData['travel_hotel'] || '';
+
+  const travelCar = document.getElementById('travel-car');
+  if (travelCar) travelCar.value = cfgData['travel_car'] || '';
+}
+
+function markUnsaved(badgeId) {
+  document.getElementById(badgeId)?.classList.add('visible');
+}
+
+function clearUnsaved(badgeId) {
+  document.getElementById(badgeId)?.classList.remove('visible');
+}
+
+function initMusicTab() {
+  // Mark unsaved on change
+  ['music-url'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', () => markUnsaved('music-unsaved'));
+  });
+  ['travel-airport','travel-hotel','travel-car'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', () => markUnsaved('travel-unsaved'));
+  });
+
+  document.getElementById('btn-save-music')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btn-save-music');
+    btn.disabled = true; btn.textContent = 'กำลังบันทึก…';
+    const val = document.getElementById('music-url')?.value.trim() || '';
+    await apiPost({ type: 'config_update', key: 'music_url', value: val });
+    cfgData['music_url'] = val;
+    btn.disabled = false; btn.textContent = 'บันทึก';
+    clearUnsaved('music-unsaved');
+    showToast('บันทึก Music URL แล้ว ✓');
+  });
+
+  document.getElementById('btn-save-travel')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btn-save-travel');
+    btn.disabled = true; btn.textContent = 'กำลังบันทึก…';
+    const fields = {
+      travel_airport: document.getElementById('travel-airport')?.value.trim() || '',
+      travel_hotel:   document.getElementById('travel-hotel')?.value.trim()   || '',
+      travel_car:     document.getElementById('travel-car')?.value.trim()     || '',
+    };
+    await Promise.allSettled(
+      Object.entries(fields).map(([key, value]) => apiPost({ type: 'config_update', key, value }))
+    );
+    Object.assign(cfgData, fields);
+    btn.disabled = false; btn.textContent = 'บันทึก';
+    clearUnsaved('travel-unsaved');
+    showToast('บันทึก Travel Info แล้ว ✓');
+  });
+}
+
+// ── Logout ────────────────────────────────────────────────────────────────────
+function initLogout() {
+  document.getElementById('sidebar-logout')?.addEventListener('click', () => {
+    sessionStorage.removeItem(AUTH_KEY);
+    location.reload();
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+function initAdmin() {
+  initTabs();
+  initEventTab();
+  initGalleryTab();
+  initRsvpTab();
+  initGuestbookTab();
+  initMusicTab();
+  initLogout();
+}
+
+document.addEventListener('DOMContentLoaded', initAuth);

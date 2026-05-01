@@ -267,7 +267,7 @@
               <circle cx="11" cy="14" r="1.5" fill="#4A4340" />
             </svg></div>
           <h3>วันที่</h3>
-          <p>วันเสาร์ที่ 15 มีนาคม<br />พ.ศ. 2569</p>
+          <p id="dc-date">วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569</p>
         </div>
         <div class="detail-card reveal reveal-delay-2">
           <div class="detail-card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -276,7 +276,7 @@
                 stroke-linejoin="round" />
             </svg></div>
           <h3>เวลา</h3>
-          <p>เริ่มพิธี 11:00 น.<br />รับประทานอาหาร 12:00 น.</p>
+          <p id="dc-time">เริ่มพิธี 11:00 น.<br />รับประทานอาหาร 12:00 น.</p>
         </div>
         <div class="detail-card reveal reveal-delay-3">
           <div class="detail-card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -285,7 +285,7 @@
               <circle cx="11" cy="8" r="2" stroke="#4A4340" stroke-width="1.5" />
             </svg></div>
           <h3>สถานที่</h3>
-          <p>ตำบลแป-ระ อำเภอท่าแพ<br />จังหวัดสตูล</p>
+          <p id="dc-venue">ตำบลแป-ระ อำเภอท่าแพ<br />จังหวัดสตูล</p>
         </div>
         <div class="detail-card reveal reveal-delay-4">
           <div class="detail-card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -294,7 +294,7 @@
               <path d="M8 2c0 1.657 1.343 3 3 3s3-1.343 3-3" stroke="#4A4340" stroke-width="1.5" />
             </svg></div>
           <h3>การแต่งกาย</h3>
-          <p>Pastel Formal</p>
+          <p id="dc-dress">Pastel Formal</p>
           <div class="dress-palette">
             <span class="dress-swatch" style="background:#F9C8D4" title="ชมพู Pastel"></span>
             <span class="dress-swatch" style="background:#C9B8E8" title="ม่วง Pastel"></span>
@@ -308,7 +308,7 @@
       <div style="height:20px"></div>
 
       <div class="map-embed reveal">
-        <iframe src="https://maps.google.com/maps?q=ตำบลแป-ระ+อำเภอท่าแพ+จังหวัดสตูล&output=embed&hl=th&z=13"
+        <iframe id="map-iframe" src="https://maps.google.com/maps?q=ตำบลแป-ระ+อำเภอท่าแพ+จังหวัดสตูล&output=embed&hl=th&z=13"
           title="แผนที่สถานที่จัดงาน" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade">
         </iframe>
       </div>
@@ -350,7 +350,7 @@
             </div>
             <div class="travel-item-text">
               <strong>สนามบินหาดใหญ่ (HDY)</strong>
-              <span>ระยะทางประมาณ 1 ชั่วโมงครึ่ง จากสนามบิน</span>
+              <span data-config="travel_airport">ระยะทางประมาณ 1 ชั่วโมงครึ่ง จากสนามบิน</span>
             </div>
           </div>
           <div class="travel-item">
@@ -363,7 +363,7 @@
             </div>
             <div class="travel-item-text">
               <strong>ที่พักแนะนำ</strong>
-              <span>โรงแรมในตัวเมืองสตูล ห่างจากงาน ~20 นาที</span>
+              <span data-config="travel_hotel">โรงแรมในตัวเมืองสตูล ห่างจากงาน ~20 นาที</span>
             </div>
           </div>
           <div class="travel-item">
@@ -378,7 +378,7 @@
             </div>
             <div class="travel-item-text">
               <strong>ที่จอดรถ</strong>
-              <span>มีที่จอดรถสำหรับแขกเพียงพอ ไม่มีค่าใช้จ่าย</span>
+              <span data-config="travel_car">มีที่จอดรถสำหรับแขกเพียงพอ ไม่มีค่าใช้จ่าย</span>
             </div>
           </div>
         </div>
@@ -390,7 +390,7 @@
       <hr class="divider" />
       <span class="section-label reveal">ตอบรับการเข้าร่วม</span>
       <h2 class="rsvp-heading reveal reveal-delay-1">RSVP</h2>
-      <p class="rsvp-sub reveal reveal-delay-2">กรุณาตอบรับภายในวันที่ 28 กุมภาพันธ์ 2569</p>
+      <p class="rsvp-sub reveal reveal-delay-2" id="rsvp-deadline-text">กรุณาตอบรับภายในวันที่ 28 กุมภาพันธ์ 2569</p>
       <div class="rsvp-form reveal reveal-delay-3">
         <form id="rsvp-form" novalidate>
           <div class="form-row">
