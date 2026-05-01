@@ -298,7 +298,10 @@ async function loadPhotos() {
   const retryEl = document.getElementById("gallery-error");
   const refreshBtn = document.getElementById("refresh-btn");
   if (retryEl) retryEl.style.display = "none";
-  if (refreshBtn) { refreshBtn.disabled = true; refreshBtn.textContent = "↻ โหลด…"; }
+  if (refreshBtn) {
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = "↻ โหลด…";
+  }
   try {
     const data = await apiGet({ type: "photos_all" });
     photos = Array.isArray(data)
@@ -310,11 +313,17 @@ async function loadPhotos() {
     photos = [];
     setListContent("");
     if (retryEl) retryEl.style.display = "flex";
-    if (refreshBtn) { refreshBtn.disabled = false; refreshBtn.textContent = "↻ รีเฟรช"; }
+    if (refreshBtn) {
+      refreshBtn.disabled = false;
+      refreshBtn.textContent = "↻ รีเฟรช";
+    }
     showToast("โหลดรูปไม่ได้", "error");
     return;
   }
-  if (refreshBtn) { refreshBtn.disabled = false; refreshBtn.textContent = "↻ รีเฟรช"; }
+  if (refreshBtn) {
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = "↻ รีเฟรช";
+  }
   renderPhotoList();
   updatePhotoCount();
 }
