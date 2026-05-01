@@ -125,14 +125,17 @@ export function injectConfig(cfg) {
 
   // Loader title
   const loaderTitle = document.getElementById("loader-title");
-  if (loaderTitle) loaderTitle.textContent = `${c.groom_name} & ${c.bride_name}`;
+  if (loaderTitle)
+    loaderTitle.textContent = `${c.groom_name} & ${c.bride_name}`;
 
   // Guestbook sub + thanks
   const gbSub = document.getElementById("guestbook-sub");
-  if (gbSub) gbSub.textContent = `ฝากคำอวยพรให้${c.groom_name} & ${c.bride_name}`;
+  if (gbSub)
+    gbSub.textContent = `ฝากคำอวยพรให้${c.groom_name} & ${c.bride_name}`;
 
   const gbThanks = document.getElementById("guestbook-thanks-msg");
-  if (gbThanks) gbThanks.textContent = `คำอวยพรของท่านส่งถึง${c.groom_name} & ${c.bride_name}แล้ว ♡`;
+  if (gbThanks)
+    gbThanks.textContent = `คำอวยพรของท่านส่งถึง${c.groom_name} & ${c.bride_name}แล้ว ♡`;
 
   // Calendar button href (build dynamically from config)
   const calBtn = document.getElementById("calendar-btn");
@@ -157,9 +160,19 @@ export function injectConfig(cfg) {
   const couple = `${c.groom_name} & ${c.bride_name}`;
   document.title = `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน`;
   const metaDesc = `ขอเรียนเชิญร่วมงานแต่งงาน ${couple} ${c.event_date_display} ณ ${c.venue_name}`;
-  document.querySelector('meta[name="description"]')?.setAttribute("content", metaDesc);
-  document.querySelector('meta[property="og:title"]')?.setAttribute("content", `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน`);
-  document.querySelector('meta[property="og:description"]')?.setAttribute("content", metaDesc);
-  document.querySelector('meta[name="twitter:title"]')?.setAttribute("content", `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน`);
-  document.querySelector('meta[name="twitter:description"]')?.setAttribute("content", metaDesc);
+  document
+    .querySelector('meta[name="description"]')
+    ?.setAttribute("content", metaDesc);
+  document
+    .querySelector('meta[property="og:title"]')
+    ?.setAttribute("content", `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน`);
+  document
+    .querySelector('meta[property="og:description"]')
+    ?.setAttribute("content", metaDesc);
+  document
+    .querySelector('meta[name="twitter:title"]')
+    ?.setAttribute("content", `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน`);
+  document
+    .querySelector('meta[name="twitter:description"]')
+    ?.setAttribute("content", metaDesc);
 }
