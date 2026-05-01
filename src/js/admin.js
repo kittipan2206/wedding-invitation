@@ -800,18 +800,24 @@ function initMusicTab() {
     });
     previewBtn.addEventListener("click", () => {
       const url = document.getElementById("music-url")?.value.trim();
-      if (!url) { showToast("ใส่ URL เพลงก่อนนะ", "error"); return; }
+      if (!url) {
+        showToast("ใส่ URL เพลงก่อนนะ", "error");
+        return;
+      }
       if (!previewAudio.paused) {
         previewAudio.pause();
         previewAudio.currentTime = 0;
         previewBtn.textContent = "▶ ลองฟัง";
       } else {
         previewAudio.src = url;
-        previewAudio.play().then(() => {
-          previewBtn.textContent = "⏹ หยุด";
-        }).catch(() => {
-          showToast("เล่นเพลงไม่ได้ — ตรวจสอบ URL", "error");
-        });
+        previewAudio
+          .play()
+          .then(() => {
+            previewBtn.textContent = "⏹ หยุด";
+          })
+          .catch(() => {
+            showToast("เล่นเพลงไม่ได้ — ตรวจสอบ URL", "error");
+          });
       }
     });
   }
