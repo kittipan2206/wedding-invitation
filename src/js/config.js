@@ -122,4 +122,44 @@ export function injectConfig(cfg) {
   const rsvpDeadline = document.getElementById("rsvp-deadline-text");
   if (rsvpDeadline)
     rsvpDeadline.textContent = `กรุณาตอบรับภายในวันที่ ${c.rsvp_deadline_display}`;
+
+  // Loader title
+  const loaderTitle = document.getElementById("loader-title");
+  if (loaderTitle) loaderTitle.textContent = `${c.groom_name} & ${c.bride_name}`;
+
+  // Guestbook sub + thanks
+  const gbSub = document.getElementById("guestbook-sub");
+  if (gbSub) gbSub.textContent = `ฝากคำอวยพรให้${c.groom_name} & ${c.bride_name}`;
+
+  const gbThanks = document.getElementById("guestbook-thanks-msg");
+  if (gbThanks) gbThanks.textContent = `คำอวยพรของท่านส่งถึง${c.groom_name} & ${c.bride_name}แล้ว ♡`;
+
+  // Calendar button href (build dynamically from config)
+  const calBtn = document.getElementById("calendar-btn");
+  if (calBtn && c.event_date_iso && c.event_time_ceremony) {
+    const coupleName = `${c.groom_name} & ${c.bride_name}`;
+    const dateCompact = c.event_date_iso.replace(/-/g, "");
+    const [ch, cm] = c.event_time_ceremony.split(":");
+    const startDT = `${dateCompact}T${ch}${cm}0000`;
+    const endDT = `${dateCompact}T160000`;
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: `งานแต่งงาน ${coupleName}`,
+      dates: `${startDT}/${endDT}`,
+      ctz: "Asia/Bangkok",
+      details: `ขอเรียนเชิญร่วมงานแต่งงาน ${coupleName}`,
+      location: c.venue_name || "",
+    });
+    calBtn.href = `https://calendar.google.com/calendar/render?${params}`;
+  }
+
+  // Page title + meta tags
+  const couple = `${c.groom_name} & ${c.bride_name}`;
+  document.title = `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน`;
+  const metaDesc = `ขอเรียนเชิญร่วมงานแต่งงาน ${couple} ${c.event_date_display} ณ ${c.venue_name}`;
+  document.querySelector('meta[name="description"]')?.setAttribute("content", metaDesc);
+  document.querySelector('meta[property="og:title"]')?.setAttribute("content", `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน`);
+  document.querySelector('meta[property="og:description"]')?.setAttribute("content", metaDesc);
+  document.querySelector('meta[name="twitter:title"]')?.setAttribute("content", `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน`);
+  document.querySelector('meta[name="twitter:description"]')?.setAttribute("content", metaDesc);
 }
