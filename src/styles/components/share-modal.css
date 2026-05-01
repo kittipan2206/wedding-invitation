@@ -124,6 +124,12 @@
   opacity: 0.88;
 }
 
+.share-action-btn--native {
+  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(249, 200, 212, 0.4);
+}
+
 .share-action-btn--copy {
   background: linear-gradient(135deg, #C9B8E8, #B8D8F8);
   color: #3d3550;
