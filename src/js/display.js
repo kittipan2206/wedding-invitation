@@ -18,6 +18,7 @@ let knownKeys = new Set();
 let currentPage = 0;
 let pageTimer = null;
 let transitioning = false;
+let featuredKey = null; // tracks key of currently displayed featured entry
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -34,7 +35,8 @@ function entryKey(e) {
 }
 
 function totalPages() {
-  return Math.max(1, Math.ceil(allEntries.length / PAGE_SIZE));
+  const remaining = Math.max(0, allEntries.length - 1);
+  return Math.max(1, Math.ceil(remaining / PAGE_SIZE));
 }
 
 function delay(ms) {
@@ -52,6 +54,53 @@ async function fetchEntries() {
   } catch {
     return null;
   }
+}
+
+// ── Featured card builder (pinned top) ──────────────────────────────────────────────
+
+function buildFeaturedCard(e, isNew) {
+  const card = document.createElement("div");
+  card.className = "featured-card" + (isNew ? " featured-card--new" : "");
+  card.dataset.key = entryKey(e);
+  card.innerHTML = `
+    <span class="featured-label">❖ ล่าสุด</span>
+    <div class="featured-avatar">${escHtml(Array.from(e.name)[0] || "♡")}</div>
+    <div class="display-card-body">
+      <p class="featured-name">${escHtml(e.name)}</p>
+      <p class="featured-msg">${escHtml(e.message)}</p>
+    </div>`;
+  if (isNew) {
+    setTimeout(() => card.classList.remove("featured-card--new"), 60_000);
+  }
+  return card;
+}
+
+function renderFeatured(newKeys = new Set()) {
+  const el = document.getElementById("display-featured");
+  if (!el) return;
+
+  if (allEntries.length === 0) {
+    el.innerHTML =
+      '<p class="display-empty" style="padding:20px 0">ยังไม่มีคำอวยพร ♡</p>';
+    featuredKey = null;
+    return;
+  }
+
+  const entry = allEntries[0];
+  const key = entryKey(entry);
+  if (key === featuredKey && !newKeys.has(key)) return; // unchanged
+
+  featuredKey = key;
+  el.replaceChildren(buildFeaturedCard(entry, newKeys.has(key)));
+}
+
+// ── QR Code ────────────────────────────────────────────────────────────────────────
+
+function initQrCode() {
+  const img = document.getElementById("display-qr");
+  if (!img) return;
+  const url = window.location.origin + "/?goto=guestbook";
+  img.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=2e2a28&margin=6`;
 }
 
 // ── Card builder ──────────────────────────────────────────────────────────────
@@ -85,14 +134,17 @@ function renderPage(newKeys = new Set()) {
   const feed = document.getElementById("display-feed");
   if (!feed) return;
 
-  const start = currentPage * PAGE_SIZE;
+  if (allEntries.length <= 1) {
+    // No carousel entries; featured takes the latest
+    feed.replaceChildren();
+    return;
+  }
+
+  const start = 1 + currentPage * PAGE_SIZE; // skip index 0 (featured)
   const visible = allEntries.slice(start, start + PAGE_SIZE);
 
   if (visible.length === 0) {
-    const p = document.createElement("p");
-    p.className = "display-empty";
-    p.textContent = "ยังไม่มีคำอวยพร ♡";
-    feed.replaceChildren(p);
+    feed.replaceChildren();
     return;
   }
 
@@ -156,6 +208,7 @@ async function transitionToPage(page) {
   await delay(320);
 
   currentPage = page;
+  renderFeatured();
   renderPage();
   updatePageDots();
 
@@ -199,6 +252,7 @@ async function poll() {
   if (newKeys.size > 0 && currentPage !== 0 && !transitioning) {
     await transitionToPage(0);
   } else {
+    renderFeatured(newKeys);
     renderPage(newKeys);
   }
 
@@ -255,6 +309,7 @@ function updateNavButtons() {
 
 document.addEventListener("DOMContentLoaded", () => {
   spawnPetals();
+  initQrCode();
   poll();
   setInterval(poll, POLL_INTERVAL);
 
