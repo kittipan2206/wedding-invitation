@@ -15,8 +15,14 @@ export function initShare() {
   const copyBtn = document.getElementById("share-copy-btn");
   const lineBtn = document.getElementById("share-line-btn");
   const fbBtn = document.getElementById("share-fb-btn");
+  const nativeBtn = document.getElementById("share-native-btn");
 
   if (!shareBtn || !modal) return;
+
+  // Hide native share button if Web Share API not available
+  if (!navigator.share) {
+    nativeBtn?.style && (nativeBtn.style.display = "none");
+  }
 
   function getLink() {
     const name = nameInput?.value.trim();
@@ -48,6 +54,19 @@ export function initShare() {
   closeBtn?.addEventListener("click", closeModal);
   backdrop?.addEventListener("click", closeModal);
   nameInput?.addEventListener("input", updateLink);
+
+  nativeBtn?.addEventListener("click", async () => {
+    if (!navigator.share) return;
+    try {
+      await navigator.share({
+        title: "นนท์ & เมย์ — ขอเรียนเชิญร่วมงานแต่งงาน",
+        text: "ขอเรียนเชิญร่วมงานแต่งงาน นนท์ & เมย์ วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569",
+        url: getLink(),
+      });
+    } catch {
+      // User cancelled — do nothing
+    }
+  });
 
   copyBtn?.addEventListener("click", async () => {
     try {
