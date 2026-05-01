@@ -2,69 +2,88 @@
 
 เว็บการ์ดเชิญงานแต่งงานออนไลน์ สร้างด้วย Vite + Vanilla JS
 
-🔗 **Live site:** https://wedding-invitation-eight-sigma-97.vercel.app
+🔗 **Live:** https://wedding-invitation-eight-sigma-97.vercel.app
 
 ---
 
-## ✨ Features
+## รายละเอียดงาน
 
-- **Envelope animation** — เปิดซองจดหมายก่อนเข้าสู่การ์ด
-- **Countdown timer** — นับถอยหลังถึงวันงาน
-- **RSVP form** — ตอบรับการเข้าร่วม บันทึกลง Google Sheets อัตโนมัติ
-- **Google Calendar** — ปุ่มบันทึกงานเข้าปฏิทิน Google ได้เลย
-- **Google Maps** — ปุ่มนำทางไปสถานที่จัดงาน
-- **Background music** — เพลงประกอบพร้อมปุ่มเปิด/ปิด
-- **Petal rain** — ดอกไม้ร่วงตกในหน้าแรก
-- **Scroll reveal** — animation เมื่อ scroll ผ่านแต่ละ section
-- **Responsive** — รองรับมือถือและ desktop
-
----
-
-## 🗓 รายละเอียดงาน
-
-| รายการ | ข้อมูล |
-|--------|--------|
+| | |
+|---|---|
 | วันที่ | วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569 |
-| เวลา | 11:00 น. (รับประทานอาหาร 12:00 น.) |
+| เวลา | 11:00 น. — รับประทานอาหาร 12:00 น. |
 | สถานที่ | ตำบลแป-ระ อำเภอท่าแพ จังหวัดสตูล |
-| การแต่งกาย | Pastel Formal — สีโทนพาสเทล |
+| การแต่งกาย | Pastel Formal |
+| RSVP ภายใน | 28 กุมภาพันธ์ 2569 |
 
 ---
 
-## 🛠 Tech Stack
+## Features
+
+| Feature | รายละเอียด |
+|---|---|
+| Envelope animation | เปิดซองก่อนเข้าการ์ด พร้อมปุ่ม music + fullscreen |
+| Flip countdown | นับถอยหลัง 3D flip animation |
+| Cursor sparkle | trail ประกายตามเมาส์ |
+| Hero parallax | botanical SVG เลื่อนตามเมาส์ |
+| Typewriter | วันที่พิมพ์ออกมาทีละตัว |
+| Petal rain | ดอกไม้ร่วงหลังเปิดซอง |
+| Details section | cards + Google Maps embed + travel info |
+| RSVP | form → Google Sheets, localStorage guard, confetti |
+| Guestbook | global feed (fetch จาก sheet), optimistic update |
+| Gallery | placeholder grid (อัปเดตรูปหลังงาน) |
+| Share modal | personalized link `?to=ชื่อ` + Line / Facebook / Copy |
+| Background music | fade in/out, multi-button sync |
+| Scroll-snap | proximity snap ระหว่าง sections |
+| Personalized URL | `?to=ชื่อแขก` แสดงชื่อในหัวจดหมาย |
+
+---
+
+## Tech Stack
 
 - **Vite** — build tool
 - **Vanilla JS** — ไม่มี framework
-- **CSS Custom Properties** — design tokens
-- **Google Apps Script** — รับข้อมูล RSVP เข้า Google Sheets
-- **Vercel** — hosting & deployment
+- **CSS Custom Properties** — design tokens, DM Sans + Cormorant Garamond
+- **Google Apps Script → Google Sheets** — RSVP + Guestbook backend
+- **Vercel** — hosting, auto-deploy จาก `main`
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ```bash
-# ติดตั้ง dependencies
 npm install
-
-# รัน dev server
-npm run dev
-
-# Build สำหรับ production
-npm run build
+npm run dev    # dev server → http://localhost:5173
+npm run build  # production build
 ```
 
 ---
 
-## 📋 RSVP Setup
+## Branch Workflow
 
-ฟอร์ม RSVP ส่งข้อมูลผ่าน Google Apps Script ไปเก็บใน Google Sheets
+```
+feature → develop → PR → main → Vercel deploy
+```
 
-หากต้องการเปลี่ยน endpoint แก้ค่า `SHEET_URL` ใน [`src/js/rsvp.js`](src/js/rsvp.js)
+- ทำงานบน `develop` เสมอ
+- push ขึ้น `main` เมื่อ owner ยืนยัน
 
 ---
 
-## 📁 Project Structure
+## Google Apps Script
+
+endpoint เดียวทำทั้ง RSVP และ Guestbook
+
+| Method | หน้าที่ |
+|---|---|
+| `POST` | รับ RSVP / Guestbook เขียนลง sheet |
+| `GET` | return guestbook entries `[{name, message}]` |
+
+แก้ `SHEET_URL` ใน `src/js/rsvp.js` และ `src/js/guestbook.js` หากเปลี่ยน endpoint
+
+---
+
+## Project Structure
 
 ```
 wedding-invitation/
@@ -72,15 +91,36 @@ wedding-invitation/
 ├── src/
 │   ├── main.js
 │   ├── js/
-│   │   ├── envelope.js      # animation เปิดซอง
-│   │   ├── countdown.js     # นับถอยหลัง
-│   │   ├── rsvp.js          # ฟอร์ม RSVP → Google Sheets
-│   │   ├── music.js         # เพลงประกอบ
-│   │   ├── petals.js        # ดอกไม้ร่วง
-│   │   └── reveal.js        # scroll reveal
+│   │   ├── envelope.js       animation เปิดซอง
+│   │   ├── countdown.js      flip countdown
+│   │   ├── rsvp.js           form + Google Sheets
+│   │   ├── guestbook.js      global feed + submit
+│   │   ├── share.js          personalized link modal
+│   │   ├── music.js          background music
+│   │   ├── petals.js         petal rain
+│   │   ├── parallax.js       hero botanical parallax
+│   │   ├── cursor-sparkle.js mouse trail
+│   │   ├── confetti.js       confetti burst
+│   │   ├── typewriter.js     typewriter effect
+│   │   ├── reveal.js         scroll reveal
+│   │   ├── fullscreen.js     fullscreen toggle
+│   │   ├── scroll-nav.js     dot navigation
+│   │   └── gallery.js        gallery preview
 │   └── styles/
-│       ├── base.css
+│       ├── base.css           tokens + scroll-snap
 │       ├── animations.css
+│       ├── typography.css
 │       └── components/
+│           ├── envelope.css
+│           ├── hero.css
+│           ├── countdown.css
+│           ├── details.css
+│           ├── rsvp.css
+│           ├── guestbook.css
+│           ├── gallery.css
+│           ├── share-modal.css
+│           ├── footer.css
+│           └── scroll-nav.css
 └── public/
+    └── music.mp3
 ```
