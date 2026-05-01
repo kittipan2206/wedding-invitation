@@ -7,6 +7,8 @@ export function initMusic() {
   audio.volume = 0;
 
   let playing = false;
+  let fadeRaf = null;   // current fade animation frame
+  let pauseTimer = null; // scheduled pause timeout
   const btns = [];
 
   function sync() {
@@ -16,28 +18,51 @@ export function initMusic() {
     });
   }
 
+  function cancelFade() {
+    if (fadeRaf) { cancelAnimationFrame(fadeRaf); fadeRaf = null; }
+    if (pauseTimer) { clearTimeout(pauseTimer); pauseTimer = null; }
+  }
+
   function fadeTo(target, duration = 1500) {
+    cancelFade();
     const start = audio.volume;
     const diff  = target - start;
     const t0    = performance.now();
-    (function step(now) {
+    function step(now) {
       const p = Math.min((now - t0) / duration, 1);
       audio.volume = start + diff * p;
-      if (p < 1) requestAnimationFrame(step);
-    })(performance.now());
+      if (p < 1) { fadeRaf = requestAnimationFrame(step); }
+      else { fadeRaf = null; }
+    }
+    fadeRaf = requestAnimationFrame(step);
   }
 
-  function toggle() {
-    if (audio.paused) {
-      audio.play();
-      fadeTo(0.55);
-      playing = true;
+  async function toggle() {
+    if (!playing) {
+      // Resuming: cancel any pending fade-out/pause
+      cancelFade();
+      // Reset volume to 0 so fade-in works correctly even if faded-out mid-way
+      audio.volume = 0;
+      try {
+        await audio.play();
+        playing = true;
+        sync();
+        fadeTo(0.55);
+      } catch {
+        // play() was blocked (autoplay policy etc.) — keep icon as note
+        playing = false;
+        sync();
+      }
     } else {
-      fadeTo(0, 800);
-      setTimeout(() => audio.pause(), 850);
+      // Pausing: fade out then pause
       playing = false;
+      sync();
+      fadeTo(0, 800);
+      pauseTimer = setTimeout(() => {
+        audio.pause();
+        pauseTimer = null;
+      }, 850);
     }
-    sync();
   }
 
   ['env-music-btn', 'music-btn'].forEach(id => {
