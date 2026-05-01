@@ -1,31 +1,49 @@
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 const RSVP_KEY = "rsvp_submitted_v1";
+const FEED_LIMIT = 5;
 
 // ── Render ──────────────────────────────────────────────────────────────────
 
+function makeEntryEl(e) {
+  const div = document.createElement("div");
+  div.className = "gb-entry";
+  div.innerHTML = `
+    <div class="gb-entry-avatar">${escHtml(Array.from(e.name)[0] || "♡")}</div>
+    <div class="gb-entry-body">
+      <p class="gb-entry-name">${escHtml(e.name)}</p>
+      <p class="gb-entry-msg">${escHtml(e.message)}</p>
+    </div>`;
+  return div;
+}
+
 function renderFeed(entries) {
-  const feed = document.getElementById("guestbook-feed");
+  const feed    = document.getElementById("guestbook-feed");
+  const showBtn = document.getElementById("gb-show-more");
   if (!feed) return;
 
   if (!entries || entries.length === 0) {
     feed.innerHTML = "";
+    if (showBtn) showBtn.style.display = "none";
     return;
   }
 
-  feed.innerHTML = entries
-    .map(
-      (e) => `
-    <div class="gb-entry">
-      <div class="gb-entry-avatar">${escHtml(Array.from(e.name)[0] || "♡")}</div>
-      <div class="gb-entry-body">
-        <p class="gb-entry-name">${escHtml(e.name)}</p>
-        <p class="gb-entry-msg">${escHtml(e.message)}</p>
-      </div>
-    </div>
-  `,
-    )
-    .join("");
+  feed.innerHTML = "";
+  entries.slice(0, FEED_LIMIT).forEach((e) => feed.appendChild(makeEntryEl(e)));
+
+  if (showBtn) {
+    if (entries.length > FEED_LIMIT) {
+      const remaining = entries.length - FEED_LIMIT;
+      showBtn.textContent = `ดูทั้งหมด (${remaining} คำอวยพรอีก)`;
+      showBtn.style.display = "block";
+      showBtn.onclick = () => {
+        entries.slice(FEED_LIMIT).forEach((e) => feed.appendChild(makeEntryEl(e)));
+        showBtn.style.display = "none";
+      };
+    } else {
+      showBtn.style.display = "none";
+    }
+  }
 }
 
 function renderLoading() {
@@ -158,14 +176,8 @@ export function initGuestbook() {
     // Optimistic: prepend new entry to current feed immediately
     const feed = document.getElementById("guestbook-feed");
     if (feed) {
-      const card = document.createElement("div");
-      card.className = "gb-entry gb-entry--new";
-      card.innerHTML = `
-        <div class="gb-entry-avatar">${escHtml(Array.from(name)[0] || "♡")}</div>
-        <div class="gb-entry-body">
-          <p class="gb-entry-name">${escHtml(name)}</p>
-          <p class="gb-entry-msg">${escHtml(message)}</p>
-        </div>`;
+      const card = makeEntryEl({ name, message });
+      card.classList.add("gb-entry--new");
       feed.prepend(card);
     }
 
