@@ -67,7 +67,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     afterEnvelope();
     if (target) {
       // Small delay lets fonts/layout settle before scrolling
-      setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
+      setTimeout(
+        () => target.scrollIntoView({ behavior: "smooth", block: "start" }),
+        300,
+      );
     }
   } else {
     initEnvelope(afterEnvelope);
