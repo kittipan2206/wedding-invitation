@@ -94,7 +94,7 @@ function showToast(msg, type = "success") {
 }
 
 async function apiGet(params) {
-  const url = `${SHEET_URL}?${new URLSearchParams(params)}`;
+  const url = `${SHEET_URL}?${new URLSearchParams({ ...params, _t: Date.now() })}`;
   const res = await fetch(url, { redirect: "follow" });
   if (!res.ok) throw new Error(`GET failed: ${res.status}`);
   return res.json();
@@ -593,7 +593,7 @@ function renderGuestbook() {
       <td>${i + 1}</td>
       <td><span class="td-truncate" style="max-width:100px" title="${escHtml(entry.name || "")}">${escHtml(entry.name || "—")}</span></td>
       <td><span class="td-truncate" title="${escHtml(entry.message || "")}">${escHtml(entry.message || "—")}</span></td>
-      <td style="white-space:nowrap;font-size:11px;color:var(--muted)">${escHtml(entry.timestamp || "")}</td>
+      <td style="white-space:nowrap;font-size:11px;color:var(--muted)">${escHtml(formatGbTimestamp(entry.timestamp))}</td>
       <td>${hiddenBadge}</td>
       <td>
         <div class="td-actions">
@@ -626,13 +626,37 @@ function renderGuestbook() {
   });
 }
 
+function formatGbTimestamp(raw) {
+  if (!raw) return '—';
+  const s = String(raw);
+  // Already Thai format: dd/MM/yyyy HH:mm:ss
+  const thaiRe = /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2})/;
+  const tm = s.match(thaiRe);
+  if (tm) return `${tm[1]}/${tm[2]}/${tm[3]} ${tm[4]}`;
+  // ISO string from Sheets
+  const isoRe = /^\d{4}-\d{2}-\d{2}T/;
+  if (isoRe.test(s)) {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleString('th-TH', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok',
+      });
+    }
+  }
+  return s;
+}
+
 function handleGbHide(id, hidden) {
   const entry = gbData.find((e) => String(e.id) === id);
   if (!entry) return;
   entry.hidden = hidden;
   renderGuestbook();
-  showToast(hidden ? "ซ่อนข้อความแล้ว" : "แสดงข้อความแล้ว");
-  apiPost({ type: "guestbook_hide", id, hidden });
+  showToast(hidden ? 'ซ่อนข้อความแล้ว' : 'แสดงข้อความแล้ว');
+  apiPost({ type: 'guestbook_hide', id, hidden }).then(() => {
+    // Re-fetch after 1.5s to confirm server actually updated
+    setTimeout(() => loadGuestbook(), 1500);
+  });
 }
 
 async function handleGbDelete(id) {

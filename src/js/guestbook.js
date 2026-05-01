@@ -65,7 +65,8 @@ function escHtml(str) {
 
 async function fetchEntries() {
   try {
-    const res = await fetch(SHEET_URL, { method: "GET", redirect: "follow" });
+    const url = `${SHEET_URL}?type=guestbook&_t=${Date.now()}`;
+    const res = await fetch(url, { method: "GET", redirect: "follow" });
     if (!res.ok) {
       console.error("[Guestbook] GET failed, status:", res.status);
       return null;
