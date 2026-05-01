@@ -1,26 +1,20 @@
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec';
-const ENTRIES_KEY = 'guestbook_entries';
-const RSVP_KEY    = 'rsvp_submitted_v1';
+const RSVP_KEY  = 'rsvp_submitted_v1';
 
-function loadEntries() {
-  try { return JSON.parse(localStorage.getItem(ENTRIES_KEY)) || []; } catch { return []; }
-}
+// ── Render ──────────────────────────────────────────────────────────────────
 
-function saveEntry(entry) {
-  const entries = loadEntries();
-  entries.unshift(entry);
-  localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries.slice(0, 50)));
-}
-
-function renderFeed() {
+function renderFeed(entries) {
   const feed = document.getElementById('guestbook-feed');
   if (!feed) return;
-  const entries = loadEntries();
-  if (entries.length === 0) { feed.innerHTML = ''; return; }
+
+  if (!entries || entries.length === 0) {
+    feed.innerHTML = '';
+    return;
+  }
 
   feed.innerHTML = entries.map(e => `
     <div class="gb-entry">
-      <div class="gb-entry-avatar">${Array.from(e.name)[0] || '♡'}</div>
+      <div class="gb-entry-avatar">${escHtml(Array.from(e.name)[0] || '♡')}</div>
       <div class="gb-entry-body">
         <p class="gb-entry-name">${escHtml(e.name)}</p>
         <p class="gb-entry-msg">${escHtml(e.message)}</p>
@@ -29,35 +23,50 @@ function renderFeed() {
   `).join('');
 }
 
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function renderLoading() {
+  const feed = document.getElementById('guestbook-feed');
+  if (feed) feed.innerHTML = '<p class="gb-loading">กำลังโหลดคำอวยพร…</p>';
 }
 
-export function initGuestbook() {
-  const form = document.getElementById('guestbook-form');
-  if (!form) return;
-  const thanks    = document.getElementById('guestbook-thanks');
-  const submitBtn = form.querySelector('button[type="submit"]');
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
-  // Render any existing local entries
-  renderFeed();
+// ── Remote fetch ─────────────────────────────────────────────────────────────
 
-  // Auto-fill name from RSVP data
+async function fetchEntries() {
   try {
-    const rsvpData = JSON.parse(localStorage.getItem(RSVP_KEY));
-    if (rsvpData?.name) {
+    const res = await fetch(SHEET_URL, { method: 'GET', redirect: 'follow' });
+    const data = await res.json();
+    if (Array.isArray(data)) return data;
+  } catch (_) {}
+  return null;
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+
+export function initGuestbook() {
+  const form      = document.getElementById('guestbook-form');
+  const thanks    = document.getElementById('guestbook-thanks');
+  const submitBtn = form?.querySelector('button[type="submit"]');
+  if (!form) return;
+
+  // Auto-fill name from RSVP
+  try {
+    const rsvp = JSON.parse(localStorage.getItem(RSVP_KEY));
+    if (rsvp?.name) {
       const nameEl = document.getElementById('gb-name');
-      if (nameEl && !nameEl.value) nameEl.value = rsvpData.name;
+      if (nameEl && !nameEl.value) nameEl.value = rsvp.name;
     }
   } catch {}
 
-  function showErr(id, show) {
-    const el = document.getElementById(id);
-    if (el) el.style.display = show ? 'block' : 'none';
-  }
-  function markError(el, hasError) {
-    el.classList.toggle('error', hasError);
-  }
+  // Load remote entries
+  renderLoading();
+  fetchEntries().then(entries => {
+    renderFeed(entries || []);
+  });
 
   // Char counter
   const msgEl   = document.getElementById('gb-message');
@@ -68,12 +77,19 @@ export function initGuestbook() {
     });
   }
 
+  function showErr(id, show) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = show ? 'block' : 'none';
+  }
+  function markError(el, hasError) {
+    el.classList.toggle('error', hasError);
+  }
+
   // onBlur validation
   document.getElementById('gb-name')?.addEventListener('blur', function () {
     const ok = this.value.trim().length >= 2;
     markError(this, !ok); showErr('gb-err-name', !ok);
   });
-
   document.getElementById('gb-name')?.addEventListener('input', function () {
     if (this.value.trim().length >= 2) { markError(this, false); showErr('gb-err-name', false); }
   });
@@ -81,6 +97,7 @@ export function initGuestbook() {
     if (this.value.trim().length >= 2) { markError(this, false); showErr('gb-err-msg', false); }
   });
 
+  // Submit
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const nameEl = document.getElementById('gb-name');
@@ -94,7 +111,6 @@ export function initGuestbook() {
     const msgOk = msgElF.value.trim().length >= 2;
     markError(msgElF, !msgOk); showErr('gb-err-msg', !msgOk);
     if (!msgOk) valid = false;
-
     if (!valid) return;
 
     submitBtn.disabled = true;
@@ -112,8 +128,19 @@ export function initGuestbook() {
       });
     } catch (_) {}
 
-    saveEntry({ name, message, ts: Date.now() });
-    renderFeed();
+    // Optimistic: prepend new entry to current feed immediately
+    const feed = document.getElementById('guestbook-feed');
+    if (feed) {
+      const card = document.createElement('div');
+      card.className = 'gb-entry gb-entry--new';
+      card.innerHTML = `
+        <div class="gb-entry-avatar">${escHtml(Array.from(name)[0] || '♡')}</div>
+        <div class="gb-entry-body">
+          <p class="gb-entry-name">${escHtml(name)}</p>
+          <p class="gb-entry-msg">${escHtml(message)}</p>
+        </div>`;
+      feed.prepend(card);
+    }
 
     form.style.display = 'none';
     if (thanks) thanks.style.display = 'flex';

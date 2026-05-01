@@ -128,3 +128,16 @@
   line-height: 1.6;
   word-break: break-word;
 }
+
+.gb-entry--new {
+  animation: fadeInUp 0.4s ease both;
+}
+
+.gb-loading {
+  font-size: 13px;
+  color: var(--color-muted);
+  text-align: center;
+  padding: 16px 0;
+  font-style: italic;
+  opacity: 0.7;
+}
