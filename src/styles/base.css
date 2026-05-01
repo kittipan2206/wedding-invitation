@@ -2,29 +2,31 @@
    BASE — Reset, custom properties, global
    ═══════════════════════════════════════ */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 :root {
-  --color-pink:     #F9C8D4;
-  --color-lavender: #C9B8E8;
-  --color-mint:     #B8E8D8;
-  --color-peach:    #F8D8B8;
-  --color-sky:      #B8D8F8;
-  --color-white:    #FDFCFB;
-  --color-text:     #2e2a28;
-  --color-muted:    #8A7F7A;
-  --glass-bg:       rgba(255, 255, 255, 0.72);
+  --color-pink: #f9c8d4;
+  --color-lavender: #c9b8e8;
+  --color-mint: #b8e8d8;
+  --color-peach: #f8d8b8;
+  --color-sky: #b8d8f8;
+  --color-white: #fdfcfb;
+  --color-text: #2e2a28;
+  --color-muted: #8a7f7a;
+  --glass-bg: rgba(255, 255, 255, 0.72);
 
-  --font-serif:     'Cormorant Garamond', Georgia, serif;
-  --font-sans:      'DM Sans', system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
 
-  --radius-sm:  8px;
-  --radius-md:  16px;
-  --radius-lg:  24px;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
 
   --shadow-soft: 0 4px 28px rgba(0, 0, 0, 0.055);
   --shadow-card: 0 8px 48px rgba(0, 0, 0, 0.06);
@@ -33,11 +35,12 @@
 
   --transition-ease: cubic-bezier(0.23, 1, 0.32, 1);
   --transition-fast: 0.22s ease;
-  --transition-med:  0.45s var(--transition-ease);
+  --transition-med: 0.45s var(--transition-ease);
   --transition-slow: 0.85s var(--transition-ease);
 }
 
-html, body {
+html,
+body {
   height: 100%;
   overflow: hidden;
   -webkit-text-size-adjust: 100%;
@@ -61,7 +64,8 @@ body {
   scroll-behavior: smooth;
 }
 
-img, svg {
+img,
+svg {
   display: block;
   max-width: 100%;
 }
@@ -95,11 +99,21 @@ a {
 }
 
 @keyframes gradientShift {
-  0%   { background-position: 0% 50%; }
-  25%  { background-position: 100% 0%; }
-  50%  { background-position: 100% 100%; }
-  75%  { background-position: 0% 100%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* ── Scroll snap sections ── */
@@ -179,7 +193,9 @@ hr.divider {
   white-space: nowrap;
 }
 
-.text-center { text-align: center; }
+.text-center {
+  text-align: center;
+}
 
 /* Touch target helper */
 .touch-target {
