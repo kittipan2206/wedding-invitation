@@ -112,9 +112,9 @@
             z-index: 1;
             height: 100vh;
             display: grid;
-            grid-template-rows: auto 1fr auto;
+            grid-template-rows: auto auto 1fr auto;
             padding: clamp(16px, 3.5vh, 52px) clamp(16px, 5vw, 96px);
-            gap: clamp(12px, 2.2vh, 32px);
+            gap: clamp(10px, 1.8vh, 24px);
         }
 
         /* ── Header ── */
@@ -176,6 +176,113 @@
                 opacity: 0.4;
                 transform: scale(0.65);
             }
+        }
+
+        /* ── Featured card (latest entry, pinned top) ── */
+        #display-featured {
+            width: 100%;
+        }
+
+        .featured-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: clamp(16px, 2vw, 32px);
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: var(--radius-lg);
+            border: var(--border-glass);
+            box-shadow: 0 4px 48px rgba(201, 184, 232, 0.22), var(--shadow-card);
+            padding: clamp(16px, 2vh, 28px) clamp(20px, 2.5vw, 40px);
+            overflow: hidden;
+            border-color: rgba(201, 184, 232, 0.55);
+        }
+
+        .featured-card--new {
+            animation: cardIn 0.55s var(--ease-out) both;
+            box-shadow: 0 4px 64px rgba(201, 184, 232, 0.5), var(--shadow-card);
+        }
+
+        .featured-label {
+            position: absolute;
+            top: 10px;
+            left: 16px;
+            font-size: clamp(9px, 0.7vw, 12px);
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--color-muted);
+            opacity: 0.55;
+        }
+
+        .featured-avatar {
+            flex-shrink: 0;
+            width: clamp(52px, 5.5vw, 88px);
+            height: clamp(52px, 5.5vw, 88px);
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(22px, 2.4vw, 38px);
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+            margin-top: 12px;
+        }
+
+        .featured-name {
+            font-size: clamp(17px, 1.8vw, 30px);
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: 6px;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .featured-msg {
+            font-size: clamp(14px, 1.4vw, 24px);
+            color: var(--color-muted);
+            line-height: 1.65;
+            word-break: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* ── QR Code (fixed bottom-right) ── */
+        #display-qr-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: var(--border-glass);
+            border-radius: 16px;
+            padding: clamp(6px, 1vh, 12px);
+            box-shadow: var(--shadow-card);
+            flex-shrink: 0;
+        }
+
+        #display-qr-wrap img {
+            width: clamp(72px, 8vw, 120px);
+            height: clamp(72px, 8vw, 120px);
+            border-radius: 8px;
+            display: block;
+        }
+
+        .qr-label {
+            font-size: clamp(9px, 0.75vw, 13px);
+            color: var(--color-muted);
+            letter-spacing: 0.08em;
+            text-align: center;
         }
 
         /* ── Feed grid ── */
@@ -320,9 +427,15 @@
         /* ── Footer ── */
         .display-footer {
             display: grid;
-            grid-template-columns: 1fr auto 1fr;
+            grid-template-columns: 1fr auto auto;
             align-items: center;
             gap: 16px;
+        }
+
+        .display-footer-right {
+            display: flex;
+            align-items: center;
+            gap: clamp(10px, 1.5vw, 20px);
         }
 
         .display-subtitle {
@@ -495,14 +608,23 @@
             </div>
         </header>
 
-        <main id="display-feed" class="display-feed">
-            <p class="display-empty">กำลังโหลดคำอวยพร…</p>
-        </main>
+        <!-- Featured: latest entry pinned -->
+        <section id="display-featured">
+            <p class="display-empty" style="padding:20px 0">กำลังโหลดคำอวยพร…</p>
+        </section>
+
+        <main id="display-feed" class="display-feed"></main>
 
         <footer class="display-footer">
             <p class="display-subtitle">ฝากคำอวยพรให้นนท์ &amp; เมย์</p>
             <div id="display-pages" class="display-pages"></div>
-            <p id="display-updated" class="display-updated"></p>
+            <div class="display-footer-right">
+                <p id="display-updated" class="display-updated"></p>
+                <div id="display-qr-wrap">
+                    <img id="display-qr" src="" alt="QR Code ฝากคำอวยพร" />
+                    <p class="qr-label">ฝากคำอวยพร</p>
+                </div>
+            </div>
         </footer>
     </div>
 </body>
