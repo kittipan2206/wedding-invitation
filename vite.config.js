@@ -7,6 +7,8 @@ export default defineConfig({
         main: "./index.html",
         card: "./card.html",
         display: "./display.html",
+        gallery: "./gallery.html",
+        admin: "./admin.html",
       },
     },
   },
