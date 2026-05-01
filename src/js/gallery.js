@@ -33,7 +33,8 @@ async function fetchPhotos() {
     if (!Array.isArray(data)) return [];
     // Guard: only accept items that look like photo records (must have a url field)
     return data.filter(
-      (item) => item && typeof item.url === "string" && item.url.startsWith("http")
+      (item) =>
+        item && typeof item.url === "string" && item.url.startsWith("http"),
     );
   } catch {
     return [];

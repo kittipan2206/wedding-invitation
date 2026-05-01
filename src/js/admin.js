@@ -53,7 +53,8 @@ async function loadPhotos() {
     // Guard: only accept items that look like photo records
     photos = Array.isArray(data)
       ? data.filter(
-          (item) => item && typeof item.url === "string" && item.url.startsWith("http")
+          (item) =>
+            item && typeof item.url === "string" && item.url.startsWith("http"),
         )
       : [];
   } catch {
