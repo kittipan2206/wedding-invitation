@@ -63,7 +63,9 @@
   color: var(--color-text);
   background: rgba(255, 255, 255, 0.75);
   outline: none;
-  transition: border-color 0.25s, box-shadow 0.25s;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
   appearance: none;
   -webkit-appearance: none;
 }
@@ -92,7 +94,7 @@
 }
 
 .form-select-wrapper::after {
-  content: '';
+  content: "";
   position: absolute;
   right: 18px;
   top: 50%;
@@ -139,7 +141,11 @@
 
 .radio-option input[type="radio"]:checked + label {
   border-color: var(--color-lavender);
-  background: linear-gradient(135deg, rgba(249, 200, 212, 0.28), rgba(201, 184, 232, 0.28));
+  background: linear-gradient(
+    135deg,
+    rgba(249, 200, 212, 0.28),
+    rgba(201, 184, 232, 0.28)
+  );
   color: var(--color-text);
   box-shadow: 0 2px 12px rgba(201, 184, 232, 0.25);
 }
@@ -175,13 +181,20 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.18s;
+  transition:
+    opacity 0.2s,
+    transform 0.18s;
   box-shadow: 0 4px 24px rgba(196, 168, 222, 0.4);
   margin-top: 8px;
 }
 
-.btn-submit:hover  { opacity: 0.88; transform: translateY(-1px); }
-.btn-submit:active { transform: translateY(0); }
+.btn-submit:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+.btn-submit:active {
+  transform: translateY(0);
+}
 
 /* ── Field error ── */
 .field-error {
@@ -241,4 +254,45 @@
   color: var(--color-muted);
   max-width: 340px;
   line-height: 1.7;
+}
+
+/* ── RSVP closed banner ── */
+#rsvp-closed-banner {
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1.5px solid rgba(201, 184, 232, 0.35);
+  border-radius: 16px;
+  padding: 18px 24px;
+  margin-bottom: 20px;
+  max-width: 560px;
+  width: 100%;
+  animation: fadeInUp 0.6s ease both;
+}
+
+.rsvp-closed-icon {
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.rsvp-closed-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--color-text);
+  margin: 0 0 2px;
+}
+
+.rsvp-closed-sub {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+/* ── RSVP form closed state ── */
+.rsvp-form--closed {
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+  filter: grayscale(0.3);
 }
