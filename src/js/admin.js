@@ -792,6 +792,36 @@ function initMusicTab() {
       ?.addEventListener("input", () => markUnsaved("travel-unsaved"));
   });
 
+  const previewBtn = document.getElementById("btn-preview-music");
+  const previewAudio = document.getElementById("music-preview-audio");
+  if (previewBtn && previewAudio) {
+    previewAudio.addEventListener("ended", () => {
+      previewBtn.textContent = "▶ ลองฟัง";
+    });
+    previewBtn.addEventListener("click", () => {
+      const url = document.getElementById("music-url")?.value.trim();
+      if (!url) {
+        showToast("ใส่ URL เพลงก่อนนะ", "error");
+        return;
+      }
+      if (!previewAudio.paused) {
+        previewAudio.pause();
+        previewAudio.currentTime = 0;
+        previewBtn.textContent = "▶ ลองฟัง";
+      } else {
+        previewAudio.src = url;
+        previewAudio
+          .play()
+          .then(() => {
+            previewBtn.textContent = "⏹ หยุด";
+          })
+          .catch(() => {
+            showToast("เล่นเพลงไม่ได้ — ตรวจสอบ URL", "error");
+          });
+      }
+    });
+  }
+
   document
     .getElementById("btn-save-music")
     ?.addEventListener("click", async () => {
