@@ -8,6 +8,14 @@ let filteredPhotos = [];
 let currentLightboxIndex = 0;
 let lightboxOpen = false;
 
+// Cache of ALL photos fetched by initGalleryPreview (reused by overlay)
+let cachedPhotos = [];
+
+// Overlay state (separate from preview lightbox)
+let overlayFiltered = [];
+let overlayLbIndex = 0;
+let overlayLbOpen = false;
+
 // ── URL helper ────────────────────────────────────────────────────────────────
 
 function getSizedUrl(url, size) {
@@ -214,16 +222,188 @@ function initLightbox() {
 
 // ── Full gallery page (gallery.html) ─────────────────────────────────────────
 
+function hideLoader() {
+  const loader = document.getElementById("page-loader");
+  if (loader) loader.classList.add("loader--hidden");
+}
+
+function revealPage() {
+  const page = document.querySelector(".gallery-page");
+  if (page) page.classList.add("is-ready");
+}
+
 export async function initGallery() {
   initLightbox();
   setupFilters();
 
-  const grid = document.getElementById("gallery-grid");
-  if (grid) grid.innerHTML = '<p class="gallery-status">กำลังโหลดรูปภาพ…</p>';
-
-  allPhotos = await fetchPhotos();
+  // Wait for fonts before fetching so there's no reflow flash
+  const [photos] = await Promise.all([fetchPhotos(), document.fonts.ready]);
+  allPhotos = photos;
   filteredPhotos = [...allPhotos];
   renderGrid(filteredPhotos, "gallery-grid", openLightbox);
+
+  // Reveal page then fade out loader
+  revealPage();
+  setTimeout(hideLoader, 80);
+}
+
+// ── Gallery overlay (index.html → opens in-place, no page navigation) ─────────
+
+function openOverlay() {
+  const el = document.getElementById("gallery-overlay");
+  if (!el) return;
+  el.classList.add("overlay--open");
+  el.setAttribute("aria-hidden", "false");
+
+  // Lazy-init: render grid + wire lightbox on first open
+  if (!el.dataset.initialized) {
+    el.dataset.initialized = "1";
+    overlayFiltered = [...cachedPhotos];
+    renderGrid(overlayFiltered, "overlay-gallery-grid", openOverlayLightbox);
+    setupOverlayFilters();
+    initOverlayLightbox();
+  }
+}
+
+function closeOverlay() {
+  const el = document.getElementById("gallery-overlay");
+  if (!el) return;
+  el.classList.remove("overlay--open");
+  el.setAttribute("aria-hidden", "true");
+  if (overlayLbOpen) closeOverlayLightbox();
+}
+
+function applyOverlayFilter(category) {
+  overlayFiltered =
+    category === "all"
+      ? [...cachedPhotos]
+      : cachedPhotos.filter((p) => p.category === category);
+  renderGrid(overlayFiltered, "overlay-gallery-grid", openOverlayLightbox);
+}
+
+function setupOverlayFilters() {
+  document.querySelectorAll("[data-overlay-filter]").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document
+        .querySelectorAll("[data-overlay-filter]")
+        .forEach((t) => t.classList.remove("overlay-filter--active"));
+      tab.classList.add("overlay-filter--active");
+      applyOverlayFilter(tab.dataset.overlayFilter);
+    });
+  });
+}
+
+function openOverlayLightbox(index) {
+  overlayLbIndex = index;
+  updateOverlayLbContent();
+  document.getElementById("overlay-lightbox")?.classList.add("lightbox--open");
+  overlayLbOpen = true;
+}
+
+function closeOverlayLightbox() {
+  document
+    .getElementById("overlay-lightbox")
+    ?.classList.remove("lightbox--open");
+  overlayLbOpen = false;
+}
+
+function updateOverlayLbContent() {
+  const photo = overlayFiltered[overlayLbIndex];
+  if (!photo) return;
+  const img = document.getElementById("overlay-lightbox-img");
+  const caption = document.getElementById("overlay-lightbox-caption");
+  const counter = document.getElementById("overlay-lightbox-counter");
+  if (img) {
+    img.src = getSizedUrl(photo.url, 1600);
+    img.alt = photo.caption || "";
+  }
+  if (caption) caption.textContent = photo.caption || "";
+  if (counter)
+    counter.textContent = `${overlayLbIndex + 1} / ${overlayFiltered.length}`;
+  const prev = document.getElementById("overlay-lightbox-prev");
+  const next = document.getElementById("overlay-lightbox-next");
+  if (prev) prev.disabled = overlayLbIndex === 0;
+  if (next) next.disabled = overlayLbIndex === overlayFiltered.length - 1;
+}
+
+function initOverlayLightbox() {
+  document
+    .getElementById("overlay-lightbox-close")
+    ?.addEventListener("click", closeOverlayLightbox);
+  document
+    .getElementById("overlay-lightbox-prev")
+    ?.addEventListener("click", () => {
+      if (overlayLbIndex > 0) {
+        overlayLbIndex--;
+        updateOverlayLbContent();
+      }
+    });
+  document
+    .getElementById("overlay-lightbox-next")
+    ?.addEventListener("click", () => {
+      if (overlayLbIndex < overlayFiltered.length - 1) {
+        overlayLbIndex++;
+        updateOverlayLbContent();
+      }
+    });
+  document
+    .getElementById("overlay-lightbox")
+    ?.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) closeOverlayLightbox();
+    });
+
+  // Keyboard: Escape closes lightbox first, then overlay on next press
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (overlayLbOpen) {
+        closeOverlayLightbox();
+      } else if (
+        document
+          .getElementById("gallery-overlay")
+          ?.classList.contains("overlay--open")
+      ) {
+        closeOverlay();
+      }
+    }
+    if (!overlayLbOpen) return;
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      if (overlayLbIndex > 0) {
+        overlayLbIndex--;
+        updateOverlayLbContent();
+      }
+    }
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      if (overlayLbIndex < overlayFiltered.length - 1) {
+        overlayLbIndex++;
+        updateOverlayLbContent();
+      }
+    }
+  });
+
+  // Touch swipe
+  let tx = 0;
+  const lb = document.getElementById("overlay-lightbox");
+  lb?.addEventListener(
+    "touchstart",
+    (e) => {
+      tx = e.touches[0].clientX;
+    },
+    { passive: true },
+  );
+  lb?.addEventListener("touchend", (e) => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0 && overlayLbIndex < overlayFiltered.length - 1) {
+        overlayLbIndex++;
+        updateOverlayLbContent();
+      } else if (dx > 0 && overlayLbIndex > 0) {
+        overlayLbIndex--;
+        updateOverlayLbContent();
+      }
+    }
+  });
 }
 
 // ── Preview section (index.html) ──────────────────────────────────────────────
@@ -234,6 +414,7 @@ export async function initGalleryPreview() {
   if (!grid) return;
 
   const photos = await fetchPhotos();
+  cachedPhotos = photos; // store ALL photos for overlay use
   const preview = photos.slice(0, PREVIEW_LIMIT);
 
   if (preview.length === 0) {
@@ -247,12 +428,22 @@ export async function initGalleryPreview() {
   initLightbox();
   renderGrid(preview, "gallery-preview-grid", openLightbox);
 
-  if (viewAllBtn && photos.length > PREVIEW_LIMIT) {
+  if (viewAllBtn && photos.length > 0) {
     viewAllBtn.style.display = "inline-flex";
-    viewAllBtn.textContent = `ดูทั้งหมด ${photos.length} รูป →`;
-  } else if (viewAllBtn && photos.length > 0) {
-    viewAllBtn.style.display = "inline-flex";
+    if (photos.length > PREVIEW_LIMIT) {
+      viewAllBtn.textContent = `ดูทั้งหมด ${photos.length} รูป →`;
+    }
+    // Open overlay instead of navigating to gallery.html
+    viewAllBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      openOverlay();
+    });
   }
+
+  // Wire overlay close button
+  document
+    .getElementById("gallery-overlay-close")
+    ?.addEventListener("click", closeOverlay);
 }
 
 // ── Entry point: auto-detect which page ───────────────────────────────────────

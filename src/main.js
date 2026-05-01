@@ -22,6 +22,12 @@ function afterEnvelope() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Hide loader once fonts are ready (covers both first-visit and refresh cases)
+  document.fonts.ready.then(() => {
+    const loader = document.getElementById("page-loader");
+    if (loader) loader.classList.add("loader--hidden");
+  });
+
   const params = new URLSearchParams(window.location.search);
   const guestName = params.get("to");
   if (guestName) {
