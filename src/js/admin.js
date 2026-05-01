@@ -140,29 +140,40 @@ function buildPhotoItem(photo, index) {
   return item;
 }
 
-// ── Actions ───────────────────────────────────────────────────────────────────
+// ── Actions (Optimistic UI — update local state first, POST in background) ────
 
-async function handleToggleVisible(id, visible) {
+function handleToggleVisible(id, visible) {
+  const idx = photos.findIndex((p) => p.id === id);
+  if (idx === -1) return;
+  photos[idx] = { ...photos[idx], visible };
+  renderPhotoList();
+  updatePhotoCount();
   showToast(visible ? "แสดงรูปแล้ว" : "ซ่อนรูปแล้ว");
-  await post({ type: "photo_update", id, visible });
-  await loadPhotos();
+  post({ type: "photo_update", id, visible }); // fire-and-forget
 }
 
-async function handleReorder(fromIdx, toIdx) {
+function handleReorder(fromIdx, toIdx) {
   if (toIdx < 0 || toIdx >= photos.length) return;
   const a = photos[fromIdx];
   const b = photos[toIdx];
-  // Swap order values
-  await post({ type: "photo_update", id: a.id, order: b.order ?? toIdx + 1 });
-  await post({ type: "photo_update", id: b.id, order: a.order ?? fromIdx + 1 });
-  await loadPhotos();
+  // Swap in local array
+  [photos[fromIdx], photos[toIdx]] = [photos[toIdx], photos[fromIdx]];
+  // Update order numbers
+  photos[fromIdx] = { ...photos[fromIdx], order: a.order ?? fromIdx + 1 };
+  photos[toIdx] = { ...photos[toIdx], order: b.order ?? toIdx + 1 };
+  renderPhotoList();
+  // Fire both POSTs in background
+  post({ type: "photo_update", id: a.id, order: b.order ?? toIdx + 1 });
+  post({ type: "photo_update", id: b.id, order: a.order ?? fromIdx + 1 });
 }
 
-async function handleDelete(id) {
+function handleDelete(id) {
   if (!confirm("ลบรูปนี้? ไม่สามารถกู้คืนได้")) return;
+  photos = photos.filter((p) => p.id !== id);
+  renderPhotoList();
+  updatePhotoCount();
   showToast("ลบรูปแล้ว");
-  await post({ type: "photo_delete", id });
-  await loadPhotos();
+  post({ type: "photo_delete", id }); // fire-and-forget
 }
 
 // ── Add form ──────────────────────────────────────────────────────────────────
@@ -184,34 +195,32 @@ function setupAddForm() {
     }
   });
 
-  form?.addEventListener("submit", async (e) => {
+  form?.addEventListener("submit", (e) => {
     e.preventDefault();
     const url = urlInput?.value.trim();
     if (!url) return;
 
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = "กำลังเพิ่ม…";
-    }
-
-    await post({
-      type: "photo_add",
+    const newPhoto = {
+      id: String(Date.now()),
       url: cleanUrl(url),
       caption: document.getElementById("new-caption")?.value.trim() ?? "",
       category: document.getElementById("new-category")?.value ?? "",
       order: photos.length + 1,
       visible: true,
-    });
+      timestamp: new Date().toISOString(),
+    };
+
+    // Optimistic: add to local array and render immediately
+    photos.push(newPhoto);
+    renderPhotoList();
+    updatePhotoCount();
 
     form.reset();
     if (previewWrap) previewWrap.classList.remove("visible");
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = "+ เพิ่มรูป";
-    }
-
     showToast("เพิ่มรูปภาพแล้ว ✓");
-    await loadPhotos();
+
+    // POST in background
+    post({ type: "photo_add", ...newPhoto });
   });
 }
 
@@ -226,8 +235,6 @@ async function post(payload) {
       headers: { "Content-Type": "text/plain" },
       body: JSON.stringify(payload),
     });
-    // GAS needs a moment to write
-    await new Promise((r) => setTimeout(r, 1200));
   } catch {
     // no-cors response is always opaque — errors are silent
   }
