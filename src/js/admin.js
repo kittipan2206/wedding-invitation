@@ -627,7 +627,7 @@ function renderGuestbook() {
 }
 
 function formatGbTimestamp(raw) {
-  if (!raw) return '—';
+  if (!raw) return "—";
   const s = String(raw);
   // Already Thai format: dd/MM/yyyy HH:mm:ss
   const thaiRe = /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2})/;
@@ -638,9 +638,13 @@ function formatGbTimestamp(raw) {
   if (isoRe.test(s)) {
     const d = new Date(s);
     if (!isNaN(d.getTime())) {
-      return d.toLocaleString('th-TH', {
-        year: 'numeric', month: 'short', day: 'numeric',
-        hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok',
+      return d.toLocaleString("th-TH", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Asia/Bangkok",
       });
     }
   }
@@ -652,8 +656,8 @@ function handleGbHide(id, hidden) {
   if (!entry) return;
   entry.hidden = hidden;
   renderGuestbook();
-  showToast(hidden ? 'ซ่อนข้อความแล้ว' : 'แสดงข้อความแล้ว');
-  apiPost({ type: 'guestbook_hide', id, hidden }).then(() => {
+  showToast(hidden ? "ซ่อนข้อความแล้ว" : "แสดงข้อความแล้ว");
+  apiPost({ type: "guestbook_hide", id, hidden }).then(() => {
     // Re-fetch after 1.5s to confirm server actually updated
     setTimeout(() => loadGuestbook(), 1500);
   });
