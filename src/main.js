@@ -57,5 +57,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   initGuestbook();
   initParallax();
   initGalleryPreview();
-  initEnvelope(afterEnvelope);
+
+  // If ?goto=<sectionId> is in the URL, skip envelope and scroll directly to section
+  const gotoSection = params.get("goto");
+  if (gotoSection) {
+    const target = document.getElementById(gotoSection);
+    const overlay = document.getElementById("envelope-overlay");
+    if (overlay) overlay.style.display = "none";
+    afterEnvelope();
+    if (target) {
+      // Small delay lets fonts/layout settle before scrolling
+      setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
+    }
+  } else {
+    initEnvelope(afterEnvelope);
+  }
 });
