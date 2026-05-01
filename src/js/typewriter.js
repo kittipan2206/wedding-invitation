@@ -5,7 +5,7 @@ export function initTypewriter(
   const el = document.querySelector(selector);
   if (!el) return;
 
-  const text = el.textContent.trim();
+  const text = (el.dataset.typewriter || el.textContent).trim();
   const chars = [...text]; // Unicode-safe split (handles Thai correctly)
   el.textContent = "";
   el.classList.add("typewriter-active");
