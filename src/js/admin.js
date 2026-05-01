@@ -224,15 +224,23 @@ const EV_FIELDS = {
 
 async function loadEventConfig() {
   const retryEl = document.getElementById("ev-error");
+  const overlay = document.getElementById("ev-loading-overlay");
+  const formCard = document.querySelector("#tab-event .form-card");
   if (retryEl) retryEl.style.display = "none";
+  if (overlay) overlay.classList.add("visible");
+  if (formCard) formCard.classList.add("fields-loading");
   try {
     cfgData = await apiGet({ type: "config" });
   } catch {
+    if (overlay) overlay.classList.remove("visible");
+    if (formCard) formCard.classList.remove("fields-loading");
     if (retryEl) retryEl.style.display = "flex";
     showToast("โหลด config ไม่ได้", "error");
     cfgData = {};
     return;
   }
+  if (overlay) overlay.classList.remove("visible");
+  if (formCard) formCard.classList.remove("fields-loading");
   Object.entries(EV_FIELDS).forEach(([elId, key]) => {
     const el = document.getElementById(elId);
     if (el && cfgData[key] != null) {
@@ -288,7 +296,9 @@ function initEventTab() {
 async function loadPhotos() {
   setListContent('<p class="admin-status">กำลังโหลด…</p>');
   const retryEl = document.getElementById("gallery-error");
+  const refreshBtn = document.getElementById("refresh-btn");
   if (retryEl) retryEl.style.display = "none";
+  if (refreshBtn) { refreshBtn.disabled = true; refreshBtn.textContent = "↻ โหลด…"; }
   try {
     const data = await apiGet({ type: "photos_all" });
     photos = Array.isArray(data)
@@ -300,9 +310,11 @@ async function loadPhotos() {
     photos = [];
     setListContent("");
     if (retryEl) retryEl.style.display = "flex";
+    if (refreshBtn) { refreshBtn.disabled = false; refreshBtn.textContent = "↻ รีเฟรช"; }
     showToast("โหลดรูปไม่ได้", "error");
     return;
   }
+  if (refreshBtn) { refreshBtn.disabled = false; refreshBtn.textContent = "↻ รีเฟรช"; }
   renderPhotoList();
   updatePhotoCount();
 }
@@ -727,10 +739,16 @@ function initGuestbookTab() {
 
 // ── Music & Travel Tab ────────────────────────────────────────────────────────
 async function loadMusicTravel() {
+  const overlay = document.getElementById("music-loading-overlay");
+  const cards = document.querySelectorAll("#tab-music .form-card");
+  if (overlay) overlay.classList.add("visible");
+  cards.forEach((c) => c.classList.add("fields-loading"));
   try {
     const cfg = await apiGet({ type: "config" });
     cfgData = { ...cfgData, ...cfg };
   } catch {}
+  if (overlay) overlay.classList.remove("visible");
+  cards.forEach((c) => c.classList.remove("fields-loading"));
   const musicUrl = document.getElementById("music-url");
   if (musicUrl) musicUrl.value = cfgData["music_url"] || "/music.mp3";
 

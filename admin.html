@@ -557,6 +557,31 @@
       color: #7b5ea7;
     }
 
+    /* ── Tab loading overlay ─────────────────────────────────── */
+    .tab-loading-overlay {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10; border-radius: var(--radius-lg);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.15s;
+    }
+    .tab-loading-overlay.visible { opacity: 1; pointer-events: auto; }
+    .tab-spinner {
+      width: 28px; height: 28px;
+      border: 3px solid rgba(201,184,232,0.3);
+      border-top-color: var(--lavender);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Fields dimmed while loading */
+    .fields-loading .form-input,
+    .fields-loading .form-textarea,
+    .fields-loading .btn-save { opacity: 0.4; pointer-events: none; }
+
     /* ── Table ───────────────────────────────────────────────── */
     .table-card {
       background: var(--glass);
@@ -1195,7 +1220,10 @@
       <main class="admin-content">
 
         <!-- ── Tab: Event Info ── -->
-        <section class="tab-panel" id="tab-event">
+        <section class="tab-panel" id="tab-event" style="position:relative">
+          <div id="ev-loading-overlay" class="tab-loading-overlay">
+            <div class="tab-spinner"></div>
+          </div>
           <div class="panel-header">
             <div>
               <h2 class="panel-title">Event Info</h2>
@@ -1437,7 +1465,10 @@
         </section>
 
         <!-- ── Tab: Music & Travel ── -->
-        <section class="tab-panel tab-panel--hidden" id="tab-music">
+        <section class="tab-panel tab-panel--hidden" id="tab-music" style="position:relative">
+          <div id="music-loading-overlay" class="tab-loading-overlay">
+            <div class="tab-spinner"></div>
+          </div>
           <div class="panel-header">
             <div>
               <h2 class="panel-title">Music &amp; Travel</h2>
