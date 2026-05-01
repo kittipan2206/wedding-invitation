@@ -128,7 +128,7 @@ function updateTimestamp() {
   const el = document.getElementById("display-updated");
   if (el) {
     el.textContent =
-      "อัพเดต " +
+      "อัปเดต " +
       new Date().toLocaleTimeString("th-TH", {
         hour: "2-digit",
         minute: "2-digit",
