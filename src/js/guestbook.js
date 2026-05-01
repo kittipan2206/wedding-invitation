@@ -34,7 +34,7 @@ function renderFeed(entries) {
   if (showBtn) {
     if (entries.length > FEED_LIMIT) {
       const remaining = entries.length - FEED_LIMIT;
-      showBtn.textContent = `ดูทั้งหมด (${remaining} คำอวยพรอีก)`;
+      showBtn.textContent = `ดูเพิ่มอีก ${remaining} ข้อความ`;
       showBtn.style.display = "block";
       showBtn.onclick = () => {
         entries

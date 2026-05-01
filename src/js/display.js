@@ -111,6 +111,7 @@ function renderPage(newKeys = new Set()) {
 function updatePageDots() {
   const el = document.getElementById("display-pages");
   if (!el) return;
+  updateNavButtons();
   const total = totalPages();
   if (total <= 1) {
     el.innerHTML = "";
@@ -127,7 +128,7 @@ function updateTimestamp() {
   const el = document.getElementById("display-updated");
   if (el) {
     el.textContent =
-      "อัพเดต " +
+      "อัปเดต " +
       new Date().toLocaleTimeString("th-TH", {
         hour: "2-digit",
         minute: "2-digit",
@@ -218,8 +219,82 @@ function spawnPetals() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
+// ── Manual navigation ─────────────────────────────────────────────────────────
+
+function navigatePage(dir) {
+  const total = totalPages();
+  if (total <= 1) return;
+  const next = (currentPage + dir + total) % total;
+  transitionToPage(next);
+  resetPageTimer(); // restart auto-rotate after manual nav
+}
+
+function updateNavButtons() {
+  const total = totalPages();
+  const prev = document.getElementById("nav-prev");
+  const next = document.getElementById("nav-next");
+  if (!prev || !next) return;
+  if (total <= 1) {
+    prev.disabled = true;
+    next.disabled = true;
+  } else {
+    prev.disabled = false;
+    next.disabled = false;
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
 document.addEventListener("DOMContentLoaded", () => {
   spawnPetals();
   poll();
   setInterval(poll, POLL_INTERVAL);
+
+  // Click buttons
+  document
+    .getElementById("nav-prev")
+    ?.addEventListener("click", () => navigatePage(-1));
+  document
+    .getElementById("nav-next")
+    ?.addEventListener("click", () => navigatePage(1));
+
+  // Keyboard: ← → Space
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === " ") {
+      e.preventDefault();
+      navigatePage(1);
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      navigatePage(-1);
+    }
+  });
+
+  // Scroll wheel (debounced)
+  let wheelLock = false;
+  document.addEventListener(
+    "wheel",
+    (e) => {
+      if (wheelLock) return;
+      wheelLock = true;
+      setTimeout(() => {
+        wheelLock = false;
+      }, 600);
+      navigatePage(e.deltaY > 0 || e.deltaX > 0 ? 1 : -1);
+    },
+    { passive: true },
+  );
+
+  // Touch swipe
+  let touchStartX = 0;
+  document.addEventListener(
+    "touchstart",
+    (e) => {
+      touchStartX = e.touches[0].clientX;
+    },
+    { passive: true },
+  );
+  document.addEventListener("touchend", (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) navigatePage(dx < 0 ? 1 : -1);
+  });
 });
