@@ -1,0 +1,72 @@
+/* ══════════════════════════════
+   GUESTBOOK SECTION
+   ══════════════════════════════ */
+
+#guestbook {
+  text-align: center;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+.guestbook-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 5vw, 40px);
+  font-weight: 400;
+  font-style: italic;
+  margin-bottom: 12px;
+  color: var(--color-text);
+}
+
+.guestbook-sub {
+  font-size: 15px;
+  color: var(--color-muted);
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.guestbook-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+  border: var(--border-glass);
+  box-shadow: var(--shadow-card);
+  padding: clamp(32px, 6vw, 56px) clamp(24px, 5vw, 48px);
+  width: 100%;
+}
+
+/* ── Thank-you state ── */
+.guestbook-thanks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 0;
+}
+
+.guestbook-thanks-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(201, 184, 232, 0.4);
+}
+
+.guestbook-thanks h3 {
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-text);
+}
+
+.guestbook-thanks p {
+  font-size: 15px;
+  color: var(--color-muted);
+  line-height: 1.65;
+}

@@ -1,3 +1,5 @@
+import { burstConfetti } from './confetti.js';
+
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec';
 
 export function initRsvp() {
@@ -58,6 +60,7 @@ export function initRsvp() {
 
     form.style.display = 'none';
     if (thankYou) thankYou.style.display = 'flex';
+    burstConfetti();
   });
 
   document.getElementById('guest-name')?.addEventListener('input', function () {

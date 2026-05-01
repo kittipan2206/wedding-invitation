@@ -9,28 +9,33 @@ const ICON_COMPRESS = `<svg width="20" height="20" viewBox="0 0 24 24" fill="non
 </svg>`;
 
 export function initFullscreen() {
-  const btn = document.getElementById('fullscreen-btn');
-  if (!btn) return;
+  if (!document.fullscreenEnabled) return;
 
-  // Hide button if Fullscreen API not supported
-  if (!document.fullscreenEnabled) {
-    btn.style.display = 'none';
-    return;
+  const btns = ['env-fullscreen-btn', 'fullscreen-btn']
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+
+  if (!btns.length) return;
+
+  function sync() {
+    const isFs = !!document.fullscreenElement;
+    btns.forEach(btn => {
+      btn.innerHTML = isFs ? ICON_COMPRESS : ICON_EXPAND;
+      btn.title = isFs ? 'ออกจากเต็มหน้าจอ' : 'เต็มหน้าจอ';
+      btn.setAttribute('aria-label', btn.title);
+    });
   }
 
-  btn.innerHTML = ICON_EXPAND;
-
-  btn.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    } else {
-      document.exitFullscreen().catch(() => {});
-    }
+  btns.forEach(btn => {
+    btn.innerHTML = ICON_EXPAND;
+    btn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
   });
 
-  document.addEventListener('fullscreenchange', () => {
-    btn.innerHTML = document.fullscreenElement ? ICON_COMPRESS : ICON_EXPAND;
-    btn.title = document.fullscreenElement ? 'ออกจากเต็มหน้าจอ' : 'เต็มหน้าจอ';
-    btn.setAttribute('aria-label', btn.title);
-  });
+  document.addEventListener('fullscreenchange', sync);
 }

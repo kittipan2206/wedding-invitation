@@ -125,11 +125,15 @@
 .floral-top {
   top: -10px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(calc(-50% + var(--px, 0px))) translateY(var(--py, 0px));
+  will-change: transform;
+  transition: transform 0.05s linear;
 }
 
 .floral-bottom {
   bottom: 80px;
   left: 50%;
-  transform: translateX(-50%) scaleY(-1);
+  transform: translateX(calc(-50% + var(--px, 0px))) scaleY(-1) translateY(var(--py, 0px));
+  will-change: transform;
+  transition: transform 0.05s linear;
 }
