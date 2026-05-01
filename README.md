@@ -2,7 +2,7 @@
 
 เว็บการ์ดเชิญงานแต่งงานออนไลน์ สร้างด้วย Vite + Vanilla JS
 
-🔗 **Live:** https://wedding-invitation-eight-sigma-97.vercel.app
+🔗 **Live:** <https://wedding-invitation-eight-sigma-97.vercel.app>
 
 ---
 
@@ -67,6 +67,41 @@ feature → develop → PR → main → Vercel deploy
 
 - ทำงานบน `develop` เสมอ
 - push ขึ้น `main` เมื่อ owner ยืนยัน
+
+---
+
+## URL Parameters (Deep Links)
+
+### `?to=<ชื่อแขก>`
+
+แสดงชื่อแขกในหัวจดหมายและ title ของหน้าเว็บ ใช้สำหรับส่งลิงก์ส่วนตัวให้แขกแต่ละคน
+
+```
+https://your-site.vercel.app/?to=คุณสมชาย
+```
+
+### `?goto=<sectionId>`
+
+ข้ามหน้าต่างซอง (envelope) แล้ว scroll ตรงไปยัง section ที่กำหนด ใช้สำหรับ QR Code หรือลิงก์ตรงที่แชร์ในงาน
+
+| ค่า | ปลายทาง |
+|---|---|
+| `hero` | ส่วนหัว (ชื่อบ่าวสาว) |
+| `countdown` | นับถอยหลัง |
+| `details` | รายละเอียดงาน |
+| `rsvp` | ฟอร์มยืนยันเข้าร่วม |
+| `guestbook` | ฝากคำอวยพร |
+| `gallery` | แกลเลอรีรูปภาพ |
+
+```
+https://your-site.vercel.app/?goto=guestbook
+```
+
+### รวมทั้งสอง param
+
+```
+https://your-site.vercel.app/?to=คุณสมชาย&goto=rsvp
+```
 
 ---
 
