@@ -106,7 +106,7 @@
   font-size: 16px;
   font-weight: 600;
   color: #fff;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .gb-entry-body {
@@ -154,7 +154,10 @@
   color: var(--color-muted);
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
 }
 
 .gb-show-more:hover {

@@ -18,7 +18,7 @@ function makeEntryEl(e) {
 }
 
 function renderFeed(entries) {
-  const feed    = document.getElementById("guestbook-feed");
+  const feed = document.getElementById("guestbook-feed");
   const showBtn = document.getElementById("gb-show-more");
   if (!feed) return;
 
@@ -37,7 +37,9 @@ function renderFeed(entries) {
       showBtn.textContent = `ดูทั้งหมด (${remaining} คำอวยพรอีก)`;
       showBtn.style.display = "block";
       showBtn.onclick = () => {
-        entries.slice(FEED_LIMIT).forEach((e) => feed.appendChild(makeEntryEl(e)));
+        entries
+          .slice(FEED_LIMIT)
+          .forEach((e) => feed.appendChild(makeEntryEl(e)));
         showBtn.style.display = "none";
       };
     } else {
