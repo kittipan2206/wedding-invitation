@@ -343,6 +343,57 @@
             text-align: right;
         }
 
+        /* ── Nav buttons ── */
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1.5px solid rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 50%;
+            width: clamp(44px, 4vw, 68px);
+            height: clamp(44px, 4vw, 68px);
+            font-size: clamp(22px, 2.4vw, 38px);
+            color: var(--color-muted);
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, background 0.2s ease, transform 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            user-select: none;
+        }
+
+        .nav-btn--prev {
+            left: clamp(12px, 2vw, 28px);
+        }
+
+        .nav-btn--next {
+            right: clamp(12px, 2vw, 28px);
+        }
+
+        body:hover .nav-btn {
+            opacity: 0.5;
+        }
+
+        .nav-btn:hover {
+            opacity: 1 !important;
+            background: rgba(255, 255, 255, 0.38);
+        }
+
+        .nav-btn:active {
+            transform: translateY(-50%) scale(0.88);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+
         /* ── Empty state ── */
         .display-empty {
             grid-column: 1 / -1;
@@ -359,6 +410,9 @@
 
 <body>
     <div class="bg-gradient" aria-hidden="true"></div>
+
+    <button class="nav-btn nav-btn--prev" id="nav-prev" aria-label="หน้าก่อนหน้า">&#8249;</button>
+    <button class="nav-btn nav-btn--next" id="nav-next" aria-label="หน้าถัดไป">&#8250;</button>
 
     <div class="display-wrap">
         <header class="display-header">
