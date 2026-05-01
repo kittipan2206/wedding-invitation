@@ -2,7 +2,8 @@ const NOTE_ICON = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><
 const PAUSE_ICON = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="5" y="4" width="3" height="12" rx="1" fill="currentColor"/><rect x="12" y="4" width="3" height="12" rx="1" fill="currentColor"/></svg>`;
 
 export function initMusic() {
-  const musicUrl = window.__weddingConfig?.music_url || "/music/wedding-music.mp3";
+  const musicUrl =
+    window.__weddingConfig?.music_url || "/music/wedding-music.mp3";
   const audio = new Audio(musicUrl);
   audio.loop = true;
   audio.volume = 0;

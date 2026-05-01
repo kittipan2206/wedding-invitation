@@ -128,6 +128,12 @@ export function injectConfig(cfg) {
   if (loaderTitle)
     loaderTitle.textContent = `${c.groom_name} & ${c.bride_name}`;
 
+  // Admin auth screen + topbar (if on admin page)
+  const authSub = document.getElementById("auth-sub");
+  if (authSub) authSub.textContent = `${c.groom_name} & ${c.bride_name}`;
+  const adminBrand = document.getElementById("admin-brand");
+  if (adminBrand) adminBrand.textContent = `Admin — ${c.groom_name} & ${c.bride_name}`;
+
   // Guestbook sub + thanks
   const gbSub = document.getElementById("guestbook-sub");
   if (gbSub)

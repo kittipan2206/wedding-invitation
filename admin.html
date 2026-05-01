@@ -316,7 +316,19 @@
       font-family: var(--serif); font-size: 18px; font-style: italic; color: var(--muted); opacity: 0.6;
     }
     .admin-status { text-align: center; padding: 32px; color: var(--muted); font-size: 14px; font-style: italic; opacity: 0.7; }
-
+    /* ── Error + retry state ───────────────────── */
+    .error-state {
+      display: none; align-items: center; justify-content: center; flex-direction: column;
+      gap: 12px; padding: 36px 24px; text-align: center;
+    }
+    .error-state-msg { font-size: 14px; color: #a05050; }
+    .btn-retry {
+      font-size: 13px; padding: 7px 20px; border-radius: 999px;
+      background: none; border: 1.5px solid rgba(200,136,138,0.5);
+      color: #a05050; cursor: pointer; font-family: var(--sans);
+      transition: background 0.2s;
+    }
+    .btn-retry:hover { background: rgba(200,136,138,0.08); }
     /* ── Gallery tab (migrated styles) ──────────────────────── */
     .add-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .add-form-url { grid-column: 1 / -1; }
@@ -418,8 +430,14 @@
       .admin-sidebar { display: none; }
       .admin-bottom-nav { display: flex; }
       .admin-content { padding: 20px 16px calc(var(--bnav-h) + 20px); }
-      .field-row { grid-template-columns: 1fr; }
-    }
+      .field-row { grid-template-columns: 1fr; }      /* Table horizontal scroll on mobile */
+      .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .data-table { min-width: 480px; }
+      /* Hide less critical columns on mobile */
+      .data-table th:nth-child(5),
+      .data-table td:nth-child(5),
+      .data-table th:nth-child(7),
+      .data-table td:nth-child(7) { display: none; }    }
   </style>
 </head>
 <body>
@@ -428,7 +446,7 @@
 <div id="auth-screen">
   <div class="auth-card">
     <h1 class="auth-title">Admin</h1>
-    <p class="auth-sub">นนท์ &amp; เมย์</p>
+    <p id="auth-sub" class="auth-sub">นนท์ &amp; เมย์</p>
     <form id="auth-form" novalidate>
       <input class="auth-input" type="password" id="admin-password" placeholder="รหัสผ่าน" autocomplete="current-password" />
       <p class="auth-error" id="auth-error">รหัสผ่านไม่ถูกต้อง</p>
@@ -442,7 +460,7 @@
 
   <!-- Mobile topbar -->
   <header class="admin-topbar">
-    <span class="admin-brand">Admin — นนท์ &amp; เมย์</span>
+    <span id="admin-brand" class="admin-brand">Admin — นนท์ &amp; เมย์</span>
     <a href="/" class="btn-outline" style="font-size:12px;padding:6px 14px">ดูเว็บหลัก →</a>
   </header>
 
@@ -586,6 +604,10 @@
             <span class="unsaved-badge" id="ev-unsaved">มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก</span>
             <button class="btn-save" id="btn-save-event">บันทึก Event Info</button>
           </div>
+          <div id="ev-error" class="error-state">
+            <p class="error-state-msg">โหลดข้อมูลไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
+            <button class="btn-retry" onclick="tabLoaded.event=false;loadEventConfig()">↻ ลองใหม่</button>
+          </div>
         </div>
       </section>
 
@@ -637,6 +659,10 @@
             </div>
           </div>
           <div id="photo-list"><p class="admin-status">กำลังโหลด…</p></div>
+          <div id="gallery-error" class="error-state">
+            <p class="error-state-msg">โหลดรูปไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
+            <button class="btn-retry" onclick="tabLoaded.gallery=false;loadPhotos()">↻ ลองใหม่</button>
+          </div>
         </div>
       </section>
 
@@ -694,6 +720,10 @@
           </div>
           <div id="rsvp-empty" class="empty-state" style="display:none">ยังไม่มีผู้ตอบรับ</div>
           <div id="rsvp-loading" class="admin-status">กำลังโหลด…</div>
+          <div id="rsvp-error" class="error-state">
+            <p class="error-state-msg">โหลด RSVP ไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
+            <button class="btn-retry" onclick="tabLoaded.rsvp=false;loadRsvp()">↻ ลองใหม่</button>
+          </div>
         </div>
       </section>
 
@@ -727,6 +757,10 @@
           </div>
           <div id="guestbook-empty" class="empty-state" style="display:none">ยังไม่มีข้อความ</div>
           <div id="guestbook-loading" class="admin-status">กำลังโหลด…</div>
+          <div id="guestbook-error" class="error-state">
+            <p class="error-state-msg">โหลด Guestbook ไม่ได้ — ตรวจสอบการเชื่อมต่อ</p>
+            <button class="btn-retry" onclick="tabLoaded.guestbook=false;loadGuestbook()">↻ ลองใหม่</button>
+          </div>
         </div>
       </section>
 
