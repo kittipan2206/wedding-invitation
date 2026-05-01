@@ -96,22 +96,22 @@
 /* ── Map action buttons ── */
 .map-actions {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .map-btn {
-  display: inline-flex;
+  flex: 1;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 12px 22px;
-  border-radius: 50px;
+  padding: 13px 16px;
+  border-radius: 14px;
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
@@ -130,8 +130,73 @@
 .map-btn--calendar {
   background: white;
   color: #5f6368;
-  border: 1.5px solid rgba(201, 184, 232, 0.7);
-  box-shadow: 0 2px 10px rgba(201, 184, 232, 0.2);
+  border: 1.5px solid rgba(201, 184, 232, 0.6);
+  box-shadow: 0 2px 10px rgba(201, 184, 232, 0.18);
+}
+
+/* ── Travel info box ── */
+.travel-info {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-md);
+  padding: 24px 28px;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: var(--shadow-soft);
+  text-align: left;
+  margin-bottom: 0;
+}
+
+.travel-info-heading {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 18px;
+}
+
+.travel-items {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.travel-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.travel-item-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(201, 184, 232, 0.25), rgba(184, 216, 248, 0.25));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+}
+
+.travel-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.travel-item-text strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.travel-item-text span {
+  font-size: 13px;
+  color: var(--color-muted);
+  line-height: 1.5;
 }
 
 /* ── Dress code color palette ── */
