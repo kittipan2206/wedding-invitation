@@ -121,6 +121,44 @@ function confirmDialog(msg) {
   });
 }
 
+// ── Config value normalizer ───────────────────────────────────────────────────
+// Google Sheets auto-converts cells that look like dates/times to ISO strings.
+// e.g. "2026-07-31" → "2026-07-31T00:00:00.000Z"
+//      "13:00"      → "1899-12-30T13:00:00.000Z"  (Sheets time-only epoch)
+//
+// We detect these patterns and convert back to plain strings before populating fields.
+
+function normalizeConfigValue(key, raw) {
+  if (typeof raw !== 'string') return raw;
+
+  // ISO datetime string (ends with Z or +offset)
+  const isoRe = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
+  if (!isoRe.test(raw)) return raw; // not an ISO string, keep as-is
+
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return raw;
+
+  // Time-only fields: Sheets encodes them as 1899-12-30T<HH:MM:SS>
+  // (or 1899-12-29 in some timezones) — extract just HH:MM
+  if (d.getUTCFullYear() <= 1900) {
+    const hh = String(d.getUTCHours()).padStart(2, '0');
+    const mm = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${hh}:${mm}`;
+  }
+
+  // Date-only fields (keys ending in _iso or _display that contain a date)
+  // Return YYYY-MM-DD so <input type="date"> fields populate correctly
+  if (key.endsWith('_iso') || key.endsWith('_display')) {
+    const yyyy = d.getUTCFullYear();
+    const mo   = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const dd   = String(d.getUTCDate()).padStart(2, '0');
+    return `${yyyy}-${mo}-${dd}`;
+  }
+
+  // Generic date — return ISO date portion
+  return d.toISOString().slice(0, 10);
+}
+
 // ── Event Info Tab ────────────────────────────────────────────────────────────
 const EV_FIELDS = {
   'ev-groom':       'groom_name',
@@ -146,7 +184,12 @@ async function loadEventConfig() {
   }
   Object.entries(EV_FIELDS).forEach(([elId, key]) => {
     const el = document.getElementById(elId);
-    if (el && cfgData[key] != null) el.value = cfgData[key];
+    if (el && cfgData[key] != null) {
+      const normalized = normalizeConfigValue(key, cfgData[key]);
+      el.value = normalized;
+      // Keep cfgData in sync with the normalized value so dirty-check works correctly
+      cfgData[key] = normalized;
+    }
   });
   markEvClean();
 }
