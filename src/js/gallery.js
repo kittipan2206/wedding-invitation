@@ -152,9 +152,11 @@ function updateLightboxContent() {
   const prevBtn = document.getElementById("lightbox-prev");
   const nextBtn = document.getElementById("lightbox-next");
   if (prevBtn) prevBtn.disabled = currentLightboxIndex === 0;
-  if (nextBtn) nextBtn.disabled = currentLightboxIndex === filteredPhotos.length - 1;
+  if (nextBtn)
+    nextBtn.disabled = currentLightboxIndex === filteredPhotos.length - 1;
   if (caption) caption.textContent = photo.caption || "";
-  if (counter) counter.textContent = `${currentLightboxIndex + 1} / ${filteredPhotos.length}`;
+  if (counter)
+    counter.textContent = `${currentLightboxIndex + 1} / ${filteredPhotos.length}`;
 
   if (!img) return;
   const newSrc = getSizedUrl(photo.url, 1600);

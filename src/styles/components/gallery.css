@@ -216,7 +216,9 @@
 }
 
 @keyframes lb-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 #lightbox-close {
