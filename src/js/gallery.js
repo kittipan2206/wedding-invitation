@@ -13,6 +13,7 @@ let cachedPhotos = [];
 
 // Overlay state (separate from preview lightbox)
 let overlayFiltered = [];
+let _previewWired = false; // prevent duplicate event listeners on re-init
 let overlayLbIndex = 0;
 let overlayLbOpen = false;
 
@@ -275,12 +276,9 @@ function openOverlay() {
   if (!el) return;
   el.classList.add("overlay--open");
   el.setAttribute("aria-hidden", "false");
-  // Lock body scroll (iOS Safari needs position:fixed trick)
-  document.body.dataset.scrollY = window.scrollY;
+  // Prevent body scroll while overlay is open
+  // Avoid position:fixed — it causes a visible page-jump on iOS Safari
   document.body.style.overflow = "hidden";
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${window.scrollY}px`;
-  document.body.style.width = "100%";
 
   // Lazy-init: render grid + wire lightbox on first open
   if (!el.dataset.initialized) {
@@ -298,13 +296,7 @@ function closeOverlay() {
   el.classList.remove("overlay--open");
   el.setAttribute("aria-hidden", "true");
   if (overlayLbOpen) closeOverlayLightbox();
-  // Restore body scroll (iOS Safari fix)
-  const scrollY = parseInt(document.body.dataset.scrollY || "0", 10);
   document.body.style.overflow = "";
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.width = "";
-  window.scrollTo(0, scrollY);
 }
 
 function applyOverlayFilter(category) {
@@ -487,17 +479,19 @@ export async function initGalleryPreview() {
     if (photos.length > PREVIEW_LIMIT) {
       viewAllBtn.textContent = `ดูทั้งหมด ${photos.length} รูป →`;
     }
-    // Open overlay instead of navigating to gallery.html
-    viewAllBtn.addEventListener("click", (e) => {
+  }
+
+  // Wire buttons only once — guard against duplicate calls (e.g. pageshow)
+  if (!_previewWired) {
+    _previewWired = true;
+    viewAllBtn?.addEventListener("click", (e) => {
       e.preventDefault();
       openOverlay();
     });
+    document
+      .getElementById("gallery-overlay-close")
+      ?.addEventListener("click", closeOverlay);
   }
-
-  // Wire overlay close button
-  document
-    .getElementById("gallery-overlay-close")
-    ?.addEventListener("click", closeOverlay);
 }
 
 // ── Entry point: auto-detect which page ───────────────────────────────────────
