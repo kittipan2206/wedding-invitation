@@ -56,21 +56,31 @@ async function fetchPhotos() {
 // Using data-src instead of src directly prevents iOS from decoding all images
 // at once, which can exhaust tab memory and crash the page.
 
+// Load images when they approach the viewport (+300px margin)
 const _imgObserver =
   typeof IntersectionObserver !== "undefined"
     ? new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
             const img = entry.target;
-            if (img.dataset.src) {
-              img.src = img.dataset.src;
-              delete img.dataset.src;
+            if (entry.isIntersecting) {
+              // Image entering viewport — load it
+              if (img.dataset.src) {
+                img.src = img.dataset.src;
+                delete img.dataset.src;
+              }
+            } else {
+              // Image far outside viewport — release decoded bitmap from RAM
+              // Store URL back in data-src so it can reload when needed
+              if (img.src && img.complete) {
+                img.dataset.src = img.src;
+                img.src = "";
+              }
             }
-            _imgObserver.unobserve(img);
           });
         },
-        { rootMargin: "200px" },
+        // rootMargin: load 300px before entering, unload 600px after leaving
+        { rootMargin: "300px 0px 600px 0px" },
       )
     : null;
 
@@ -330,14 +340,15 @@ function closeOverlay() {
   el.setAttribute("aria-hidden", "true");
   if (overlayLbOpen) closeOverlayLightbox();
 
-  // Free decoded image memory — iOS tab limit is ~1GB
-  // Setting src="" tells the browser it can release the decoded bitmap
+  // Release all decoded bitmaps from RAM when overlay closes
+  // Observer is still attached — images will reload when overlay opens again
   document.querySelectorAll("#overlay-gallery-grid img").forEach((img) => {
-    _imgObserver?.unobserve(img);
-    img.dataset.src = img.src || img.dataset.src;
-    img.src = "";
+    if (img.src) {
+      img.dataset.src = img.src;
+      img.src = "";
+    }
   });
-  // Reset initialized flag so grid re-observes images on next open
+  // Reset initialized flag so grid re-renders fresh on next open
   if (el.dataset.initialized) delete el.dataset.initialized;
 }
 
