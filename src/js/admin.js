@@ -933,7 +933,9 @@ function initMusicTab() {
         previewAudio.src = resolveAudioUrl(url);
         previewAudio
           .play()
-          .then(() => { previewBtn.textContent = "⏹ หยุด"; })
+          .then(() => {
+            previewBtn.textContent = "⏹ หยุด";
+          })
           .catch((err) => {
             console.error("[Music Preview] เล่นไม่ได้", {
               originalUrl: url,

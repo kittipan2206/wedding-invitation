@@ -2,8 +2,26 @@ const NOTE_ICON = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><
 const PAUSE_ICON = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="5" y="4" width="3" height="12" rx="1" fill="currentColor"/><rect x="12" y="4" width="3" height="12" rx="1" fill="currentColor"/></svg>`;
 
 export function initMusic() {
-  const musicUrl =
+  const rawUrl =
     window.__weddingConfig?.music_url || "/music/wedding-music.mp3";
+
+  // Route Google Drive URLs through server proxy to avoid CORS/redirect issues
+  function resolveAudioUrl(url) {
+    if (!url) return url;
+    try {
+      const u = new URL(url);
+      if (
+        (u.hostname === "drive.google.com" && u.pathname.startsWith("/uc")) ||
+        u.hostname === "drive.usercontent.google.com"
+      ) {
+        const id = u.searchParams.get("id");
+        if (id) return `/api/proxy-audio?id=${encodeURIComponent(id)}`;
+      }
+    } catch {}
+    return url;
+  }
+
+  const musicUrl = resolveAudioUrl(rawUrl);
   const audio = new Audio(musicUrl);
   audio.loop = true;
   audio.volume = 0;
