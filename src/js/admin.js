@@ -774,12 +774,16 @@ function initGuestbookTab() {
  */
 function resolveAudioUrl(url) {
   if (!url) return url;
-  const gdMatch = url.match(
-    /drive\.google\.com\/uc[^?]*\?.*[?&]id=([A-Za-z0-9_-]+)/,
-  );
-  if (gdMatch) {
-    return `https://drive.usercontent.google.com/download?id=${gdMatch[1]}&export=download&confirm=t`;
-  }
+  try {
+    const u = new URL(url);
+    if (
+      (u.hostname === "drive.google.com" && u.pathname.startsWith("/uc")) ||
+      u.hostname === "drive.usercontent.google.com"
+    ) {
+      const id = u.searchParams.get("id");
+      if (id) return `/api/proxy-audio?id=${encodeURIComponent(id)}`;
+    }
+  } catch {}
   return url;
 }
 
@@ -929,12 +933,10 @@ function initMusicTab() {
         previewAudio.src = resolveAudioUrl(url);
         previewAudio
           .play()
-          .then(() => {
-            previewBtn.textContent = "⏹ หยุด";
-          })
+          .then(() => { previewBtn.textContent = "⏹ หยุด"; })
           .catch((err) => {
             console.error("[Music Preview] เล่นไม่ได้", {
-              url,
+              originalUrl: url,
               error: err?.message,
               name: err?.name,
               code: previewAudio.error?.code,
