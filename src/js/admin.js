@@ -369,7 +369,7 @@ function buildPhotoItem(photo, index) {
   item.innerHTML = `
     ${thumb}
     <div class="photo-info">
-      <p class="photo-caption-text">${escHtml(photo.caption || "(ไม่มี caption)")}</p>
+      <input class="photo-caption-input" type="text" value="${escHtml(photo.caption || "")}" placeholder="(ไม่มี caption — คลิกเพื่อแก้ไข)" />
       <div class="photo-meta">
         <span class="photo-category-badge">${escHtml(catLabel)}</span>
         <span class="photo-order">#${photo.order ?? index + 1}</span>
@@ -402,6 +402,23 @@ function buildPhotoItem(photo, index) {
   item
     .querySelector(".btn-icon--del")
     .addEventListener("click", () => handleDeletePhoto(photo.id));
+
+  const captionInput = item.querySelector(".photo-caption-input");
+  let captionOriginal = photo.caption || "";
+  captionInput.addEventListener("blur", () => {
+    const val = captionInput.value.trim();
+    if (val === captionOriginal) return;
+    captionOriginal = val;
+    const idx = photos.findIndex((p) => p.id === photo.id);
+    if (idx !== -1) photos[idx] = { ...photos[idx], caption: val };
+    apiPost({ type: "photo_update", id: photo.id, caption: val });
+    showToast("บันทึก caption แล้ว ✓");
+  });
+  captionInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") captionInput.blur();
+    if (e.key === "Escape") { captionInput.value = captionOriginal; captionInput.blur(); }
+  });
+
   return item;
 }
 
