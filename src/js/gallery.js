@@ -14,6 +14,7 @@ let cachedPhotos = [];
 // Overlay state (separate from preview lightbox)
 let overlayFiltered = [];
 let _previewWired = false; // prevent duplicate event listeners on re-init
+let _lightboxWired = false; // prevent duplicate lightbox listeners
 let overlayLbIndex = 0;
 let overlayLbOpen = false;
 
@@ -241,6 +242,9 @@ function lightboxNext() {
 }
 
 function initLightbox() {
+  if (_lightboxWired) return;
+  _lightboxWired = true;
+
   document
     .getElementById("lightbox-close")
     ?.addEventListener("click", closeLightbox);
