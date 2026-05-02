@@ -15,6 +15,7 @@ let cachedPhotos = [];
 let overlayFiltered = [];
 let _previewWired = false; // prevent duplicate event listeners on re-init
 let _lightboxWired = false; // prevent duplicate lightbox listeners
+let _overlayLbWired = false; // prevent duplicate overlay lightbox listeners
 let overlayLbIndex = 0;
 let overlayLbOpen = false;
 
@@ -72,18 +73,23 @@ const _imgObserver =
               }
             } else {
               // Image far outside viewport — release decoded bitmap from RAM
-              // Store URL back in data-src so it can reload when needed
-              if (img.src && img.complete) {
-                img.dataset.src = img.src;
-                img.src = "";
-              }
+              releaseImg(img);
             }
           });
         },
-        // rootMargin: load 300px before entering, unload 600px after leaving
-        { rootMargin: "300px 0px 600px 0px" },
+        // rootMargin in % = relative to viewport height (auto-scales across all screen sizes)
+        // 150% top = preload 1.5× viewport height ahead; 200% bottom = unload 2× vh after exit
+        { rootMargin: "150% 0px 200% 0px" },
       )
     : null;
+
+// Unload image bitmap from RAM while preserving layout space via aspect-ratio
+function releaseImg(img) {
+  if (!img.src || !img.complete) return;
+  // aspect-ratio is already set on img when it loaded — no extra height work needed
+  img.dataset.src = img.src;
+  img.src = "";
+}
 
 function getColCount(containerId) {
   if (containerId === "gallery-preview-grid") return 2;
@@ -125,7 +131,13 @@ function renderGrid(photos, containerId, clickCallback) {
     const sizedUrl = getSizedUrl(photo.url, 800);
     img.alt = photo.caption || "";
     img.classList.add("loading");
-    img.addEventListener("load", () => img.classList.remove("loading"));
+    img.addEventListener("load", () => {
+      img.classList.remove("loading");
+      // Store aspect-ratio so layout is preserved when src is cleared (no layout shift)
+      if (img.naturalWidth && img.naturalHeight) {
+        img.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+      }
+    });
     img.addEventListener("error", () => {
       img.src = "";
       img.style.minHeight = "120px";
@@ -365,10 +377,7 @@ function closeOverlay() {
   // Release all decoded bitmaps from RAM when overlay closes
   // Observer is still attached — images will reload when overlay opens again
   document.querySelectorAll("#overlay-gallery-grid img").forEach((img) => {
-    if (img.src) {
-      img.dataset.src = img.src;
-      img.src = "";
-    }
+    releaseImg(img);
   });
   // Reset initialized flag so grid re-renders fresh on next open
   if (el.dataset.initialized) delete el.dataset.initialized;
@@ -448,6 +457,9 @@ function updateOverlayLbContent() {
 }
 
 function initOverlayLightbox() {
+  if (_overlayLbWired) return;
+  _overlayLbWired = true;
+
   document
     .getElementById("overlay-lightbox-close")
     ?.addEventListener("click", closeOverlayLightbox);
