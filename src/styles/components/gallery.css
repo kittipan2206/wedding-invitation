@@ -199,6 +199,24 @@
   object-fit: contain;
   border-radius: 10px;
   display: block;
+  transition: opacity 0.2s ease;
+}
+
+/* Spinner shown while image is preloading */
+#lightbox.lightbox--loading::after {
+  content: "";
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  animation: lb-spin 0.7s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes lb-spin {
+  to { transform: rotate(360deg); }
 }
 
 #lightbox-close {
@@ -397,6 +415,19 @@
   object-fit: contain;
   border-radius: 10px;
   display: block;
+  transition: opacity 0.2s ease;
+}
+
+#overlay-lightbox.lightbox--loading::after {
+  content: "";
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  animation: lb-spin 0.7s linear infinite;
+  pointer-events: none;
 }
 
 #overlay-lightbox-close {

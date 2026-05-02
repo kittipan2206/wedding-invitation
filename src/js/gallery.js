@@ -135,6 +135,12 @@ function closeLightbox() {
   lightboxOpen = false;
 }
 
+function setLightboxLoading(loading) {
+  const lb = document.getElementById("lightbox");
+  if (loading) lb?.classList.add("lightbox--loading");
+  else lb?.classList.remove("lightbox--loading");
+}
+
 function updateLightboxContent() {
   const photo = filteredPhotos[currentLightboxIndex];
   if (!photo) return;
@@ -143,19 +149,32 @@ function updateLightboxContent() {
   const caption = document.getElementById("lightbox-caption");
   const counter = document.getElementById("lightbox-counter");
 
-  if (img) {
-    img.src = getSizedUrl(photo.url, 1600);
-    img.alt = photo.caption || "";
-  }
-  if (caption) caption.textContent = photo.caption || "";
-  if (counter)
-    counter.textContent = `${currentLightboxIndex + 1} / ${filteredPhotos.length}`;
-
   const prevBtn = document.getElementById("lightbox-prev");
   const nextBtn = document.getElementById("lightbox-next");
   if (prevBtn) prevBtn.disabled = currentLightboxIndex === 0;
-  if (nextBtn)
-    nextBtn.disabled = currentLightboxIndex === filteredPhotos.length - 1;
+  if (nextBtn) nextBtn.disabled = currentLightboxIndex === filteredPhotos.length - 1;
+  if (caption) caption.textContent = photo.caption || "";
+  if (counter) counter.textContent = `${currentLightboxIndex + 1} / ${filteredPhotos.length}`;
+
+  if (!img) return;
+  const newSrc = getSizedUrl(photo.url, 1600);
+
+  // Preload in memory first, then swap — avoids blank flash
+  setLightboxLoading(true);
+  img.style.opacity = "0";
+  const preload = new Image();
+  preload.onload = () => {
+    img.src = newSrc;
+    img.alt = photo.caption || "";
+    img.style.opacity = "1";
+    setLightboxLoading(false);
+  };
+  preload.onerror = () => {
+    img.src = newSrc; // show broken-img rather than blank
+    img.style.opacity = "1";
+    setLightboxLoading(false);
+  };
+  preload.src = newSrc;
 }
 
 function lightboxPrev() {
@@ -320,23 +339,43 @@ function closeOverlayLightbox() {
   overlayLbOpen = false;
 }
 
+function setOverlayLbLoading(loading) {
+  const lb = document.getElementById("overlay-lightbox");
+  if (loading) lb?.classList.add("lightbox--loading");
+  else lb?.classList.remove("lightbox--loading");
+}
+
 function updateOverlayLbContent() {
   const photo = overlayFiltered[overlayLbIndex];
   if (!photo) return;
   const img = document.getElementById("overlay-lightbox-img");
   const caption = document.getElementById("overlay-lightbox-caption");
   const counter = document.getElementById("overlay-lightbox-counter");
-  if (img) {
-    img.src = getSizedUrl(photo.url, 1600);
-    img.alt = photo.caption || "";
-  }
-  if (caption) caption.textContent = photo.caption || "";
   if (counter)
     counter.textContent = `${overlayLbIndex + 1} / ${overlayFiltered.length}`;
   const prev = document.getElementById("overlay-lightbox-prev");
   const next = document.getElementById("overlay-lightbox-next");
   if (prev) prev.disabled = overlayLbIndex === 0;
   if (next) next.disabled = overlayLbIndex === overlayFiltered.length - 1;
+
+  if (!img) return;
+  const newSrc = getSizedUrl(photo.url, 1600);
+  setOverlayLbLoading(true);
+  img.style.opacity = "0";
+  const preload = new Image();
+  preload.onload = () => {
+    img.src = newSrc;
+    img.alt = photo.caption || "";
+    img.style.opacity = "1";
+    setOverlayLbLoading(false);
+  };
+  preload.onerror = () => {
+    img.src = newSrc;
+    img.alt = photo.caption || "";
+    img.style.opacity = "1";
+    setOverlayLbLoading(false);
+  };
+  preload.src = newSrc;
 }
 
 function initOverlayLightbox() {
