@@ -15,6 +15,7 @@ export const CONFIG_DEFAULTS = {
   travel_airport: "ระยะทางประมาณ 1 ชั่วโมงครึ่ง จากสนามบิน",
   travel_hotel: "โรงแรมในตัวเมืองสตูล ห่างจากงาน ~20 นาที",
   travel_car: "มีที่จอดรถสำหรับแขกเพียงพอ ไม่มีค่าใช้จ่าย",
+  og_image: "https://non-may.vercel.app/og-image.png",
 };
 
 // Normalize values that Google Sheets auto-converted to ISO datetime strings.

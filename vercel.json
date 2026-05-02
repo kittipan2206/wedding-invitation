@@ -2,6 +2,14 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "functions": {
+    "api/og.js": {
+      "includeFiles": "dist/index.html"
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/api/og" }
+  ],
   "git": {
     "deploymentEnabled": {
       "main": true
