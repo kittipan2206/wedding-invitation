@@ -52,9 +52,37 @@ async function fetchPhotos() {
 
 // ── Render masonry grid ───────────────────────────────────────────────────────
 
+// ── Lazy load via IntersectionObserver ───────────────────────────────────────
+// Using data-src instead of src directly prevents iOS from decoding all images
+// at once, which can exhaust tab memory and crash the page.
+
+const _imgObserver =
+  typeof IntersectionObserver !== "undefined"
+    ? new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const img = entry.target;
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+              delete img.dataset.src;
+            }
+            _imgObserver.unobserve(img);
+          });
+        },
+        { rootMargin: "200px" },
+      )
+    : null;
+
 function renderGrid(photos, containerId, clickCallback) {
   const grid = document.getElementById(containerId);
   if (!grid) return;
+
+  // Free memory from previously loaded images before re-rendering
+  grid.querySelectorAll("img").forEach((img) => {
+    _imgObserver?.unobserve(img);
+    img.src = "";
+  });
 
   if (photos.length === 0) {
     grid.innerHTML = '<p class="gallery-status">ยังไม่มีรูปภาพในหมวดนี้</p>';
@@ -68,9 +96,8 @@ function renderGrid(photos, containerId, clickCallback) {
     item.dataset.index = i;
 
     const img = document.createElement("img");
-    img.src = getSizedUrl(photo.url, 800);
+    const sizedUrl = getSizedUrl(photo.url, 800);
     img.alt = photo.caption || "";
-    img.loading = "lazy";
     img.classList.add("loading");
     img.addEventListener("load", () => img.classList.remove("loading"));
     img.addEventListener("error", () => {
@@ -78,6 +105,15 @@ function renderGrid(photos, containerId, clickCallback) {
       img.style.minHeight = "120px";
       img.style.background = "rgba(201,184,232,0.15)";
     });
+
+    if (_imgObserver) {
+      // True lazy load: only decode when near viewport
+      img.dataset.src = sizedUrl;
+      _imgObserver.observe(img);
+    } else {
+      // Fallback for old browsers
+      img.src = sizedUrl;
+    }
 
     const overlay = document.createElement("div");
     overlay.className = "gallery-item-overlay";
@@ -293,6 +329,16 @@ function closeOverlay() {
   el.classList.remove("overlay--open");
   el.setAttribute("aria-hidden", "true");
   if (overlayLbOpen) closeOverlayLightbox();
+
+  // Free decoded image memory — iOS tab limit is ~1GB
+  // Setting src="" tells the browser it can release the decoded bitmap
+  document.querySelectorAll("#overlay-gallery-grid img").forEach((img) => {
+    _imgObserver?.unobserve(img);
+    img.dataset.src = img.src || img.dataset.src;
+    img.src = "";
+  });
+  // Reset initialized flag so grid re-observes images on next open
+  if (el.dataset.initialized) delete el.dataset.initialized;
 }
 
 function applyOverlayFilter(category) {
