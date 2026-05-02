@@ -57,10 +57,12 @@ export function initShare() {
 
   nativeBtn?.addEventListener("click", async () => {
     if (!navigator.share) return;
+    const c = window.__weddingConfig || {};
+    const names = c.groom_name && c.bride_name ? `${c.groom_name} & ${c.bride_name}` : "นนท์ & เมย์";
     try {
       await navigator.share({
-        title: "นนท์ & เมย์ — ขอเรียนเชิญร่วมงานแต่งงาน",
-        text: "ขอเรียนเชิญร่วมงานแต่งงาน นนท์ & เมย์ วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569",
+        title: `${names} — ขอเรียนเชิญร่วมงานแต่งงาน`,
+        text: `ขอเรียนเชิญร่วมงานแต่งงาน ${names}${c.event_date_display ? ` ${c.event_date_display}` : ""}`,
         url: getLink(),
       });
     } catch {
