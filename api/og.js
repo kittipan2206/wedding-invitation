@@ -49,8 +49,13 @@ function escAttr(str) {
 }
 
 export default async function handler(req, res) {
-  // Locate the built index.html (production) or source (local dev)
-  let htmlPath = path.join(process.cwd(), "dist", "index.html");
+  // Locate the template HTML:
+  // - Production (Vercel): dist/_template.html (renamed by postbuild so it's not served statically)
+  // - Local dev (vercel dev): source index.html
+  let htmlPath = path.join(process.cwd(), "dist", "_template.html");
+  if (!fs.existsSync(htmlPath)) {
+    htmlPath = path.join(process.cwd(), "dist", "index.html");
+  }
   if (!fs.existsSync(htmlPath)) {
     htmlPath = path.join(process.cwd(), "index.html");
   }

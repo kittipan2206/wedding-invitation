@@ -4,7 +4,7 @@
   "framework": "vite",
   "functions": {
     "api/og.js": {
-      "includeFiles": "dist/index.html"
+      "includeFiles": "dist/_template.html"
     }
   },
   "rewrites": [{ "source": "/", "destination": "/api/og" }],
