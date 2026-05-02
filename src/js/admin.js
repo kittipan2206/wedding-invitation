@@ -416,7 +416,10 @@ function buildPhotoItem(photo, index) {
   });
   captionInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") captionInput.blur();
-    if (e.key === "Escape") { captionInput.value = captionOriginal; captionInput.blur(); }
+    if (e.key === "Escape") {
+      captionInput.value = captionOriginal;
+      captionInput.blur();
+    }
   });
 
   return item;
@@ -764,6 +767,61 @@ function initGuestbookTab() {
 }
 
 // ── Music & Travel Tab ────────────────────────────────────────────────────────
+
+/**
+ * แปลง Google Drive URL (uc?export=download) → drive.usercontent.google.com
+ * เพื่อให้ <audio> element stream ได้โดยตรงโดยไม่ติด redirect/virus-scan page
+ */
+function resolveAudioUrl(url) {
+  if (!url) return url;
+  const gdMatch = url.match(
+    /drive\.google\.com\/uc[^?]*\?.*[?&]id=([A-Za-z0-9_-]+)/,
+  );
+  if (gdMatch) {
+    return `https://drive.usercontent.google.com/download?id=${gdMatch[1]}&export=download&confirm=t`;
+  }
+  return url;
+}
+
+/* เพลงใน /public/music/ — inject โดย Vite plugin ตอน build */
+const LOCAL_MUSIC =
+  typeof __LOCAL_MUSIC__ !== "undefined" ? __LOCAL_MUSIC__ : [];
+
+function buildMusicOptions(currentUrl, extraUrls = []) {
+  const sel = document.getElementById("music-select");
+  if (!sel) return;
+  sel.innerHTML = "";
+  const all = [
+    ...LOCAL_MUSIC,
+    ...extraUrls.map((u) => ({ label: u.split("/").pop(), url: u })),
+  ];
+  if (!all.length) {
+    sel.innerHTML = '<option value="">— ไม่พบไฟล์เพลงในคลัง —</option>';
+    return;
+  }
+  all.forEach(({ label, url }) => {
+    const opt = document.createElement("option");
+    opt.value = url;
+    opt.textContent = label;
+    if (url === currentUrl) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function setMusicCurrentLabel(url) {
+  const el = document.getElementById("music-current-label");
+  if (el) el.textContent = url ? url.split("/").pop() : "-";
+}
+
+function getMusicActiveUrl() {
+  const mode = document.querySelector(".music-mode-btn.active")?.dataset.mode;
+  if (mode === "library")
+    return document.getElementById("music-select")?.value || "";
+  if (mode === "url")
+    return document.getElementById("music-url-custom")?.value.trim() || "";
+  return "";
+}
+
 async function loadMusicTravel() {
   const overlay = document.getElementById("music-loading-overlay");
   const cards = document.querySelectorAll("#tab-music .form-card");
@@ -775,17 +833,40 @@ async function loadMusicTravel() {
   } catch {}
   if (overlay) overlay.classList.remove("visible");
   cards.forEach((c) => c.classList.remove("fields-loading"));
-  const musicUrl = document.getElementById("music-url");
-  if (musicUrl) musicUrl.value = cfgData["music_url"] || "/music.mp3";
+
+  const currentUrl = cfgData["music_url"] || "";
+  let extraUrls = [];
+  try {
+    extraUrls = JSON.parse(cfgData["music_library"] || "[]");
+  } catch {}
+
+  buildMusicOptions(currentUrl, extraUrls);
+  setMusicCurrentLabel(currentUrl);
+
+  // ถ้า URL ปัจจุบันไม่อยู่ใน library → switch ไป URL mode อัตโนมัติ
+  const allUrls = [...LOCAL_MUSIC.map((f) => f.url), ...extraUrls];
+  if (currentUrl && !allUrls.includes(currentUrl)) {
+    switchMusicMode("url");
+    const inp = document.getElementById("music-url-custom");
+    if (inp) inp.value = currentUrl;
+  }
 
   const travelAirport = document.getElementById("travel-airport");
   if (travelAirport) travelAirport.value = cfgData["travel_airport"] || "";
-
   const travelHotel = document.getElementById("travel-hotel");
   if (travelHotel) travelHotel.value = cfgData["travel_hotel"] || "";
-
   const travelCar = document.getElementById("travel-car");
   if (travelCar) travelCar.value = cfgData["travel_car"] || "";
+}
+
+function switchMusicMode(mode) {
+  document
+    .querySelectorAll(".music-mode-btn")
+    .forEach((b) => b.classList.toggle("active", b.dataset.mode === mode));
+  ["library", "url", "upload"].forEach((m) => {
+    const el = document.getElementById(`music-panel-${m}`);
+    if (el) el.style.display = m === mode ? "" : "none";
+  });
 }
 
 function markUnsaved(badgeId) {
@@ -797,18 +878,37 @@ function clearUnsaved(badgeId) {
 }
 
 function initMusicTab() {
-  // Mark unsaved on change
-  ["music-url"].forEach((id) => {
-    document
-      .getElementById(id)
-      ?.addEventListener("input", () => markUnsaved("music-unsaved"));
+  // Mode switching
+  document.querySelectorAll(".music-mode-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      switchMusicMode(btn.dataset.mode);
+      markUnsaved("music-unsaved");
+    });
   });
+
+  // Mark unsaved when inputs change
+  document
+    .getElementById("music-select")
+    ?.addEventListener("change", () => markUnsaved("music-unsaved"));
+  document
+    .getElementById("music-url-custom")
+    ?.addEventListener("input", () => markUnsaved("music-unsaved"));
+
+  // File chooser → auto-upload
+  const fileInput = document.getElementById("music-file-input");
+  document
+    .getElementById("btn-choose-file")
+    ?.addEventListener("click", () => fileInput?.click());
+  fileInput?.addEventListener("change", () => handleMusicFileSelect(fileInput));
+
+  // Travel unsaved tracking
   ["travel-airport", "travel-hotel", "travel-car"].forEach((id) => {
     document
       .getElementById(id)
       ?.addEventListener("input", () => markUnsaved("travel-unsaved"));
   });
 
+  // Preview button
   const previewBtn = document.getElementById("btn-preview-music");
   const previewAudio = document.getElementById("music-preview-audio");
   if (previewBtn && previewAudio) {
@@ -816,9 +916,9 @@ function initMusicTab() {
       previewBtn.textContent = "▶ ลองฟัง";
     });
     previewBtn.addEventListener("click", () => {
-      const url = document.getElementById("music-url")?.value.trim();
+      const url = getMusicActiveUrl();
       if (!url) {
-        showToast("ใส่ URL เพลงก่อนนะ", "error");
+        showToast("เลือกเพลงก่อนนะ", "error");
         return;
       }
       if (!previewAudio.paused) {
@@ -826,34 +926,50 @@ function initMusicTab() {
         previewAudio.currentTime = 0;
         previewBtn.textContent = "▶ ลองฟัง";
       } else {
-        previewAudio.src = url;
+        previewAudio.src = resolveAudioUrl(url);
         previewAudio
           .play()
           .then(() => {
             previewBtn.textContent = "⏹ หยุด";
           })
-          .catch(() => {
+          .catch((err) => {
+            console.error("[Music Preview] เล่นไม่ได้", {
+              url,
+              error: err?.message,
+              name: err?.name,
+              code: previewAudio.error?.code,
+              mediaError: previewAudio.error,
+            });
             showToast("เล่นเพลงไม่ได้ — ตรวจสอบ URL", "error");
           });
       }
     });
   }
 
+  // Save music button
   document
     .getElementById("btn-save-music")
     ?.addEventListener("click", async () => {
+      const mode = document.querySelector(".music-mode-btn.active")?.dataset
+        .mode;
+      if (mode === "upload") {
+        showToast("อัปโหลดไฟล์ก่อน หรือเลือกโหมดอื่น", "error");
+        return;
+      }
       const btn = document.getElementById("btn-save-music");
       btn.disabled = true;
       btn.textContent = "กำลังบันทึก…";
-      const val = document.getElementById("music-url")?.value.trim() || "";
+      const val = getMusicActiveUrl();
       await apiPost({ type: "config_update", key: "music_url", value: val });
       cfgData["music_url"] = val;
+      setMusicCurrentLabel(val);
       btn.disabled = false;
       btn.textContent = "บันทึก";
       clearUnsaved("music-unsaved");
-      showToast("บันทึก Music URL แล้ว ✓");
+      showToast("บันทึก URL เพลงแล้ว ✓");
     });
 
+  // Save travel button
   document
     .getElementById("btn-save-travel")
     ?.addEventListener("click", async () => {
@@ -878,6 +994,92 @@ function initMusicTab() {
       clearUnsaved("travel-unsaved");
       showToast("บันทึก Travel Info แล้ว ✓");
     });
+}
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleMusicFileSelect(fileInput) {
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const MAX_MB = 8;
+  if (file.size > MAX_MB * 1024 * 1024) {
+    showToast(`ไฟล์ใหญ่เกิน ${MAX_MB}MB`, "error");
+    fileInput.value = "";
+    return;
+  }
+
+  document.getElementById("music-file-name").textContent = file.name;
+
+  const progressWrap = document.getElementById("music-upload-progress");
+  const progressFill = document.getElementById("upload-bar-fill");
+  const progressText = document.getElementById("upload-progress-text");
+
+  progressWrap.style.display = "block";
+  progressFill.style.width = "20%";
+  progressText.textContent = "กำลังอ่านไฟล์...";
+
+  try {
+    const base64 = await readFileAsBase64(file);
+    progressFill.style.width = "50%";
+    progressText.textContent = "กำลังอัปโหลด...";
+
+    const resp = await fetch("/api/upload-music", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        filename: file.name,
+        data: base64,
+        mimeType: file.type,
+      }),
+    });
+
+    progressFill.style.width = "90%";
+    if (!resp.ok) throw new Error("upload failed");
+    const result = await resp.json();
+    if (!result.url) throw new Error("no url");
+
+    progressFill.style.width = "100%";
+    progressText.textContent = "อัปโหลดสำเร็จ!";
+
+    // Persist new URL to music_library
+    let extraUrls = [];
+    try {
+      extraUrls = JSON.parse(cfgData["music_library"] || "[]");
+    } catch {}
+    if (!extraUrls.includes(result.url)) extraUrls.push(result.url);
+    cfgData["music_library"] = JSON.stringify(extraUrls);
+    apiPost({
+      type: "config_update",
+      key: "music_library",
+      value: JSON.stringify(extraUrls),
+    });
+
+    buildMusicOptions(result.url, extraUrls);
+    switchMusicMode("library");
+    markUnsaved("music-unsaved");
+    showToast("อัปโหลดเพลงสำเร็จ ✓");
+
+    setTimeout(() => {
+      progressWrap.style.display = "none";
+      progressFill.style.width = "0%";
+      fileInput.value = "";
+    }, 1500);
+  } catch {
+    progressWrap.style.display = "none";
+    progressFill.style.width = "0%";
+    fileInput.value = "";
+    document.getElementById("music-file-name").textContent =
+      "ยังไม่ได้เลือกไฟล์";
+    showToast("อัปโหลดไม่สำเร็จ — ลองใหม่", "error");
+  }
 }
 
 // ── Logout ────────────────────────────────────────────────────────────────────

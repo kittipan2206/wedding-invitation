@@ -461,6 +461,32 @@
       border-color: var(--lavender);
     }
 
+    .music-mode-row {
+      display: flex; gap: 6px; margin-bottom: 14px;
+    }
+    .music-mode-btn {
+      flex: 1; padding: 6px 4px; font-size: 12px; font-weight: 600;
+      border: 1.5px solid #e8e0d8; border-radius: 8px; background: #faf8f5;
+      color: #888; cursor: pointer; transition: all .15s;
+    }
+    .music-mode-btn.active {
+      border-color: var(--gold); background: #fffbf4; color: var(--gold);
+    }
+    .music-upload-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .music-filename {
+      font-size: 13px; color: #999; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap; flex: 1;
+    }
+    .upload-bar {
+      width: 100%; height: 6px; background: #eee; border-radius: 99px; overflow: hidden;
+    }
+    .upload-bar-fill {
+      height: 100%; width: 0%; background: var(--gold);
+      border-radius: 99px; transition: width .3s;
+    }
+
     .btn-outline {
       padding: 9px 20px;
       background: transparent;
@@ -1580,9 +1606,40 @@
             <!-- Music -->
             <div class="form-card">
               <p class="card-title">เพลงประกอบ</p>
-              <div class="field-group">
-                <label class="form-label" for="music-url">URL เพลง (mp3 หรือ path)</label>
-                <input class="form-input" type="text" id="music-url" placeholder="/music.mp3" />
+              <div class="music-mode-row">
+                <button class="music-mode-btn active" data-mode="library">📚 คลังเพลง</button>
+                <button class="music-mode-btn" data-mode="url">🔗 URL</button>
+                <button class="music-mode-btn" data-mode="upload">⬆️ อัปโหลด</button>
+              </div>
+              <div class="music-panel" id="music-panel-library">
+                <div class="field-group">
+                  <label class="form-label">เลือกเพลงจากคลัง</label>
+                  <select class="form-input" id="music-select"></select>
+                </div>
+              </div>
+              <div class="music-panel" id="music-panel-url" style="display:none">
+                <div class="field-group">
+                  <label class="form-label">URL เพลง (mp3)</label>
+                  <input class="form-input" type="url" id="music-url-custom" placeholder="https://..." />
+                </div>
+              </div>
+              <div class="music-panel" id="music-panel-upload" style="display:none">
+                <div class="field-group">
+                  <label class="form-label">อัปโหลดไฟล์เพลง</label>
+                  <div class="music-upload-row">
+                    <input type="file" id="music-file-input" accept=".mp3,.wav,.ogg,.m4a" style="display:none" />
+                    <button class="btn-secondary" id="btn-choose-file" type="button">เลือกไฟล์</button>
+                    <span id="music-file-name" class="music-filename">ยังไม่ได้เลือกไฟล์</span>
+                  </div>
+                  <div id="music-upload-progress" style="display:none;margin-top:8px">
+                    <div class="upload-bar"><div class="upload-bar-fill" id="upload-bar-fill"></div></div>
+                    <span id="upload-progress-text" style="font-size:12px;color:#888;margin-top:4px;display:block">กำลังอัปโหลด...</span>
+                  </div>
+                </div>
+              </div>
+              <div class="field-group" style="margin-top:4px">
+                <label class="form-label" style="font-size:11px;color:#aaa">เพลงที่ใช้อยู่ตอนนี้</label>
+                <p id="music-current-label" style="font-size:13px;color:#666;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">-</p>
               </div>
               <audio id="music-preview-audio" preload="none"></audio>
               <div class="form-actions">
