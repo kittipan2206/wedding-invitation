@@ -1,7 +1,7 @@
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 
-const POLL_INTERVAL = 10_000; // poll every 10 s
+const POLL_INTERVAL = 30_000; // poll every 30 s
 const PAGE_ROTATE_MS = 20_000; // auto-rotate every 20 s
 
 function getPageSize() {
