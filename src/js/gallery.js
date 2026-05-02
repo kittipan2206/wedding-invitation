@@ -254,6 +254,12 @@ function openOverlay() {
   if (!el) return;
   el.classList.add("overlay--open");
   el.setAttribute("aria-hidden", "false");
+  // Lock body scroll (iOS Safari needs position:fixed trick)
+  document.body.dataset.scrollY = window.scrollY;
+  document.body.style.overflow = "hidden";
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${window.scrollY}px`;
+  document.body.style.width = "100%";
 
   // Lazy-init: render grid + wire lightbox on first open
   if (!el.dataset.initialized) {
@@ -271,6 +277,13 @@ function closeOverlay() {
   el.classList.remove("overlay--open");
   el.setAttribute("aria-hidden", "true");
   if (overlayLbOpen) closeOverlayLightbox();
+  // Restore body scroll (iOS Safari fix)
+  const scrollY = parseInt(document.body.dataset.scrollY || "0", 10);
+  document.body.style.overflow = "";
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.width = "";
+  window.scrollTo(0, scrollY);
 }
 
 function applyOverlayFilter(category) {

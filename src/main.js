@@ -76,3 +76,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     initEnvelope(afterEnvelope);
   }
 });
+
+// iOS Safari bfcache: when user navigates back from gallery.html,
+// the page is restored from cache without re-running DOMContentLoaded.
+// Re-init gallery preview so the "view all" button works again.
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) {
+    initGalleryPreview();
+  }
+});
