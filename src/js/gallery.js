@@ -276,9 +276,6 @@ function openOverlay() {
   if (!el) return;
   el.classList.add("overlay--open");
   el.setAttribute("aria-hidden", "false");
-  // Prevent body scroll while overlay is open
-  // Avoid position:fixed — it causes a visible page-jump on iOS Safari
-  document.body.style.overflow = "hidden";
 
   // Lazy-init: render grid + wire lightbox on first open
   if (!el.dataset.initialized) {
@@ -296,7 +293,6 @@ function closeOverlay() {
   el.classList.remove("overlay--open");
   el.setAttribute("aria-hidden", "true");
   if (overlayLbOpen) closeOverlayLightbox();
-  document.body.style.overflow = "";
 }
 
 function applyOverlayFilter(category) {
