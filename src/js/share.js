@@ -58,7 +58,10 @@ export function initShare() {
   nativeBtn?.addEventListener("click", async () => {
     if (!navigator.share) return;
     const c = window.__weddingConfig || {};
-    const names = c.groom_name && c.bride_name ? `${c.groom_name} & ${c.bride_name}` : "นนท์ & เมย์";
+    const names =
+      c.groom_name && c.bride_name
+        ? `${c.groom_name} & ${c.bride_name}`
+        : "นนท์ & เมย์";
     try {
       await navigator.share({
         title: `${names} — ขอเรียนเชิญร่วมงานแต่งงาน`,

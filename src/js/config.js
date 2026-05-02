@@ -128,8 +128,12 @@ export function injectConfig(cfg) {
     // End time: ceremony start + 5 hours
     const eh = (sh + 5) % 24;
     const endTime = `${String(eh).padStart(2, "0")}${String(sm).padStart(2, "0")}00`;
-    const text = encodeURIComponent(`งานแต่งงาน ${c.groom_name} & ${c.bride_name}`);
-    const details = encodeURIComponent(`ขอเรียนเชิญร่วมงานแต่งงาน ${c.groom_name} & ${c.bride_name}`);
+    const text = encodeURIComponent(
+      `งานแต่งงาน ${c.groom_name} & ${c.bride_name}`,
+    );
+    const details = encodeURIComponent(
+      `ขอเรียนเชิญร่วมงานแต่งงาน ${c.groom_name} & ${c.bride_name}`,
+    );
     const location = encodeURIComponent(c.venue_name || "");
     calBtn.href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dateStr}T${startTime}/${dateStr}T${endTime}&ctz=Asia%2FBangkok&details=${details}&location=${location}`;
   }
