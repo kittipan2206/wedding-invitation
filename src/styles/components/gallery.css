@@ -19,29 +19,39 @@
   color: var(--color-text);
 }
 
-/* Masonry columns — photos show at natural aspect ratio */
+/* Masonry using flex columns — items fill left-to-right, then top-to-bottom within each column */
 .gallery-grid {
-  columns: 2;
-  column-gap: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
   margin-bottom: 24px;
+}
+
+.gallery-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
 }
 
 /* 3-column masonry used by gallery overlay + gallery.html */
 .gallery-masonry {
-  columns: 3;
-  column-gap: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
   margin-bottom: 24px;
 }
 
 @media (max-width: 700px) {
   .gallery-masonry {
-    columns: 2;
+    /* handled by JS — colCount changes to 2 */
   }
 }
 
 @media (max-width: 420px) {
   .gallery-masonry {
-    columns: 1;
+    /* handled by JS — colCount changes to 1 */
   }
 }
 

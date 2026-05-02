@@ -85,6 +85,13 @@ const _imgObserver =
       )
     : null;
 
+function getColCount(containerId) {
+  if (containerId === "gallery-preview-grid") return 2;
+  if (window.innerWidth <= 420) return 1;
+  if (window.innerWidth <= 700) return 2;
+  return 3;
+}
+
 function renderGrid(photos, containerId, clickCallback) {
   const grid = document.getElementById(containerId);
   if (!grid) return;
@@ -100,7 +107,15 @@ function renderGrid(photos, containerId, clickCallback) {
     return;
   }
 
-  grid.innerHTML = "";
+  // Build flex column wrappers — distribute left-to-right so reading order is
+  // row-by-row (1,2,3 / 4,5,6) instead of CSS columns top-down (1,4,7 / 2,5,8)
+  const colCount = getColCount(containerId);
+  const cols = Array.from({ length: colCount }, () => {
+    const col = document.createElement("div");
+    col.className = "gallery-col";
+    return col;
+  });
+
   photos.forEach((photo, i) => {
     const item = document.createElement("div");
     item.className = "gallery-item";
@@ -118,11 +133,9 @@ function renderGrid(photos, containerId, clickCallback) {
     });
 
     if (_imgObserver) {
-      // True lazy load: only decode when near viewport
       img.dataset.src = sizedUrl;
       _imgObserver.observe(img);
     } else {
-      // Fallback for old browsers
       img.src = sizedUrl;
     }
 
@@ -138,8 +151,13 @@ function renderGrid(photos, containerId, clickCallback) {
     item.appendChild(img);
     item.appendChild(overlay);
     item.addEventListener("click", () => clickCallback(i));
-    grid.appendChild(item);
+
+    // Assign to column left-to-right: photo 0→col0, 1→col1, 2→col2, 3→col0...
+    cols[i % colCount].appendChild(item);
   });
+
+  grid.innerHTML = "";
+  cols.forEach((col) => grid.appendChild(col));
 }
 
 // ── Filter ────────────────────────────────────────────────────────────────────
