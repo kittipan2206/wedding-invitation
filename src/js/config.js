@@ -51,13 +51,59 @@ function normalizeConfigValues(data) {
   return out;
 }
 
-export async function fetchConfig() {
+const CACHE_KEY = "weddingConfig";
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+function readCache() {
   try {
-    const res = await fetch(`${SHEET_URL}?type=config`, { redirect: "follow" });
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (!data || typeof data !== "object" || Array.isArray(data)) return null;
-    return normalizeConfigValues(data);
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL) return null; // expired
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
+  } catch {
+    // localStorage unavailable (e.g. private browsing quota) — silently ignore
+  }
+}
+
+async function fetchFromGAS() {
+  const res = await fetch(`${SHEET_URL}?type=config`, { redirect: "follow" });
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  return normalizeConfigValues(data);
+}
+
+export async function fetchConfig() {
+  const cached = readCache();
+
+  // Revalidate in background (SWR) — always fetch fresh copy quietly
+  fetchFromGAS()
+    .then((fresh) => {
+      if (fresh) {
+        writeCache(fresh);
+        // If data changed vs what we rendered, re-inject automatically
+        if (cached && JSON.stringify(fresh) !== JSON.stringify(cached)) {
+          injectConfig(fresh);
+        }
+      }
+    })
+    .catch(() => {});
+
+  // Return cache instantly if available, otherwise wait for network
+  if (cached) return cached;
+  try {
+    const fresh = await fetchFromGAS();
+    if (fresh) writeCache(fresh);
+    return fresh;
   } catch {
     return null;
   }
