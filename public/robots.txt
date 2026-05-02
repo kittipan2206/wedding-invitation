@@ -7,4 +7,4 @@ Allow: /
 User-agent: Twitterbot
 Allow: /
 
-Sitemap: https://wedding-invitation-eight-sigma-97.vercel.app/sitemap.xml
+Sitemap: https://non-may.vercel.app/sitemap.xml

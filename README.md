@@ -2,7 +2,7 @@
 
 เว็บการ์ดเชิญงานแต่งงานออนไลน์ สร้างด้วย Vite + Vanilla JS
 
-🔗 **Live:** <https://wedding-invitation-eight-sigma-97.vercel.app>
+🔗 **Live:** <https://non-may.vercel.app>
 
 ---
 

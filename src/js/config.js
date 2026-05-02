@@ -150,7 +150,7 @@ export function injectConfig(cfg) {
     const coupleName = `${c.groom_name} & ${c.bride_name}`;
     const dateCompact = c.event_date_iso.replace(/-/g, "");
     const [ch, cm] = c.event_time_ceremony.split(":");
-    const startDT = `${dateCompact}T${ch}${cm}0000`;
+    const startDT = `${dateCompact}T${ch}${cm}00`;
     const endDT = `${dateCompact}T160000`;
     const params = new URLSearchParams({
       action: "TEMPLATE",
