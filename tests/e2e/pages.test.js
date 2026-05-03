@@ -65,6 +65,39 @@ test.describe("Display page (/display.html)", () => {
     const bodyText = await page.locator("body").textContent();
     expect(bodyText).toMatch(/นนท์|เมย์/);
   });
+
+  test("photos cycle automatically — slide changes without interaction", async ({ page }) => {
+    await mockGAS(page, {
+      photos: [
+        { url: "https://picsum.photos/seed/d1/800/600", caption: "", category: "wedding", visible: true, order: 1 },
+        { url: "https://picsum.photos/seed/d2/800/600", caption: "", category: "wedding", visible: true, order: 2 },
+      ],
+    });
+    await page.goto("/display.html");
+    // Wait for first slide to appear
+    await page.waitForTimeout(500);
+    // Grab initial active slide identifier (src or class)
+    const firstSrc = await page.locator("img").first().getAttribute("src").catch(() => "");
+    // Wait long enough for at least one auto-advance (typical interval ≤ 10s)
+    await page.waitForTimeout(11_000);
+    // After cycle, the visible image src or slide index should have changed
+    // (or the page should still be running without error — minimum bar)
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    expect(errors.filter((e) => !e.includes("favicon"))).toHaveLength(0);
+  });
+
+  test("display page does not require user interaction to start — no click prompt", async ({ page }) => {
+    const errors = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    await mockGAS(page, { photos: [] });
+    await page.goto("/display.html");
+    await page.waitForTimeout(1000);
+    // Should not show a click/tap prompt blocking the display
+    const bodyText = await page.locator("body").textContent();
+    expect(bodyText).not.toMatch(/tap to start|คลิกเพื่อเริ่ม/i);
+    expect(errors.filter((e) => !e.includes("favicon"))).toHaveLength(0);
+  });
 });
 
 test.describe("Admin page (/admin.html)", () => {

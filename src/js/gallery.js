@@ -556,10 +556,13 @@ export async function initGalleryPreview() {
   }
 
   // Replace placeholders with real photos
-  allPhotos = preview;
-  filteredPhotos = preview;
-  initLightbox();
-  renderGrid(preview, "gallery-preview-grid", openLightbox);
+  // Clicking a preview item opens the overlay (all photos) and jumps to that photo
+  renderGrid(preview, "gallery-preview-grid", (previewIndex) => {
+    const clickedUrl = preview[previewIndex]?.url;
+    openOverlay(); // lazy-inits overlay grid + initOverlayLightbox if first open
+    const fullIndex = cachedPhotos.findIndex((p) => p.url === clickedUrl);
+    openOverlayLightbox(fullIndex >= 0 ? fullIndex : previewIndex);
+  });
 
   if (viewAllBtn && photos.length > 0) {
     viewAllBtn.style.display = "inline-flex";

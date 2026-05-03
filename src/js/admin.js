@@ -106,7 +106,7 @@ function initTabs() {
 }
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
-function escHtml(str) {
+export function escHtml(str) {
   return String(str)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -174,7 +174,7 @@ function confirmDialog(msg) {
 //
 // We detect these patterns and convert back to plain strings before populating fields.
 
-function normalizeConfigValue(key, raw) {
+export function normalizeConfigValue(key, raw) {
   if (typeof raw !== "string") return raw;
 
   // ISO datetime string (ends with Z or +offset)
@@ -791,7 +791,7 @@ function resolveAudioUrl(url) {
 const LOCAL_MUSIC =
   typeof __LOCAL_MUSIC__ !== "undefined" ? __LOCAL_MUSIC__ : [];
 
-function buildMusicOptions(currentUrl, extraUrls = []) {
+export function buildMusicOptions(currentUrl, extraUrls = []) {
   const sel = document.getElementById("music-select");
   if (!sel) return;
   sel.innerHTML = "";

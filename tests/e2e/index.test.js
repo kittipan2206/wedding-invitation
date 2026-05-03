@@ -152,3 +152,74 @@ test.describe("Homepage — mobile layout", () => {
     expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2); // 2px tolerance
   });
 });
+
+// ─── Gallery Preview (on main page) ──────────────────────────────────────────
+
+const PREVIEW_PHOTOS = Array.from({ length: 8 }, (_, i) => ({
+  url: `https://picsum.photos/seed/p${i}/400/300`,
+  caption: `Preview ${i + 1}`,
+  category: "wedding",
+  visible: true,
+  order: i + 1,
+}));
+
+test.describe("Homepage — gallery preview", () => {
+  test("shows preview grid when photos exist", async ({ page }) => {
+    await mockGAS(page, { photos: PREVIEW_PHOTOS });
+    await page.goto("/?goto=guestbook");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    await expect(page.locator("#gallery-section, #gallery, .gallery-preview")).toBeVisible({ timeout: 8_000 });
+  });
+
+  test("shows at most 6 photos in the preview grid", async ({ page }) => {
+    await mockGAS(page, { photos: PREVIEW_PHOTOS });
+    await page.goto("/?goto=guestbook");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    // Wait for gallery items to render
+    await page.waitForSelector(".gallery-item, #gallery-preview-grid .gallery-item", { timeout: 10_000 }).catch(() => {});
+    const items = await page.locator("#gallery-preview-grid .gallery-item, .gallery-preview .gallery-item").count();
+    expect(items).toBeLessThanOrEqual(6);
+  });
+
+  test("'View All' button is visible when there are more than 6 photos", async ({ page }) => {
+    await mockGAS(page, { photos: PREVIEW_PHOTOS }); // 8 photos
+    await page.goto("/?goto=guestbook");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    await expect(page.locator("#gallery-view-all, [id*='view-all']")).toBeVisible({ timeout: 8_000 });
+  });
+
+  test("gallery section is hidden when no photos exist", async ({ page }) => {
+    await mockGAS(page, { photos: [] });
+    await page.goto("/?goto=guestbook");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    // Section should either be hidden or show empty state (not crash)
+    const section = page.locator("#gallery-section, #gallery");
+    const isHidden = await section.isHidden().catch(() => true);
+    const hasItems = await page.locator("#gallery-preview-grid .gallery-item").count();
+    expect(isHidden || hasItems === 0).toBe(true);
+  });
+
+  test("clicking a preview photo opens the overlay lightbox", async ({ page }) => {
+    await mockGAS(page, { photos: PREVIEW_PHOTOS });
+    await page.goto("/?goto=guestbook");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    const item = page.locator("#gallery-preview-grid .gallery-item, .gallery-preview .gallery-item").first();
+    await item.waitFor({ state: "visible", timeout: 10_000 });
+    await item.click();
+    // The overlay lightbox opens when a preview photo is clicked
+    await expect(page.locator("#overlay-lightbox")).toHaveClass(/lightbox--open/, { timeout: 5_000 });
+  });
+});
+
+test.describe("Homepage — envelope localStorage", () => {
+  test("envelope already open when localStorage flag is set", async ({ page }) => {
+    await mockGAS(page);
+    // Set localStorage before loading
+    await page.addInitScript(() => {
+      localStorage.setItem("envelope_opened", "1");
+    });
+    await page.goto("/");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    await expect(page.locator("#envelope-overlay")).toBeHidden({ timeout: 5_000 });
+  });
+});
