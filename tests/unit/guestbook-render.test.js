@@ -4,8 +4,8 @@ import { escHtml, makeEntryEl, renderFeed } from "../../src/js/guestbook.js";
 // ─── escHtml ──────────────────────────────────────────────────────────────────
 
 describe("guestbook escHtml", () => {
-  it("escapes & < > \" characters", () => {
-    expect(escHtml('A & B')).toBe("A &amp; B");
+  it('escapes & < > " characters', () => {
+    expect(escHtml("A & B")).toBe("A &amp; B");
     expect(escHtml("<script>")).toBe("&lt;script&gt;");
     expect(escHtml('"quoted"')).toBe("&quot;quoted&quot;");
   });
@@ -54,7 +54,10 @@ describe("guestbook makeEntryEl", () => {
   });
 
   it("escapes HTML special chars in name and message", () => {
-    const el = makeEntryEl({ name: "<b>evil</b>", message: '<img src=x onerror="alert(1)">' });
+    const el = makeEntryEl({
+      name: "<b>evil</b>",
+      message: '<img src=x onerror="alert(1)">',
+    });
     expect(el.innerHTML).not.toContain("<b>evil</b>");
     expect(el.innerHTML).not.toContain("<img");
   });
@@ -79,8 +82,12 @@ describe("guestbook renderFeed", () => {
       { name: "แขกคนแรก", message: "ขอให้มีความสุข" },
       { name: "แขกคนสอง", message: "สวัสดีครับ" },
     ]);
-    expect(document.getElementById("guestbook-feed").textContent).toContain("แขกคนแรก");
-    expect(document.getElementById("guestbook-feed").textContent).toContain("แขกคนสอง");
+    expect(document.getElementById("guestbook-feed").textContent).toContain(
+      "แขกคนแรก",
+    );
+    expect(document.getElementById("guestbook-feed").textContent).toContain(
+      "แขกคนสอง",
+    );
   });
 
   it("clears feed and hides show-more when entries is empty", () => {

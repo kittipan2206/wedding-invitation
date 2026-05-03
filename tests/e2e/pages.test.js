@@ -38,8 +38,20 @@ test.describe("Gallery page (/gallery.html)", () => {
   test("loads and displays photos in a grid", async ({ page }) => {
     await mockGAS(page, {
       photos: [
-        { url: "https://picsum.photos/seed/1/400/300", caption: "รูปที่ 1", category: "wedding", visible: true, order: 1 },
-        { url: "https://picsum.photos/seed/2/400/300", caption: "รูปที่ 2", category: "pre-wedding", visible: true, order: 2 },
+        {
+          url: "https://picsum.photos/seed/1/400/300",
+          caption: "รูปที่ 1",
+          category: "wedding",
+          visible: true,
+          order: 1,
+        },
+        {
+          url: "https://picsum.photos/seed/2/400/300",
+          caption: "รูปที่ 2",
+          category: "pre-wedding",
+          visible: true,
+          order: 2,
+        },
       ],
     });
     await page.goto("/gallery.html");
@@ -66,18 +78,36 @@ test.describe("Display page (/display.html)", () => {
     expect(bodyText).toMatch(/นนท์|เมย์/);
   });
 
-  test("photos cycle automatically — slide changes without interaction", async ({ page }) => {
+  test("photos cycle automatically — slide changes without interaction", async ({
+    page,
+  }) => {
     await mockGAS(page, {
       photos: [
-        { url: "https://picsum.photos/seed/d1/800/600", caption: "", category: "wedding", visible: true, order: 1 },
-        { url: "https://picsum.photos/seed/d2/800/600", caption: "", category: "wedding", visible: true, order: 2 },
+        {
+          url: "https://picsum.photos/seed/d1/800/600",
+          caption: "",
+          category: "wedding",
+          visible: true,
+          order: 1,
+        },
+        {
+          url: "https://picsum.photos/seed/d2/800/600",
+          caption: "",
+          category: "wedding",
+          visible: true,
+          order: 2,
+        },
       ],
     });
     await page.goto("/display.html");
     // Wait for first slide to appear
     await page.waitForTimeout(500);
     // Grab initial active slide identifier (src or class)
-    const firstSrc = await page.locator("img").first().getAttribute("src").catch(() => "");
+    const firstSrc = await page
+      .locator("img")
+      .first()
+      .getAttribute("src")
+      .catch(() => "");
     // Wait long enough for at least one auto-advance (typical interval ≤ 10s)
     await page.waitForTimeout(11_000);
     // After cycle, the visible image src or slide index should have changed
@@ -87,7 +117,9 @@ test.describe("Display page (/display.html)", () => {
     expect(errors.filter((e) => !e.includes("favicon"))).toHaveLength(0);
   });
 
-  test("display page does not require user interaction to start — no click prompt", async ({ page }) => {
+  test("display page does not require user interaction to start — no click prompt", async ({
+    page,
+  }) => {
     const errors = [];
     page.on("pageerror", (err) => errors.push(err.message));
     await mockGAS(page, { photos: [] });

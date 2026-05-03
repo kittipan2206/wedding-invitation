@@ -118,7 +118,9 @@ describe("RSVP — character counter", () => {
   });
 
   it("counter starts at 0", () => {
-    expect(document.getElementById("rsvp-char-counter").textContent).toContain("0");
+    expect(document.getElementById("rsvp-char-counter").textContent).toContain(
+      "0",
+    );
   });
 });
 
@@ -128,20 +130,26 @@ describe("RSVP — deadline", () => {
   it("shows closed banner when deadline has passed", () => {
     setupRsvpDOM({ deadlineIso: "2020-01-01" });
     initRsvp();
-    expect(document.getElementById("rsvp-closed-banner").style.display).not.toBe("none");
+    expect(
+      document.getElementById("rsvp-closed-banner").style.display,
+    ).not.toBe("none");
   });
 
   it("disables all form fields after deadline", () => {
     setupRsvpDOM({ deadlineIso: "2020-01-01" });
     initRsvp();
-    const inputs = document.querySelectorAll("#rsvp-form input, #rsvp-form select, #rsvp-form textarea, #rsvp-form button");
+    const inputs = document.querySelectorAll(
+      "#rsvp-form input, #rsvp-form select, #rsvp-form textarea, #rsvp-form button",
+    );
     inputs.forEach((el) => expect(el.disabled).toBe(true));
   });
 
   it("does not show closed banner when deadline is in the future", () => {
     setupRsvpDOM({ deadlineIso: "2099-12-31" });
     initRsvp();
-    expect(document.getElementById("rsvp-closed-banner").style.display).toBe("none");
+    expect(document.getElementById("rsvp-closed-banner").style.display).toBe(
+      "none",
+    );
   });
 });
 
@@ -149,7 +157,10 @@ describe("RSVP — deadline", () => {
 
 describe("RSVP — localStorage persistence", () => {
   it("shows thank-you immediately when already submitted", () => {
-    localStorage.setItem("rsvp_submitted_v1", JSON.stringify({ name: "สมชาย", ts: Date.now() }));
+    localStorage.setItem(
+      "rsvp_submitted_v1",
+      JSON.stringify({ name: "สมชาย", ts: Date.now() }),
+    );
     setupRsvpDOM();
     initRsvp();
     expect(document.getElementById("thank-you").style.display).toBe("flex");
