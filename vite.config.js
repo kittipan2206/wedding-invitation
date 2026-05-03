@@ -26,6 +26,32 @@ const GAS_URL =
 
 export default defineConfig({
   plugins: [musicManifestPlugin()],
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: ["./tests/setup.js"],
+    include: ["tests/unit/**/*.test.js"],
+    define: {
+      __LOCAL_MUSIC__: JSON.stringify([]),
+    },
+    coverage: {
+      provider: "v8",
+      include: ["src/js/**/*.js"],
+      exclude: [
+        "src/js/music.js",
+        "src/js/petals.js",
+        "src/js/cursor-sparkle.js",
+        "src/js/confetti.js",
+        "src/js/parallax.js",
+        "src/js/scroll-nav.js",
+        "src/js/reveal.js",
+        "src/js/fullscreen.js",
+        "src/js/card-export.js",
+      ],
+      reporter: ["text", "html"],
+      thresholds: { lines: 70, functions: 70 },
+    },
+  },
   server: {
     proxy: {
       "/api/upload-music": {
