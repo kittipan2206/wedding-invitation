@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Display Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'DM Sans', system-ui, sans-serif;
+      --glass-light: rgba(255,255,255,0.14);
+      --glass-medium: rgba(255,255,255,0.22);
+      --glass-border: 1px solid rgba(255,255,255,0.28);
+      --text-white: rgba(255,255,255,0.95);
+      --text-muted: rgba(255,255,255,0.60);
+      --pink: #F9C8D4;
+      --lavender: #C9B8E8;
+    }
+
+    html, body {
+      height: 100%; overflow: hidden;
+      font-family: var(--font-sans);
+      background: #1a1218;
+    }
+
+    /* ── Slideshow layers ── */
+    .slide-layer {
+      position: fixed; inset: 0; z-index: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+    .slide-layer--active {
+      opacity: 1;
+      animation: kenBurns 12s ease-in-out forwards;
+    }
+    @keyframes kenBurns {
+      from { transform: scale(1.0) translate(0, 0); }
+      to   { transform: scale(1.07) translate(-1%, 0.5%); }
+    }
+    .slide-layer--active-b {
+      opacity: 1;
+      animation: kenBurnsB 12s ease-in-out forwards;
+    }
+    @keyframes kenBurnsB {
+      from { transform: scale(1.04) translate(1%, 0); }
+      to   { transform: scale(1.0) translate(0, 0); }
+    }
+
+    /* ── Cinematic overlay ── */
+    .overlay {
+      position: fixed; inset: 0; z-index: 1;
+      background:
+        linear-gradient(to bottom,
+          rgba(10,6,12,0.52) 0%,
+          rgba(10,6,12,0.18) 35%,
+          rgba(10,6,12,0.18) 60%,
+          rgba(10,6,12,0.65) 100%);
+    }
+
+    /* ── Petals ── */
+    .petal {
+      position: fixed; border-radius: 50% 0 50% 0;
+      opacity: 0; animation: petalFall linear infinite;
+      pointer-events: none; z-index: 2;
+    }
+    @keyframes petalFall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity:0; }
+      8%   { opacity: 0.18; }
+      92%  { opacity: 0.08; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity:0; }
+    }
+
+    /* ── Layout ── */
+    .display-wrap {
+      position: relative; z-index: 3;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      padding: clamp(20px,3.5vh,52px) clamp(24px,5vw,96px);
+      gap: clamp(12px,2vh,28px);
+    }
+
+    /* ── Header ── */
+    .display-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .display-couple {
+      font-family: var(--font-serif);
+      font-size: clamp(32px,4vw,64px);
+      font-weight: 300; font-style: italic;
+      color: var(--text-white);
+      letter-spacing: 0.02em;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.4);
+    }
+    .display-couple .amp {
+      display: inline-block; margin: 0 10px;
+      opacity: 0.45; font-style: normal; font-size: 0.68em;
+    }
+    .live-badge {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 22px;
+      background: var(--glass-light);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: var(--glass-border); border-radius: 999px;
+      font-size: clamp(13px,1.1vw,17px);
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #ff7b7b; flex-shrink: 0;
+      animation: livePulse 1.8s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(255,100,100,0.6);
+    }
+    @keyframes livePulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:0.35; transform:scale(0.6); }
+    }
+
+    /* ── Featured card ── */
+    .featured-card {
+      display: flex; align-items: center;
+      gap: clamp(16px,2vw,32px);
+      background: var(--glass-medium);
+      backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+      border: var(--glass-border);
+      border-radius: 20px;
+      padding: clamp(20px,2.5vh,36px) clamp(24px,3vw,48px);
+      box-shadow: 0 8px 48px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+      position: relative; overflow: hidden;
+      animation: cardIn 0.6s cubic-bezier(0.23,1,0.32,1) both;
+    }
+    .featured-card::before {
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(135deg, rgba(249,200,212,0.08), rgba(201,184,232,0.08));
+      pointer-events: none;
+    }
+    @keyframes cardIn {
+      from { opacity:0; transform: translateY(-16px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+    .featured-label {
+      position: absolute; top: 12px; left: 18px;
+      font-size: clamp(9px,0.65vw,11px);
+      font-weight: 500; letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+    .featured-avatar {
+      flex-shrink: 0;
+      width: clamp(56px,6vw,96px); height: clamp(56px,6vw,96px);
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink), var(--lavender));
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(24px,2.6vw,42px);
+      font-weight: 600; color: #fff;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 20px rgba(201,184,232,0.4);
+      margin-top: 14px;
+    }
+    .featured-body { flex:1; min-width:0; }
+    .featured-name {
+      font-size: clamp(18px,1.9vw,32px);
+      font-weight: 500; color: var(--text-white);
+      margin-bottom: 8px; letter-spacing: 0.01em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.3);
+    }
+    .featured-msg {
+      font-size: clamp(15px,1.5vw,26px);
+      color: rgba(255,255,255,0.72);
+      line-height: 1.7;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .featured-quote {
+      font-family: var(--font-serif);
+      font-size: clamp(40px,4vw,72px);
+      font-style: italic;
+      color: rgba(255,255,255,0.12);
+      position: absolute; top: -4px; left: 120px;
+      line-height: 1; pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── Feed grid ── */
+    .display-feed {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(12px,1.6vw,22px);
+      align-content: center;
+    }
+    .display-card {
+      display: flex; align-items: flex-start;
+      gap: clamp(12px,1.4vw,20px);
+      background: rgba(255,255,255,0.09);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 16px;
+      padding: clamp(16px,2vw,28px) clamp(18px,2.2vw,34px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      animation: cardIn 0.55s cubic-bezier(0.23,1,0.32,1) both;
+      position: relative; overflow: hidden;
+    }
+    .display-card::after {
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent);
+      pointer-events:none;
+    }
+    .card-avatar {
+      flex-shrink: 0;
+      width: clamp(40px,4vw,64px); height: clamp(40px,4vw,64px);
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink), var(--lavender));
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(16px,1.7vw,26px);
+      font-weight: 600; color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 12px rgba(201,184,232,0.35);
+    }
+    .card-body { flex:1; min-width:0; }
+    .card-name {
+      font-size: clamp(14px,1.4vw,22px);
+      font-weight: 500; color: rgba(255,255,255,0.9);
+      margin-bottom: 5px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.25);
+    }
+    .card-msg {
+      font-size: clamp(12px,1.2vw,19px);
+      color: rgba(255,255,255,0.58);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 3; line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-new-badge {
+      position: absolute; top: 10px; right: 12px;
+      background: linear-gradient(135deg, rgba(249,200,212,0.7), rgba(201,184,232,0.7));
+      color: rgba(255,255,255,0.95);
+      font-size: clamp(9px,0.65vw,11px);
+      font-weight: 600; letter-spacing: 0.08em;
+      padding: 3px 10px; border-radius: 999px;
+    }
+
+    /* ── Footer ── */
+    .display-footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .display-subtitle {
+      font-family: var(--font-serif);
+      font-size: clamp(14px,1.3vw,22px);
+      font-style: italic;
+      color: rgba(255,255,255,0.38);
+      letter-spacing: 0.02em;
+    }
+    .display-pages {
+      display: flex; gap: 8px;
+    }
+    .page-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.22);
+      transition: all 0.3s ease;
+    }
+    .page-dot--active {
+      background: rgba(255,255,255,0.7);
+      transform: scale(1.4);
+    }
+    .display-updated {
+      font-size: clamp(11px,0.9vw,15px);
+      color: rgba(255,255,255,0.28);
+    }
+
+    /* ── QR ── */
+    #qr-wrap {
+      position: fixed; bottom: clamp(16px,3vh,32px); right: clamp(16px,2vw,32px);
+      z-index: 10;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 16px;
+      padding: 12px 14px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    }
+    #qr-wrap img {
+      width: clamp(72px,7.5vw,110px); height: clamp(72px,7.5vw,110px);
+      border-radius: 8px; display: block;
+      background: white; padding: 6px;
+    }
+    .qr-label {
+      font-size: clamp(10px,0.75vw,13px);
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Slideshow layers -->
+  <div class="slide-layer slide-layer--active"
+    id="layer-a"
+    style="background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&q=80')">
+  </div>
+  <div class="slide-layer"
+    id="layer-b"
+    style="background-image: url('https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1600&q=80')">
+  </div>
+
+  <!-- Cinematic overlay -->
+  <div class="overlay"></div>
+
+  <!-- Petals -->
+  <script>
+    const colors = ['#F9C8D4','#C9B8E8','#f7d6e0','#ddd0f0'];
+    for (let i = 0; i < 14; i++) {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      const size = 6 + Math.random() * 10;
+      p.style.cssText = `
+        left:${Math.random()*100}%;
+        width:${size}px; height:${size}px;
+        background:${colors[i%colors.length]};
+        animation-duration:${10+Math.random()*18}s;
+        animation-delay:${Math.random()*12}s;
+      `;
+      document.body.appendChild(p);
+    }
+  </script>
+
+  <div class="display-wrap">
+    <!-- Header -->
+    <header class="display-header">
+      <h1 class="display-couple">
+        นนท์ <span class="amp">&</span> เมย์
+      </h1>
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        <span>Guestbook Live</span>
+      </div>
+    </header>
+
+    <!-- Featured -->
+    <section>
+      <div class="featured-card">
+        <span class="featured-label">ล่าสุด</span>
+        <div class="featured-quote">"</div>
+        <div class="featured-avatar">ส</div>
+        <div class="featured-body">
+          <p class="featured-name">สมหญิง วงศ์สุวรรณ</p>
+          <p class="featured-msg">ขอให้ทั้งสองมีความสุขมากๆ นะคะ รักกันยืนยาว สุขภาพแข็งแรง เจริญรุ่งเรืองทั้งคู่เลยนะ 💕</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feed -->
+    <main class="display-feed">
+      <div class="display-card" style="animation-delay:0.05s">
+        <div class="card-avatar">น</div>
+        <div class="card-body">
+          <p class="card-name">นิดา มีสุข</p>
+          <p class="card-msg">ขอให้มีความสุขมากๆ เลยนะคะ รักกันตลอดไป</p>
+        </div>
+      </div>
+      <div class="display-card" style="animation-delay:0.10s">
+        <span class="card-new-badge">ใหม่</span>
+        <div class="card-avatar">ค</div>
+        <div class="card-body">
+          <p class="card-name">ครอบครัวสมิทธิ์</p>
+          <p class="card-msg">สุขสันต์วันแต่งงานนะครับ พวกเราดีใจด้วยมากๆ</p>
+        </div>
+      </div>
+      <div class="display-card" style="animation-delay:0.15s">
+        <div class="card-avatar">ม</div>
+        <div class="card-body">
+          <p class="card-name">มานะ ตั้งใจดี</p>
+          <p class="card-msg">ขอให้รักกันยืนยาว มีแต่ความสุข ความเจริญ สาธุ!</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="display-footer">
+      <p class="display-subtitle">ฝากคำอวยพรให้นนท์ &amp; เมย์</p>
+      <div class="display-pages">
+        <div class="page-dot page-dot--active"></div>
+        <div class="page-dot"></div>
+        <div class="page-dot"></div>
+      </div>
+      <p class="display-updated">อัปเดตเมื่อกี้</p>
+    </footer>
+  </div>
+
+  <!-- QR -->
+  <div id="qr-wrap">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://wedding.example.com?goto=guestbook" alt="QR" />
+    <p class="qr-label">ฝากคำอวยพร</p>
+  </div>
+
+  <!-- Slideshow cycle demo -->
+  <script>
+    const photos = [
+      "https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&q=80",
+      "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1600&q=80",
+      "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1600&q=80",
+    ];
+    const layerA = document.getElementById('layer-a');
+    const layerB = document.getElementById('layer-b');
+    let current = 0;
+    let useA = true;
+
+    setInterval(() => {
+      current = (current + 1) % photos.length;
+      if (useA) {
+        layerB.style.backgroundImage = `url('${photos[current]}')`;
+        layerA.className = 'slide-layer';
+        layerB.className = 'slide-layer slide-layer--active-b';
+      } else {
+        layerA.style.backgroundImage = `url('${photos[current]}')`;
+        layerB.className = 'slide-layer';
+        layerA.className = 'slide-layer slide-layer--active';
+      }
+      useA = !useA;
+    }, 8000);
+  </script>
+
+</body>
+</html>

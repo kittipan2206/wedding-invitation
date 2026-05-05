@@ -295,39 +295,43 @@ async function fetchPhotos() {
 }
 
 function initSlideshow() {
-  const layerA  = document.getElementById("slide-a");
-  const layerB  = document.getElementById("slide-b");
-  const bgGrad  = document.getElementById("bg-gradient");
+  const layerA = document.getElementById("slide-a");
+  const layerB = document.getElementById("slide-b");
+  const bgGrad = document.getElementById("bg-gradient");
   if (!layerA || !layerB) return;
 
-  fetchPhotos().then((photos) => {
-    if (!photos.length) return; // no photos → fallback gradient stays visible
+  // Restart CSS animation on a layer (force reflow so animation re-fires)
+  function activateLayer(layer, url) {
+    layer.style.backgroundImage = `url('${url}')`;
+    layer.className = "slide-layer";         // remove --active
+    void layer.offsetWidth;                  // force reflow → restart animation
+    layer.className = "slide-layer slide-layer--active";
+  }
 
-    // Hide fallback gradient once we have real photos
+  fetchPhotos().then((photos) => {
+    if (!photos.length) return;
     if (bgGrad) bgGrad.style.display = "none";
 
-    let idx    = 0;
-    let useA   = true;
+    let idx  = 0;
+    let useA = true;
 
-    // Preload and show first photo
-    layerA.style.backgroundImage = `url('${photos[0].url}')`;
-    layerA.classList.add("slide-layer--active");
+    // Show first photo on layer A
+    activateLayer(layerA, photos[0].url);
 
     setInterval(() => {
       idx = (idx + 1) % photos.length;
-      const url = photos[idx].url;
+      const url       = photos[idx].url;
+      const nextLayer = useA ? layerB : layerA;
+      const prevLayer = useA ? layerA : layerB;
 
-      if (useA) {
-        // Crossfade: A→out, B→in
-        layerB.style.backgroundImage = `url('${url}')`;
-        layerB.classList.add("slide-layer--active");
-        layerA.classList.remove("slide-layer--active");
-      } else {
-        // Crossfade: B→out, A→in
-        layerA.style.backgroundImage = `url('${url}')`;
-        layerA.classList.add("slide-layer--active");
-        layerB.classList.remove("slide-layer--active");
-      }
+      // Fade next layer in (12.5% = 1.5s fade-in within 12s animation)
+      activateLayer(nextLayer, url);
+
+      // Hide previous after new layer is fully visible (1.6s)
+      setTimeout(() => {
+        prevLayer.className = "slide-layer";
+      }, 1600);
+
       useA = !useA;
     }, SLIDE_INTERVAL);
   });

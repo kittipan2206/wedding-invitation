@@ -53,22 +53,16 @@
             background-size: cover;
             background-position: center;
             opacity: 0;
-            transition: opacity 1.5s ease;
         }
 
         .slide-layer--active {
-            opacity: 1;
-            animation: kenBurns 12s ease-in-out forwards;
+            animation: slideshowIn 12s ease-in-out forwards;
         }
 
-        .slide-layer--exit {
-            opacity: 0;
-            transition: opacity 1.5s ease;
-        }
-
-        @keyframes kenBurns {
-            from { transform: scale(1.0); }
-            to   { transform: scale(1.07); }
+        @keyframes slideshowIn {
+            0%     { opacity: 0; transform: scale(1.0); }
+            12.5%  { opacity: 1; }
+            100%   { opacity: 1; transform: scale(1.08); }
         }
 
         /* ── Fallback gradient when no photos ── */
