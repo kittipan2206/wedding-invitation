@@ -51,7 +51,7 @@ jobs:
         id: vercel
         run: |
           npm install -g vercel
-          DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }} --yes --no-clipboard 2>&1 | grep -E "^https://" | tail -1)
+          DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }} --yes --no-clipboard 2>/dev/null | grep -Eo "https://[a-zA-Z0-9._-]+\.vercel\.app" | tail -1)
           echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "Deployed to: $DEPLOY_URL"
         env:
