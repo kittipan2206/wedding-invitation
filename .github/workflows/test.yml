@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: [develop, main]
+    branches: [main]
   pull_request:
 
 jobs:
@@ -45,13 +45,13 @@ jobs:
 
       - run: npm install
 
-      # ── Cache Playwright browsers (saves ~1-2 min per run) ──────────────────
+      # ── Cache Playwright browsers ────────────────────────────────────────────
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-chromium-${{ hashFiles('package-lock.json') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright browsers (full, cache miss)
         if: steps.playwright-cache.outputs.cache-hit != 'true'
@@ -61,14 +61,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
 
-      # ── PR: run against local dev server (fast, no Vercel deploy) ───────────
+      # ── PR: chromium + mobile against local dev server (fast) ───────────────
       - name: Run E2E against local dev server (PR)
         if: github.event_name == 'pull_request'
-        run: npm run test:e2e -- --project=chromium --workers=4
+        run: npm run test:e2e -- --project=chromium --project=mobile --workers=4
         # webServer in playwright.config.js starts `npm run dev` automatically
 
-      # ── Push to branch: deploy to Vercel Preview then run full suite ─────────
-      - name: Deploy to Vercel Preview (push only)
+      # ── Push to main: deploy to Vercel then run chromium (production gate) ──
+      - name: Deploy to Vercel Preview (main only)
         if: github.event_name == 'push'
         id: vercel
         run: |
@@ -80,7 +80,7 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Run E2E against Vercel Preview (push only)
+      - name: Run E2E against Vercel Preview (main only)
         if: github.event_name == 'push'
         run: npm run test:e2e -- --project=chromium --workers=4
         env:
