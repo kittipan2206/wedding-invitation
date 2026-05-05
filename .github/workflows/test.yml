@@ -45,9 +45,31 @@ jobs:
 
       - run: npm install
 
-      - run: npx playwright install --with-deps chromium
+      # ── Cache Playwright browsers (saves ~1-2 min per run) ──────────────────
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-chromium-${{ hashFiles('package-lock.json') }}
 
-      - name: Deploy to Vercel Preview
+      - name: Install Playwright browsers (full, cache miss)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system deps only (cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # ── PR: run against local dev server (fast, no Vercel deploy) ───────────
+      - name: Run E2E against local dev server (PR)
+        if: github.event_name == 'pull_request'
+        run: npm run test:e2e -- --project=chromium --workers=4
+        # webServer in playwright.config.js starts `npm run dev` automatically
+
+      # ── Push to branch: deploy to Vercel Preview then run full suite ─────────
+      - name: Deploy to Vercel Preview (push only)
+        if: github.event_name == 'push'
         id: vercel
         run: |
           npm install -g vercel
@@ -58,7 +80,8 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Run E2E against Vercel Preview (chromium only)
+      - name: Run E2E against Vercel Preview (push only)
+        if: github.event_name == 'push'
         run: npm run test:e2e -- --project=chromium --workers=4
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.vercel.outputs.url }}
