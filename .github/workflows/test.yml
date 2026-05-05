@@ -1,0 +1,93 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    name: Vitest Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - run: npm install
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Generate coverage report (informational only)
+        run: npm run test:coverage || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+
+  e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    needs: unit
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - run: npm install
+
+      # ── Cache Playwright browsers ────────────────────────────────────────────
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers (full, cache miss)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system deps only (cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # ── PR: chromium + mobile against local dev server (fast) ───────────────
+      - name: Run E2E against local dev server (PR)
+        if: github.event_name == 'pull_request'
+        run: npm run test:e2e -- --project=chromium --project=mobile --workers=4
+        # webServer in playwright.config.js starts `npm run dev` automatically
+
+      # ── Push to main: deploy to Vercel then run chromium (production gate) ──
+      - name: Deploy to Vercel Preview (main only)
+        if: github.event_name == 'push'
+        id: vercel
+        run: |
+          npm install -g vercel
+          DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }} --yes --no-clipboard 2>/dev/null | grep -Eo "https://[a-zA-Z0-9._-]+\.vercel\.app" | tail -1)
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "Deployed to: $DEPLOY_URL"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Run E2E against Vercel Preview (main only)
+        if: github.event_name == 'push'
+        run: npm run test:e2e -- --project=chromium --workers=4
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.vercel.outputs.url }}
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/

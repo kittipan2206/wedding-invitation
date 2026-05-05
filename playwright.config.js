@@ -13,7 +13,7 @@ export default defineConfig({
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "mobile", use: { ...devices["iPhone 14"] } },
+    { name: "mobile", use: { ...devices["iPhone 14"], browserName: "chromium" } },
   ],
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined

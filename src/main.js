@@ -58,21 +58,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   initParallax();
   initGalleryPreview();
 
-  // If ?goto=<sectionId> is in the URL, skip envelope and scroll directly to section
+  // If ?goto=<sectionId> is in the URL, OR the envelope was already opened
+  // on a previous visit, skip the envelope animation entirely.
   const gotoSection = params.get("goto");
-  if (gotoSection) {
-    const target = document.getElementById(gotoSection);
+  const alreadyOpened = localStorage.getItem("envelope_opened") === "1";
+
+  if (gotoSection || alreadyOpened) {
     const overlay = document.getElementById("envelope-overlay");
     if (overlay) overlay.style.display = "none";
     afterEnvelope();
-    if (target) {
-      // Small delay lets fonts/layout settle before scrolling
-      setTimeout(
-        () => target.scrollIntoView({ behavior: "smooth", block: "start" }),
-        300,
-      );
+    if (gotoSection) {
+      const target = document.getElementById(gotoSection);
+      if (target) {
+        // Small delay lets fonts/layout settle before scrolling
+        setTimeout(
+          () => target.scrollIntoView({ behavior: "smooth", block: "start" }),
+          300,
+        );
+      }
     }
   } else {
-    initEnvelope(afterEnvelope);
+    initEnvelope(() => {
+      localStorage.setItem("envelope_opened", "1");
+      afterEnvelope();
+    });
   }
 });

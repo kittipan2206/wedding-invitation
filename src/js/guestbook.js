@@ -5,7 +5,7 @@ const FEED_LIMIT = 5;
 
 // ── Render ──────────────────────────────────────────────────────────────────
 
-function makeEntryEl(e) {
+export function makeEntryEl(e) {
   const div = document.createElement("div");
   div.className = "gb-entry";
   div.innerHTML = `
@@ -17,7 +17,7 @@ function makeEntryEl(e) {
   return div;
 }
 
-function renderFeed(entries) {
+export function renderFeed(entries) {
   const feed = document.getElementById("guestbook-feed");
   const showBtn = document.getElementById("gb-show-more");
   if (!feed) return;
@@ -53,7 +53,7 @@ function renderLoading() {
   if (feed) feed.innerHTML = '<p class="gb-loading">กำลังโหลดคำอวยพร…</p>';
 }
 
-function escHtml(str) {
+export function escHtml(str) {
   return String(str)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
