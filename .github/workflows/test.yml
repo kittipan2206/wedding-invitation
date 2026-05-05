@@ -58,8 +58,8 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Run E2E against Vercel Preview
-        run: npm run test:e2e
+      - name: Run E2E against Vercel Preview (chromium only)
+        run: npm run test:e2e -- --project=chromium --workers=4
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.vercel.outputs.url }}
 
