@@ -282,13 +282,23 @@ function spawnPetals() {
 
 // ── Photo Slideshow ───────────────────────────────────────────────────────────
 
+// Request high-res version from Google Photos (lh3.googleusercontent.com)
+// Append =w3840 for 4K width — prevents blurring on portrait photos with cover crop
+function toHiRes(url) {
+  if (!url || !url.includes("googleusercontent.com")) return url;
+  // Strip any existing size param (=wXXX, =sXXX, =hXXX) then append =w3840
+  return url.replace(/=[wsh]\d+$/, "") + "=w3840";
+}
+
 async function fetchPhotos() {
   try {
     const res = await fetch(`${SHEET_URL}?type=photos`, { redirect: "follow" });
     if (!res.ok) return [];
     const data = await res.json();
     const list = Array.isArray(data) ? data : (data.photos ?? []);
-    return list.filter((p) => p.visible !== false && p.url);
+    return list
+      .filter((p) => p.visible !== false && p.url)
+      .map((p) => ({ ...p, url: toHiRes(p.url) }));
   } catch {
     return [];
   }
