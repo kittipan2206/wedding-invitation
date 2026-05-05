@@ -520,6 +520,26 @@
             .nav-btn--next { right: 6px; }
         }
 
+        /* ── Slideshow toggle button ── */
+        #slideshow-toggle {
+            position: fixed;
+            bottom: clamp(16px,3vh,32px);
+            left: clamp(16px,2vw,32px);
+            z-index: 20;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            border: var(--glass-border);
+            background: rgba(255,255,255,0.10);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, background 0.2s ease;
+            display: flex; align-items: center; justify-content: center;
+        }
+        body:hover #slideshow-toggle { opacity: 0.5; }
+        #slideshow-toggle:hover { opacity: 1 !important; background: rgba(255,255,255,0.20); }
+
         /* ── Empty state ── */
         .display-empty {
             grid-column: 1 / -1;
@@ -555,6 +575,7 @@
 
     <button class="nav-btn nav-btn--prev" id="nav-prev" aria-label="หน้าก่อนหน้า">&#8249;</button>
     <button class="nav-btn nav-btn--next" id="nav-next" aria-label="หน้าถัดไป">&#8250;</button>
+    <button id="slideshow-toggle" aria-label="สลับสไลด์รูป"></button>
 
     <div class="display-wrap">
         <header class="display-header">

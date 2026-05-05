@@ -304,46 +304,106 @@ async function fetchPhotos() {
   }
 }
 
+// ── Slideshow toggle (localStorage) ─────────────────────────────────────────
+
+const SLIDESHOW_KEY = "display_slideshow";
+
+function isSlideshowEnabled() {
+  return localStorage.getItem(SLIDESHOW_KEY) !== "0";
+}
+
+function toggleSlideshow() {
+  localStorage.setItem(SLIDESHOW_KEY, isSlideshowEnabled() ? "0" : "1");
+  location.reload();
+}
+
+// ── Preload helper ───────────────────────────────────────────────────────────
+
+// Resolves true when image loads, false on error or timeout
+// — prevents gray flash by waiting for the image before activating layer
+function preloadImage(url, timeoutMs = 8000) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const t = setTimeout(() => resolve(false), timeoutMs);
+    img.onload  = () => { clearTimeout(t); resolve(true);  };
+    img.onerror = () => { clearTimeout(t); resolve(false); };
+    img.src = url;
+  });
+}
+
+// ── Slideshow core ───────────────────────────────────────────────────────────
+
 function initSlideshow() {
   const layerA = document.getElementById("slide-a");
   const layerB = document.getElementById("slide-b");
   const bgGrad = document.getElementById("bg-gradient");
   if (!layerA || !layerB) return;
 
-  // Restart CSS animation on a layer (force reflow so animation re-fires)
+  // Restart CSS animation by forcing reflow
   function activateLayer(layer, url) {
     layer.style.backgroundImage = `url('${url}')`;
-    layer.className = "slide-layer";         // remove --active
-    void layer.offsetWidth;                  // force reflow → restart animation
+    layer.className = "slide-layer";
+    void layer.offsetWidth;
     layer.className = "slide-layer slide-layer--active";
   }
 
-  fetchPhotos().then((photos) => {
+  // Silently preload an image into browser cache (fire-and-forget)
+  function prefetch(url) {
+    const img = new Image();
+    img.src = url;
+  }
+
+  fetchPhotos().then(async (photos) => {
     if (!photos.length) return;
+
+    // Shuffle so repeat visits feel fresh (Fisher-Yates)
+    for (let i = photos.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [photos[i], photos[j]] = [photos[j], photos[i]];
+    }
+
+    // Preload first image before revealing — no gray flash on first slide
+    const firstLoaded = await preloadImage(photos[0].url);
+    if (!firstLoaded) return; // network issue — stay on gradient
+
     if (bgGrad) bgGrad.style.display = "none";
 
     let idx  = 0;
     let useA = true;
+    let paused = false;
 
-    // Show first photo on layer A
     activateLayer(layerA, photos[0].url);
+    // Prefetch second image early
+    if (photos.length > 1) prefetch(photos[1].url);
 
-    setInterval(() => {
-      idx = (idx + 1) % photos.length;
-      const url       = photos[idx].url;
+    // Pause slideshow when tab is hidden (saves battery / avoids drift)
+    document.addEventListener("visibilitychange", () => {
+      paused = document.hidden;
+    });
+
+    async function advance() {
+      if (paused) return; // skip tick while tab hidden
+
+      const nextIdx   = (idx + 1) % photos.length;
+      const url       = photos[nextIdx].url;
       const nextLayer = useA ? layerB : layerA;
       const prevLayer = useA ? layerA : layerB;
 
-      // Fade next layer in (12.5% = 1.5s fade-in within 12s animation)
+      // Wait for image to be ready before transitioning
+      await preloadImage(url);
+
       activateLayer(nextLayer, url);
+      setTimeout(() => { prevLayer.className = "slide-layer"; }, 1600);
 
-      // Hide previous after new layer is fully visible (1.6s)
-      setTimeout(() => {
-        prevLayer.className = "slide-layer";
-      }, 1600);
-
+      idx  = nextIdx;
       useA = !useA;
-    }, SLIDE_INTERVAL);
+
+      // Prefetch the one after next while current is showing
+      const afterNext = (idx + 1) % photos.length;
+      prefetch(photos[afterNext].url);
+    }
+
+    setInterval(advance, SLIDE_INTERVAL);
   });
 }
 
@@ -375,7 +435,21 @@ function updateNavButtons() {
 
 document.addEventListener("DOMContentLoaded", () => {
   spawnPetals();
-  initSlideshow();
+
+  // Only start slideshow if enabled
+  if (isSlideshowEnabled()) {
+    initSlideshow();
+  }
+
+  // Slideshow toggle button (bottom-left, hidden until hover)
+  const toggleBtn = document.getElementById("slideshow-toggle");
+  if (toggleBtn) {
+    const enabled = isSlideshowEnabled();
+    toggleBtn.textContent  = enabled ? "🖼" : "🎨";
+    toggleBtn.title        = enabled ? "ปิดสไลด์รูป" : "เปิดสไลด์รูป";
+    toggleBtn.addEventListener("click", toggleSlideshow);
+  }
+
   initQrCode();
   poll();
   setInterval(poll, POLL_INTERVAL);
