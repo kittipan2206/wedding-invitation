@@ -2,6 +2,7 @@ const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 
 const POLL_INTERVAL = 30_000; // poll every 30 s
+const SLIDE_INTERVAL  = 10_000; // switch photo every 10 s
 const PAGE_ROTATE_MS = 20_000; // auto-rotate every 20 s
 
 function getPageSize() {
@@ -279,7 +280,58 @@ function spawnPetals() {
   }
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// ── Photo Slideshow ───────────────────────────────────────────────────────────
+
+async function fetchPhotos() {
+  try {
+    const res = await fetch(`${SHEET_URL}?type=photos`, { redirect: "follow" });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : (data.photos ?? []);
+    return list.filter((p) => p.visible !== false && p.url);
+  } catch {
+    return [];
+  }
+}
+
+function initSlideshow() {
+  const layerA  = document.getElementById("slide-a");
+  const layerB  = document.getElementById("slide-b");
+  const bgGrad  = document.getElementById("bg-gradient");
+  if (!layerA || !layerB) return;
+
+  fetchPhotos().then((photos) => {
+    if (!photos.length) return; // no photos → fallback gradient stays visible
+
+    // Hide fallback gradient once we have real photos
+    if (bgGrad) bgGrad.style.display = "none";
+
+    let idx    = 0;
+    let useA   = true;
+
+    // Preload and show first photo
+    layerA.style.backgroundImage = `url('${photos[0].url}')`;
+    layerA.classList.add("slide-layer--active");
+
+    setInterval(() => {
+      idx = (idx + 1) % photos.length;
+      const url = photos[idx].url;
+
+      if (useA) {
+        // Crossfade: A→out, B→in
+        layerB.style.backgroundImage = `url('${url}')`;
+        layerB.classList.add("slide-layer--active");
+        layerA.classList.remove("slide-layer--active");
+      } else {
+        // Crossfade: B→out, A→in
+        layerA.style.backgroundImage = `url('${url}')`;
+        layerA.classList.add("slide-layer--active");
+        layerB.classList.remove("slide-layer--active");
+      }
+      useA = !useA;
+    }, SLIDE_INTERVAL);
+  });
+}
 
 // ── Manual navigation ─────────────────────────────────────────────────────────
 
@@ -309,6 +361,7 @@ function updateNavButtons() {
 
 document.addEventListener("DOMContentLoaded", () => {
   spawnPetals();
+  initSlideshow();
   initQrCode();
   poll();
   setInterval(poll, POLL_INTERVAL);
