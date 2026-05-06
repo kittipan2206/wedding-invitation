@@ -339,11 +339,15 @@ function initSlideshow() {
   const bgGrad = document.getElementById("bg-gradient");
   if (!layerA || !layerB) return;
 
-  // Restart CSS animation by forcing reflow
-  // Sets the same URL on both .slide-blur and .slide-sharp children
+  // Restart CSS animation by forcing reflow.
+  // Incoming layer is raised to z-index:1 so it always fades in ON TOP of the
+  // outgoing layer — regardless of DOM order. Without this, the layer that is
+  // earlier in the DOM is always underneath, creating an alternating fade/no-fade
+  // pattern (one direction fades, the other direction is invisible).
   function activateLayer(layer, url) {
     layer.querySelector(".slide-blur").style.backgroundImage  = `url('${url}')`;
     layer.querySelector(".slide-sharp").style.backgroundImage = `url('${url}')`;
+    layer.style.zIndex = "1";
     layer.className = "slide";
     void layer.offsetWidth;
     layer.className = "slide slide--active";
@@ -395,7 +399,10 @@ function initSlideshow() {
       await preloadImage(url);
 
       activateLayer(nextLayer, url);
-      setTimeout(() => { prevLayer.className = "slide"; }, 1600);
+      setTimeout(() => {
+        prevLayer.className = "slide";
+        prevLayer.style.zIndex = "0"; // lower retiring layer back down
+      }, 1600);
 
       idx  = nextIdx;
       useA = !useA;
