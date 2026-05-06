@@ -340,14 +340,16 @@ function initSlideshow() {
   if (!layerA || !layerB) return;
 
   // Restart CSS animation by forcing reflow.
-  // Incoming layer is raised to z-index:1 so it always fades in ON TOP of the
-  // outgoing layer — regardless of DOM order. Without this, the layer that is
-  // earlier in the DOM is always underneath, creating an alternating fade/no-fade
-  // pattern (one direction fades, the other direction is invisible).
+  // Uses 3-tier z-index to ensure the INCOMING layer always wins during crossfade:
+  //   incoming = 2  (always on top, regardless of DOM order)
+  //   outgoing = 1  (underneath, fades out / snaps away after 1.6s)
+  //   inactive = 0  (hidden, waiting)
+  // Previously both layers were set to z-index:1, so DOM order decided —
+  // #slide-b always beat #slide-a → alternating fade / no-fade pattern.
   function activateLayer(layer, url) {
     layer.querySelector(".slide-blur").style.backgroundImage  = `url('${url}')`;
     layer.querySelector(".slide-sharp").style.backgroundImage = `url('${url}')`;
-    layer.style.zIndex = "1";
+    layer.style.zIndex = "2"; // incoming on top
     layer.className = "slide";
     void layer.offsetWidth;
     layer.className = "slide slide--active";
@@ -398,10 +400,11 @@ function initSlideshow() {
       // Wait for image to be ready before transitioning
       await preloadImage(url);
 
-      activateLayer(nextLayer, url);
+      prevLayer.style.zIndex = "1"; // downgrade outgoing to middle tier immediately
+      activateLayer(nextLayer, url);  // incoming gets z-index:2 — always on top
       setTimeout(() => {
         prevLayer.className = "slide";
-        prevLayer.style.zIndex = "0"; // lower retiring layer back down
+        prevLayer.style.zIndex = "0"; // fully retire
       }, 1600);
 
       idx  = nextIdx;
