@@ -340,11 +340,13 @@ function initSlideshow() {
   if (!layerA || !layerB) return;
 
   // Restart CSS animation by forcing reflow
+  // Sets the same URL on both .slide-blur and .slide-sharp children
   function activateLayer(layer, url) {
-    layer.style.backgroundImage = `url('${url}')`;
-    layer.className = "slide-layer";
+    layer.querySelector(".slide-blur").style.backgroundImage  = `url('${url}')`;
+    layer.querySelector(".slide-sharp").style.backgroundImage = `url('${url}')`;
+    layer.className = "slide";
     void layer.offsetWidth;
-    layer.className = "slide-layer slide-layer--active";
+    layer.className = "slide slide--active";
   }
 
   // Silently preload an image into browser cache (fire-and-forget)
@@ -393,7 +395,7 @@ function initSlideshow() {
       await preloadImage(url);
 
       activateLayer(nextLayer, url);
-      setTimeout(() => { prevLayer.className = "slide-layer"; }, 1600);
+      setTimeout(() => { prevLayer.className = "slide"; }, 1600);
 
       idx  = nextIdx;
       useA = !useA;

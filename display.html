@@ -46,23 +46,39 @@
         }
 
         /* ── Slideshow layers ── */
-        .slide-layer {
+        .slide {
             position: fixed;
             inset: 0;
             z-index: 0;
-            background-size: cover;
-            background-position: center;
             opacity: 0;
         }
 
-        .slide-layer--active {
+        .slide--active {
             animation: slideshowIn 12s ease-in-out forwards;
         }
 
+        /* Blurred fill — covers the entire slide including edges */
+        .slide-blur {
+            position: absolute;
+            inset: -60px;
+            background-size: cover;
+            background-position: center;
+            filter: blur(48px) brightness(0.42) saturate(1.3);
+        }
+
+        /* Sharp photo — contains the full photo, letterboxed */
+        .slide-sharp {
+            position: absolute;
+            inset: 0;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
         @keyframes slideshowIn {
-            0%     { opacity: 0; transform: scale(1.0); }
+            0%     { opacity: 0; }
             12.5%  { opacity: 1; }
-            100%   { opacity: 1; transform: scale(1.08); }
+            100%   { opacity: 1; }
         }
 
         /* ── Fallback gradient when no photos ── */
@@ -566,8 +582,14 @@
 
 <body>
     <!-- Slideshow layers -->
-    <div class="slide-layer" id="slide-a"></div>
-    <div class="slide-layer" id="slide-b"></div>
+    <div class="slide" id="slide-a">
+        <div class="slide-blur"></div>
+        <div class="slide-sharp"></div>
+    </div>
+    <div class="slide" id="slide-b">
+        <div class="slide-blur"></div>
+        <div class="slide-sharp"></div>
+    </div>
     <!-- Cinematic overlay -->
     <div class="overlay"></div>
     <!-- Fallback gradient (shown when no photos) -->
