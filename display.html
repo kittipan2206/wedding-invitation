@@ -46,8 +46,19 @@
         }
 
         /* ── Slideshow layers ── */
-        .slide {
+        /* isolation:isolate creates a new stacking context for the container.
+           Slides' z-index (0/1/2) compete only with each other INSIDE the
+           container — they can never bleed above .overlay, .petal, or
+           .display-wrap in the root context, eliminating the dark flash. */
+        #slideshow-container {
             position: fixed;
+            inset: 0;
+            z-index: 0;
+            isolation: isolate;
+        }
+
+        .slide {
+            position: absolute;
             inset: 0;
             z-index: 0;
             opacity: 0;
@@ -581,14 +592,16 @@
 </head>
 
 <body>
-    <!-- Slideshow layers -->
-    <div class="slide" id="slide-a">
-        <div class="slide-blur"></div>
-        <div class="slide-sharp"></div>
-    </div>
-    <div class="slide" id="slide-b">
-        <div class="slide-blur"></div>
-        <div class="slide-sharp"></div>
+    <!-- Slideshow layers (isolated stacking context — slides stay below overlay) -->
+    <div id="slideshow-container">
+        <div class="slide" id="slide-a">
+            <div class="slide-blur"></div>
+            <div class="slide-sharp"></div>
+        </div>
+        <div class="slide" id="slide-b">
+            <div class="slide-blur"></div>
+            <div class="slide-sharp"></div>
+        </div>
     </div>
     <!-- Cinematic overlay -->
     <div class="overlay"></div>
