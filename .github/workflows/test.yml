@@ -61,30 +61,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
 
-      # ── PR: chromium + mobile against local dev server (fast) ───────────────
-      - name: Run E2E against local dev server (PR)
-        if: github.event_name == 'pull_request'
+      # ── PR + push to main: chromium + mobile against local dev server ────────
+      # Vercel GitHub integration handles production deployment separately.
+      # Running E2E against a CI-created Vercel preview fails because preview
+      # deployments require Vercel authentication (Playwright gets login page).
+      # Local dev server is always correct, fast, and avoids auth issues.
+      - name: Run E2E against local dev server
         run: npm run test:e2e -- --project=chromium --project=mobile --workers=4
         # webServer in playwright.config.js starts `npm run dev` automatically
-
-      # ── Push to main: deploy to Vercel then run chromium (production gate) ──
-      - name: Deploy to Vercel Preview (main only)
-        if: github.event_name == 'push'
-        id: vercel
-        run: |
-          npm install -g vercel
-          DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }} --yes --no-clipboard 2>/dev/null | grep -Eo "https://[a-zA-Z0-9._-]+\.vercel\.app" | tail -1)
-          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
-          echo "Deployed to: $DEPLOY_URL"
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      - name: Run E2E against Vercel Preview (main only)
-        if: github.event_name == 'push'
-        run: npm run test:e2e -- --project=chromium --workers=4
-        env:
-          PLAYWRIGHT_BASE_URL: ${{ steps.vercel.outputs.url }}
 
       - uses: actions/upload-artifact@v4
         if: failure()
