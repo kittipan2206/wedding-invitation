@@ -17,6 +17,7 @@
   font-style: italic;
   margin-bottom: 12px;
   color: var(--color-text);
+  letter-spacing: -0.01em;
 }
 
 .guestbook-sub {
@@ -24,89 +25,60 @@
   color: var(--color-muted);
   margin-bottom: 40px;
   line-height: 1.6;
+  opacity: 0.85;
 }
 
 .guestbook-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 32px;
   border: var(--border-glass);
   box-shadow: var(--shadow-card);
-  padding: clamp(32px, 6vw, 56px) clamp(24px, 5vw, 48px);
+  padding: clamp(32px, 6vw, 64px) clamp(24px, 5vw, 56px);
   width: 100%;
-}
-
-/* ── Thank-you state ── */
-.guestbook-thanks {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 24px 0;
-}
-
-.guestbook-thanks-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(201, 184, 232, 0.4);
-}
-
-.guestbook-thanks h3 {
-  font-family: var(--font-serif);
-  font-size: clamp(20px, 4vw, 28px);
-  font-weight: 400;
-  font-style: italic;
-  color: var(--color-text);
-}
-
-.guestbook-thanks p {
-  font-size: 15px;
-  color: var(--color-muted);
-  line-height: 1.65;
+  text-align: left;
 }
 
 /* ── Guestbook feed ── */
 .guestbook-feed {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 32px;
   text-align: left;
 }
 
 .gb-entry {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: var(--radius-md);
-  border: 1.5px solid rgba(255, 255, 255, 0.85);
-  box-shadow: var(--shadow-soft);
-  padding: 16px 20px;
-  animation: fadeInUp 0.4s ease both;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  padding: 20px;
+  transition: transform 0.3s var(--transition-ease);
+}
+
+.gb-entry:hover {
+  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .gb-entry-avatar {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f9c8d4, #c9b8e8);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   font-weight: 600;
   color: #fff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(201, 184, 232, 0.3);
 }
 
 .gb-entry-body {
@@ -115,53 +87,74 @@
 }
 
 .gb-entry-name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: 4px;
-  letter-spacing: 0.02em;
 }
 
 .gb-entry-msg {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--color-muted);
-  line-height: 1.6;
+  line-height: 1.65;
   word-break: break-word;
-}
-
-.gb-entry--new {
-  animation: fadeInUp 0.4s ease both;
-}
-
-.gb-loading {
-  font-size: 13px;
-  color: var(--color-muted);
-  text-align: center;
-  padding: 16px 0;
-  font-style: italic;
-  opacity: 0.7;
 }
 
 /* ── Show more button ── */
 .gb-show-more {
   display: block;
   width: 100%;
-  margin: 4px 0 20px;
-  padding: 12px 20px;
-  background: transparent;
-  border: 1.5px solid rgba(201, 184, 232, 0.5);
-  border-radius: var(--radius-md);
+  margin: 0 0 32px;
+  padding: 14px 20px;
+  background: white;
+  border: 1.5px solid rgba(201, 184, 232, 0.4);
+  border-radius: 16px;
   color: var(--color-muted);
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    border-color 0.2s,
-    color 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
 .gb-show-more:hover {
-  background: rgba(201, 184, 232, 0.12);
+  background: #fdf2f6;
   border-color: var(--color-lavender);
   color: var(--color-text);
+  transform: translateY(-1px);
+}
+
+/* ── Thank-you state ── */
+.guestbook-thanks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.guestbook-thanks-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(201, 184, 232, 0.4);
+}
+
+.guestbook-thanks h3 {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 5vw, 32px);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-text);
+}
+
+.guestbook-thanks p {
+  font-size: 15px;
+  color: var(--color-muted);
+  line-height: 1.7;
 }

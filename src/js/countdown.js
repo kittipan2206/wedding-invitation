@@ -10,13 +10,11 @@ export function initCountdown() {
   if (!els[0]) return;
 
   function showEndedState() {
-    // Hide the grid of flip cards
     const grid = document.querySelector(".countdown-grid");
     const heading = document.querySelector(".countdown-heading");
     if (grid) grid.style.display = "none";
     if (heading) heading.style.display = "none";
 
-    // Inject couple names then show ended message
     const ended = document.getElementById("countdown-ended");
     if (ended) {
       const groom = cfg?.groom_name || "นนท์";
@@ -27,33 +25,15 @@ export function initCountdown() {
     }
   }
 
-  function setFlip(card, newVal) {
+  function updateValue(el, newVal) {
     const v = pad(newVal);
-    const upperSpan = card.querySelector(".flip-card__upper span");
-    if (upperSpan.textContent === v) return;
+    if (el.textContent === v) return;
+    el.textContent = v;
 
-    const oldVal = upperSpan.textContent;
-    const lowerSpan = card.querySelector(".flip-card__lower span");
-    const flipTopSpan = card.querySelector(".flip-card__flip--top span");
-    const flipBotSpan = card.querySelector(".flip-card__flip--bottom span");
-
-    // Front of top flap = old value (flips away)
-    flipTopSpan.textContent = oldVal;
-    // Front of bottom flap = new value (comes in)
-    flipBotSpan.textContent = v;
-    // Update static upper immediately (hidden behind top flap during animation)
-    upperSpan.textContent = v;
-
-    // Reset then trigger animation
-    card.classList.remove("flipping");
-    void card.offsetWidth;
-    card.classList.add("flipping");
-
-    // After both halves finish (~580ms), update lower and clean up
-    setTimeout(() => {
-      lowerSpan.textContent = v;
-      card.classList.remove("flipping");
-    }, 620);
+    // Optional: add a subtle pop animation when number changes
+    el.classList.remove("num-pop");
+    void el.offsetWidth;
+    el.classList.add("num-pop");
   }
 
   function tick() {
@@ -69,13 +49,11 @@ export function initCountdown() {
       Math.floor((diff % 3600000) / 60000),
       Math.floor((diff % 60000) / 1000),
     ];
-    els.forEach((el, i) => setFlip(el, values[i]));
+    els.forEach((el, i) => updateValue(el, values[i]));
   }
 
-  // Init static display without animation on first load
   const diff0 = wedding - new Date();
   if (diff0 <= 0) {
-    // Already past ceremony time — show ended state immediately, no interval
     showEndedState();
     return;
   }
@@ -85,10 +63,7 @@ export function initCountdown() {
     Math.floor((diff0 % 3600000) / 60000),
     Math.floor((diff0 % 60000) / 1000),
   ];
-  els.forEach((el, i) => {
-    const s = pad(v0[i]);
-    el.querySelectorAll("span").forEach((span) => (span.textContent = s));
-  });
+  els.forEach((el, i) => (el.textContent = pad(v0[i])));
 
   const timer = setInterval(tick, 1000);
 }
