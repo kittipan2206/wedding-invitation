@@ -122,7 +122,15 @@ export function injectConfig(cfg) {
   // Hero couple names
   const heroNames = document.querySelector(".hero-names");
   if (heroNames) {
-    heroNames.innerHTML = `${c.groom_name} <span class="ampersand">&amp;</span> ${c.bride_name}`;
+    heroNames.innerHTML = `
+      <span class="hero-name hero-name--first">${c.groom_name}</span>
+      <span class="ampersand-wrap" aria-hidden="true">
+        <span class="ampersand-rule"></span>
+        <span class="ampersand">&amp;</span>
+        <span class="ampersand-rule"></span>
+      </span>
+      <span class="hero-name hero-name--second">${c.bride_name}</span>
+    `;
   }
 
   // Footer names + date

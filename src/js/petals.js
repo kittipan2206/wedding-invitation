@@ -2,16 +2,17 @@ export function initPetals() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   const colors = ["#F9C8D4", "#C9B8E8", "#B8E8D8", "#F8D8B8", "#B8D8F8"];
-  const count = 18;
+  const count = 8;
 
   for (let i = 0; i < count; i++) {
     const el = document.createElement("div");
     el.className = "petal-rain-particle";
-    const size = 8 + Math.random() * 10;
+    const size = 6 + Math.random() * 7;
     const color = colors[Math.floor(Math.random() * colors.length)];
     const left = Math.random() * 100;
-    const duration = 6 + Math.random() * 8;
-    const delay = Math.random() * 8;
+    const duration = 16 + Math.random() * 10;
+    const delay = Math.random() * 14;
+    const maxOpacity = 0.28 + Math.random() * 0.12;
 
     el.style.cssText = `
       position: fixed;
@@ -23,7 +24,9 @@ export function initPetals() {
       border-radius: 50% 50% 50% 0 / 60% 60% 40% 40%;
       opacity: 0;
       pointer-events: none;
-      z-index: 1;
+      z-index: 0;
+      filter: blur(0.3px);
+      --petal-max-opacity: ${maxOpacity};
       animation: petalFall ${duration}s ${delay}s linear infinite;
     `;
     document.body.appendChild(el);
