@@ -75,6 +75,33 @@
   opacity: 0.8;
 }
 
+/* ── Day-of state (the wedding day itself) ── */
+#countdown-dayof {
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 16px 8px;
+  animation: fadeInUp 0.8s ease both;
+}
+
+.dayof-title {
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 7vw, 52px);
+  font-weight: 400;
+  font-style: italic;
+  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.dayof-sub {
+  font-size: 16px;
+  color: var(--color-text);
+  margin: 0 0 10px;
+}
+
 /* ── Post-event ended state ── */
 #countdown-ended {
   flex-direction: column;

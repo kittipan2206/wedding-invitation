@@ -1,3 +1,5 @@
+import { burstBloom } from "./bloom.js";
+
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 const RSVP_KEY = "rsvp_submitted_v1";
@@ -186,5 +188,6 @@ export function initGuestbook() {
 
     form.style.display = "none";
     if (thanks) thanks.style.display = "flex";
+    burstBloom();
   });
 }

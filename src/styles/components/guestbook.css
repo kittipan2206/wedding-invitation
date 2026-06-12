@@ -23,9 +23,52 @@
 .guestbook-sub {
   font-size: 15px;
   color: var(--color-muted);
-  margin-bottom: 40px;
+  margin-bottom: 16px;
   line-height: 1.6;
   opacity: 0.85;
+}
+
+/* ── Send-heart button ── */
+.send-heart-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.send-heart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border: 1.5px solid rgba(212, 83, 126, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #c0577e;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.25s var(--transition-ease),
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.send-heart-btn:hover {
+  background: #fdf2f6;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(212, 83, 126, 0.18);
+}
+
+.send-heart-btn.heart-pop {
+  animation: heartPop 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.heart-count-wrap {
+  font-size: 13px;
+  color: var(--color-muted);
 }
 
 .guestbook-card {

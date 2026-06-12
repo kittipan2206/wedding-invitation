@@ -15,6 +15,8 @@ import { initParallax } from "./js/parallax.js";
 import { initGalleryPreview } from "./js/gallery.js";
 import { fetchConfig, injectConfig } from "./js/config.js";
 import { applyMemoryMode } from "./js/memory-mode.js";
+import { showLetter } from "./js/letter.js";
+import { initHearts } from "./js/hearts.js";
 
 function afterEnvelope() {
   initPetals();
@@ -68,6 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initGuestbook();
   initParallax();
   initGalleryPreview();
+  initHearts();
 
   // If ?goto=<sectionId> is in the URL, OR the envelope was already opened
   // on a previous visit, skip the envelope animation entirely.
@@ -91,7 +94,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   } else {
     initEnvelope(() => {
       localStorage.setItem("envelope_opened", "1");
-      afterEnvelope();
+      // First visit only: a short personal letter before the invitation
+      showLetter(afterEnvelope);
     });
   }
 });

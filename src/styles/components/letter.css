@@ -1,0 +1,124 @@
+/* ══════════════════════════════
+   LETTER INTERSTITIAL
+   ══════════════════════════════ */
+
+#letter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+  background: rgba(253, 252, 251, 0.97);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.5s ease both;
+  transition: opacity 0.45s ease;
+}
+
+#letter-overlay.letter--closing {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.letter-paper {
+  max-width: 420px;
+  width: 100%;
+  background: #fffdfb;
+  border: 1px solid rgba(201, 184, 232, 0.35);
+  border-radius: 20px;
+  padding: clamp(32px, 7vw, 48px) clamp(24px, 6vw, 40px);
+  box-shadow: 0 18px 60px rgba(201, 184, 232, 0.28);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soft pastel wash along the top edge, like pressed petals */
+.letter-paper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #f9c8d4, #c9b8e8, #b8d8f8);
+  opacity: 0.7;
+}
+
+.letter-to {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(20px, 5vw, 26px);
+  color: var(--color-text);
+  margin-bottom: 18px;
+  opacity: 0;
+  animation: letterLine 0.7s ease 0.3s forwards;
+}
+
+.letter-body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 2;
+  color: var(--color-text);
+  margin-bottom: 22px;
+  opacity: 0;
+  animation: letterLine 0.7s ease 0.9s forwards;
+}
+
+.letter-sign {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--color-muted);
+  text-align: right;
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: letterLine 0.7s ease 1.5s forwards;
+}
+
+.letter-continue {
+  display: block;
+  margin: 0 auto;
+  padding: 14px 36px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f9c8d4, #c9b8e8);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(201, 184, 232, 0.4);
+  transition:
+    transform 0.3s var(--transition-ease),
+    box-shadow 0.3s ease;
+  opacity: 0;
+  animation: letterLine 0.7s ease 2s forwards;
+}
+
+.letter-continue:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(201, 184, 232, 0.5);
+}
+
+@keyframes letterLine {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter-to,
+  .letter-body,
+  .letter-sign,
+  .letter-continue {
+    animation: none;
+    opacity: 1;
+  }
+}

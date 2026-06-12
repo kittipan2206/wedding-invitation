@@ -73,6 +73,35 @@
   opacity: 0.7;
 }
 
+/* ── Couple portrait (arch frame) ── */
+.hero-photo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: clamp(16px, 3vw, 28px);
+}
+
+.hero-photo img {
+  width: clamp(124px, 30vw, 168px);
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 999px 999px 16px 16px;
+  border: 5px solid rgba(255, 255, 255, 0.95);
+  outline: 1px solid rgba(201, 184, 232, 0.45);
+  box-shadow: 0 14px 40px rgba(201, 184, 232, 0.35);
+  animation: fadeInUp 0.9s var(--transition-ease) both;
+}
+
+/* With a real portrait, the floral illustration steps aside */
+.hero--photo .floral-top {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-photo img {
+    animation: none;
+  }
+}
+
 .guest-greeting {
   font-family: var(--font-serif);
   font-style: italic;

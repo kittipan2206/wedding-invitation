@@ -3,8 +3,8 @@
 export const DEFAULT_CONFIG = {
   groom_name: "นนท์",
   bride_name: "เมย์",
-  event_date_iso: "2026-03-15",
-  event_date_display: "วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569",
+  event_date_iso: "2099-08-01",
+  event_date_display: "วันเสาร์ที่ 1 สิงหาคม พ.ศ. 2642",
   event_time_ceremony: "11:00",
   event_time_lunch: "12:00",
   venue_name: "ตำบลแป-ระ อำเภอท่าแพ จังหวัดสตูล",

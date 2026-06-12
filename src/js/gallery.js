@@ -1,3 +1,5 @@
+import { setHeroPhoto } from "./hero-photo.js";
+
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 
@@ -21,7 +23,7 @@ let overlayLbOpen = false;
 
 // ── URL helper ────────────────────────────────────────────────────────────────
 
-function getSizedUrl(url, size) {
+export function getSizedUrl(url, size) {
   if (!url) return "";
   // Strip any existing sizing params (=w... including -h...-s-no-gm and ?authuser=N)
   if (url.includes("googleusercontent.com")) {
@@ -539,6 +541,54 @@ function initOverlayLightbox() {
   });
 }
 
+// ── Polaroid strip (index.html preview) ───────────────────────────────────────
+// Horizontal film-strip of polaroid cards with the captions admins already
+// write ("คนสวยที่สุดดด" etc.) — the grid hid them behind hover overlays.
+
+function renderPolaroidStrip(photos, containerId, clickCallback) {
+  const grid = document.getElementById(containerId);
+  if (!grid) return;
+
+  grid.querySelectorAll("img").forEach((img) => {
+    _imgObserver?.unobserve(img);
+    img.src = "";
+  });
+
+  grid.classList.add("polaroid-strip");
+  grid.innerHTML = "";
+
+  photos.forEach((photo, i) => {
+    const item = document.createElement("div");
+    item.className = "gallery-item polaroid";
+    item.dataset.index = i;
+
+    const img = document.createElement("img");
+    img.alt = photo.caption || "";
+    img.classList.add("loading");
+    img.addEventListener("load", () => img.classList.remove("loading"));
+    img.addEventListener("error", () => {
+      img.src = "";
+    });
+
+    const sizedUrl = getSizedUrl(photo.url, 600);
+    if (_imgObserver) {
+      img.dataset.src = sizedUrl;
+      _imgObserver.observe(img);
+    } else {
+      img.src = sizedUrl;
+    }
+
+    const cap = document.createElement("p");
+    cap.className = "polaroid-caption";
+    cap.textContent = photo.caption || "♡";
+
+    item.appendChild(img);
+    item.appendChild(cap);
+    item.addEventListener("click", () => clickCallback(i));
+    grid.appendChild(item);
+  });
+}
+
 // ── Preview section (index.html) ──────────────────────────────────────────────
 
 export async function initGalleryPreview() {
@@ -548,6 +598,7 @@ export async function initGalleryPreview() {
 
   const photos = await fetchPhotos();
   cachedPhotos = photos; // store ALL photos for overlay use
+  setHeroPhoto(photos);
   const preview = photos.slice(0, PREVIEW_LIMIT);
 
   // Footer note must match what's on screen: placeholders → "photos coming",
@@ -572,7 +623,7 @@ export async function initGalleryPreview() {
 
   // Replace placeholders with real photos
   // Clicking a preview item opens the overlay (all photos) and jumps to that photo
-  renderGrid(preview, "gallery-preview-grid", (previewIndex) => {
+  renderPolaroidStrip(preview, "gallery-preview-grid", (previewIndex) => {
     const clickedUrl = preview[previewIndex]?.url;
     openOverlay(); // lazy-inits overlay grid + initOverlayLightbox if first open
     const fullIndex = cachedPhotos.findIndex((p) => p.url === clickedUrl);

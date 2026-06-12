@@ -51,6 +51,14 @@
 - With `?to=NAME`, the envelope front is addressed "ถึง NAME"
 - Clicking/tapping the envelope opens it with an animation
 - The envelope can also be opened with Enter or Space when focused (keyboard)
+
+### Letter Interstitial (first visit only)
+
+- After the envelope opens, a short personal letter appears before the invitation
+- With `?to=NAME` the letter starts "ถึง คุณNAME"; otherwise "ถึงคนสำคัญของเรา"
+- The letter mentions the event date and is signed with the couple's names
+- A continue button (or tapping outside / Enter / Escape) dismisses it
+- Returning visitors and `?goto=` links never see the letter
 - After the envelope opens, the main invitation content is revealed
 - A music control button is visible on the envelope screen
 - A fullscreen button is visible on the envelope screen
@@ -59,6 +67,9 @@
 ### Hero Section
 
 - Couple names are displayed prominently
+- An arch-framed couple photo appears above the names when a photo is available
+  (config `hero_photo_url`, else the first visible pre-wedding photo); without
+  a photo the floral illustration shows instead
 - The event date appears as a typewriter animation after envelope opens
 - Floating petals/decorations animate in the background
 
@@ -66,7 +77,10 @@
 
 - A live countdown shows days, hours, minutes, and seconds until the wedding
 - The countdown updates every second
-- After the wedding date has passed, the countdown is replaced by a congratulations message
+- The heading reads "อีก N วัน เราจะได้เจอกัน" (or "อีกไม่กี่ชั่วโมงแล้ว!" under one day)
+- On the wedding day itself (Asia/Bangkok), the countdown is replaced by a
+  "วันนี้แล้ว!" banner with the ceremony time and a navigate-to-venue button
+- After the wedding day has passed, the countdown is replaced by a thank-you message
 
 ### Event Details
 
@@ -96,6 +110,9 @@
 
 - Guests can write a congratulatory message with their name
 - Both name and message are required
+- Submitting a blessing triggers a flower-bloom burst animation
+- A "ส่งหัวใจให้บ่าวสาว" button blooms petals on every tap; a global heart count
+  shows only when the backend supports `?type=hearts` (graceful no-op otherwise)
 - Submitting immediately shows the new message at the top of the feed (optimistic UI)
 - The thank-you state appears after submission
 - Existing messages from other guests are loaded and displayed
@@ -105,7 +122,8 @@
 
 ### Photo Gallery (on main page)
 
-- A preview grid of photos is shown (up to 6 photos)
+- A preview of up to 6 photos is shown as a horizontal polaroid strip with the
+  admin-written captions under each photo
 - Clicking a photo opens a fullscreen lightbox overlay
 - Arrow buttons or swipe navigate between photos in the lightbox
 - Pressing Escape or clicking the backdrop closes the lightbox
