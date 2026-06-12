@@ -11,12 +11,16 @@ const SHEET_URL =
 // (blank row + Telegram "RSVP ใหม่" ping), so an unguarded send is NOT a
 // harmless no-op. Until the endpoint exists the button is visual-only.
 
+const FLUSH_DELAY_MS = 900;
+
 export function initHearts() {
   const btn = document.getElementById("send-heart-btn");
   if (!btn) return;
   const countEl = document.getElementById("heart-count");
 
   let heartsSupported = false;
+  let pending = 0;
+  let flushTimer = null;
 
   // Capability probe: backend must answer {count: N} to unlock sending
   fetch(`${SHEET_URL}?type=hearts`, { redirect: "follow" })
@@ -32,6 +36,28 @@ export function initHearts() {
     })
     .catch(() => {});
 
+  // Rapid taps batch into one POST ({type:"heart", count:N}) so an excited
+  // guest doesn't fire dozens of requests at Apps Script
+  function flush() {
+    if (!pending) return;
+    const count = pending;
+    pending = 0;
+    fetch(SHEET_URL, {
+      method: "POST",
+      mode: "no-cors",
+      keepalive: true,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "heart", count }),
+    }).catch(() => {});
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      clearTimeout(flushTimer);
+      flush();
+    }
+  });
+
   btn.addEventListener("click", () => {
     const rect = btn.getBoundingClientRect();
     burstBloom(rect.left + rect.width / 2, rect.top + rect.height / 2);
@@ -45,11 +71,8 @@ export function initHearts() {
     if (countEl) {
       countEl.textContent = Number(countEl.textContent || 0) + 1;
     }
-    fetch(SHEET_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "heart" }),
-    }).catch(() => {});
+    pending++;
+    clearTimeout(flushTimer);
+    flushTimer = setTimeout(flush, FLUSH_DELAY_MS);
   });
 }
