@@ -111,8 +111,11 @@
 - Guests can write a congratulatory message with their name
 - Both name and message are required
 - Submitting a blessing triggers a flower-bloom burst animation
-- A "ส่งหัวใจให้บ่าวสาว" button blooms petals on every tap; a global heart count
-  shows only when the backend supports `?type=hearts` (graceful no-op otherwise)
+- A "ส่งหัวใจให้บ่าวสาว" button blooms petals on every tap
+- The heart POST and global count activate ONLY after `?type=hearts` returns
+  `{count: N}` — until then the button is strictly visual (the GAS doPost
+  treats unknown POSTs as RSVPs, so an unguarded send creates junk RSVP rows
+  and Telegram notifications)
 - Submitting immediately shows the new message at the top of the feed (optimistic UI)
 - The thank-you state appears after submission
 - Existing messages from other guests are loaded and displayed
