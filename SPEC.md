@@ -8,23 +8,23 @@
 
 ## Personas
 
-| Persona | Description |
-|---------|-------------|
-| **Guest** | Receives a link, views the invitation, RSVPs, writes a guestbook message |
-| **Admin** | The couple or their helper — manages content, monitors RSVPs via the admin panel |
-| **Display** | A screen at the venue showing a live photo slideshow (no interaction) |
+| Persona     | Description                                                                      |
+| ----------- | -------------------------------------------------------------------------------- |
+| **Guest**   | Receives a link, views the invitation, RSVPs, writes a guestbook message         |
+| **Admin**   | The couple or their helper — manages content, monitors RSVPs via the admin panel |
+| **Display** | A screen at the venue showing a live photo slideshow (no interaction)            |
 
 ---
 
 ## Pages
 
-| Page | URL | Who uses it |
-|------|-----|-------------|
-| Main invitation | `/` | Guest |
-| Digital card | `/card.html` | Guest (share/screenshot) |
-| Venue display | `/display.html` | Display screen at venue |
-| Photo gallery | `/gallery.html` | Guest |
-| Admin panel | `/admin.html` | Admin |
+| Page            | URL             | Who uses it              |
+| --------------- | --------------- | ------------------------ |
+| Main invitation | `/`             | Guest                    |
+| Digital card    | `/card.html`    | Guest (share/screenshot) |
+| Venue display   | `/display.html` | Display screen at venue  |
+| Photo gallery   | `/gallery.html` | Guest                    |
+| Admin panel     | `/admin.html`   | Admin                    |
 
 ---
 
@@ -47,7 +47,10 @@
 ### Envelope Animation
 
 - A sealed envelope is shown on first visit
+- The couple's names are printed on the envelope front
+- With `?to=NAME`, the envelope front is addressed "ถึง NAME"
 - Clicking/tapping the envelope opens it with an animation
+- The envelope can also be opened with Enter or Space when focused (keyboard)
 - After the envelope opens, the main invitation content is revealed
 - A music control button is visible on the envelope screen
 - A fullscreen button is visible on the envelope screen
@@ -84,7 +87,7 @@
 - Submitting the form shows a thank-you screen and hides the form
 - After submitting, reloading the page still shows the thank-you screen (localStorage persistence)
 - The form cannot be submitted with required fields empty
-- The form is disabled and shows a "closed" banner after the RSVP deadline
+- After the RSVP deadline, the form is hidden entirely; a "closed" card shows the deadline date and a hint to contact the couple directly
 - Thai characters and special characters in all fields are handled correctly
 - The submit button is disabled after the first click to prevent double submission
 - If the server does not respond, the user sees an error message (not a hang)
@@ -108,6 +111,7 @@
 - Pressing Escape or clicking the backdrop closes the lightbox
 - If no photos exist, the section is hidden or shows a placeholder
 - A "View All" button appears when there are more than 6 photos
+- The footer note matches reality: placeholders → "photos coming after the wedding"; real photos before the event → "wedding-day photos will be added"; after the event → note hidden
 
 ### Music Player
 
@@ -219,6 +223,30 @@
 
 ---
 
+## Post-Event Memory Mode (`/` — automatic)
+
+After the wedding day ends (event_date_iso + 1 day, Asia/Bangkok), the main page
+flips to a keepsake album with no redeploy:
+
+- Hero badge reads "Our Wedding Memory" instead of "Wedding Invitation"
+- Countdown section shows the thank-you message; its label reads "ขอบคุณจากใจ"
+- The RSVP section is hidden
+- Travel info, "Navigate", and "Add to Calendar" buttons are hidden
+- The gallery section moves up to appear right after the countdown/thank-you
+- Page title and shared-link OG tags read as a thank-you/memory, not an invite
+
+---
+
+## Config Validation (client-side guard for hand-edited sheet data)
+
+- Display strings are trimmed of trailing punctuation (e.g. "31 พฤษภาคม 2569." → "…2569")
+- If the Thai weekday in `event_date_display` does not match `event_date_iso`,
+  the weekday is auto-corrected on render and a console warning is logged
+- If the RSVP deadline has passed while the event is still upcoming, a console
+  warning is logged (likely a stale deadline after a date change)
+
+---
+
 ## Cross-Cutting Behaviors (all pages)
 
 ### Network Resilience
@@ -250,10 +278,10 @@
 
 ## Out of Scope for Testing
 
-| Feature | Reason |
-|---------|--------|
-| Telegram bot notifications | External system, tested manually |
-| Google Apps Script logic | Server-side, not in browser |
-| Actual payment flow | No payment features in this app |
-| Email delivery | Not implemented |
+| Feature                     | Reason                            |
+| --------------------------- | --------------------------------- |
+| Telegram bot notifications  | External system, tested manually  |
+| Google Apps Script logic    | Server-side, not in browser       |
+| Actual payment flow         | No payment features in this app   |
+| Email delivery              | Not implemented                   |
 | Confetti / petal animations | Visual-only, no testable behavior |

@@ -14,6 +14,7 @@ import { initGuestbook } from "./js/guestbook.js";
 import { initParallax } from "./js/parallax.js";
 import { initGalleryPreview } from "./js/gallery.js";
 import { fetchConfig, injectConfig } from "./js/config.js";
+import { applyMemoryMode } from "./js/memory-mode.js";
 
 function afterEnvelope() {
   initPetals();
@@ -43,8 +44,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       nameEl.textContent = guestName;
       greet.style.display = "block";
     }
+    // Address the envelope front to the guest — first thing they see
+    const envTo = document.querySelector(".env-to");
+    const envToName = document.querySelector(".env-to-name");
+    if (envTo && envToName) {
+      envToName.textContent = guestName;
+      envTo.style.display = "block";
+    }
     document.title = `${guestName} — นนท์ & เมย์ Wedding Invitation`;
   }
+
+  // After the wedding day, the site flips to a keepsake-album layout
+  applyMemoryMode(window.__weddingConfig);
 
   initCountdown();
   initReveal();

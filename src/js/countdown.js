@@ -15,6 +15,10 @@ export function initCountdown() {
     if (grid) grid.style.display = "none";
     if (heading) heading.style.display = "none";
 
+    // "นับถอยหลังสู่วันพิเศษ" no longer makes sense once the day has passed
+    const label = document.querySelector("#countdown .section-label");
+    if (label) label.textContent = "ขอบคุณจากใจ";
+
     const ended = document.getElementById("countdown-ended");
     if (ended) {
       const groom = cfg?.groom_name || "นนท์";

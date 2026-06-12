@@ -11,6 +11,7 @@ export function initEnvelope(onComplete) {
   function open() {
     body.removeEventListener("click", open);
     body.removeEventListener("touchend", open);
+    body.removeEventListener("keydown", onKeydown);
     body.style.cursor = "default";
 
     // 1. Animate flap open
@@ -32,6 +33,15 @@ export function initEnvelope(onComplete) {
     }, 1200);
   }
 
+  // role="button" divs don't fire click on Enter/Space — wire it manually
+  function onKeydown(e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      open();
+    }
+  }
+
   body.addEventListener("click", open);
   body.addEventListener("touchend", open);
+  body.addEventListener("keydown", onKeydown);
 }

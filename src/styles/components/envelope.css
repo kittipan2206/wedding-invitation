@@ -102,6 +102,43 @@
   transform: translate(-50%, -50%);
 }
 
+/* ── Address on envelope front ──
+   Sits in the bottom-fold area (y 112–199px), below the wax seal. */
+.env-address {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 144px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.env-to {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.env-couple {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--color-text);
+  opacity: 0.85;
+}
+
+/* When addressed to a guest, tuck the couple names a touch tighter */
+.env-to[style*="block"] + .env-couple {
+  font-size: 17px;
+}
+
 /* ── Label below envelope ── */
 .envelope-label {
   font-family: var(--font-sans);
@@ -143,7 +180,9 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 12px rgba(201, 184, 232, 0.2);
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
   opacity: 0.72;
 }
 

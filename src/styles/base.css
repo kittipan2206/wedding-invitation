@@ -60,7 +60,9 @@ body {
   height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
-  scroll-snap-type: y mandatory;
+  /* proximity (not mandatory): sections taller than the viewport — details,
+     rsvp — must stay freely scrollable mid-section (matches README spec) */
+  scroll-snap-type: y proximity;
   scroll-behavior: smooth;
 }
 

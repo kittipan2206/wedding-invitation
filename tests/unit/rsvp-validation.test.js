@@ -135,13 +135,10 @@ describe("RSVP — deadline", () => {
     ).not.toBe("none");
   });
 
-  it("disables all form fields after deadline", () => {
+  it("hides the form entirely after deadline", () => {
     setupRsvpDOM({ deadlineIso: "2020-01-01" });
     initRsvp();
-    const inputs = document.querySelectorAll(
-      "#rsvp-form input, #rsvp-form select, #rsvp-form textarea, #rsvp-form button",
-    );
-    inputs.forEach((el) => expect(el.disabled).toBe(true));
+    expect(document.getElementById("rsvp-form").style.display).toBe("none");
   });
 
   it("does not show closed banner when deadline is in the future", () => {

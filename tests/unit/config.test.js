@@ -63,9 +63,10 @@ describe("injectConfig — detail cards", () => {
     `;
   });
 
-  it("sets event date display text", () => {
+  it("sets event date display text, auto-correcting a mismatched weekday", () => {
+    // default event_date_iso 2026-03-15 is a Sunday — validateConfig fixes the weekday
     injectConfig({ event_date_display: "วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569" });
-    expect(document.getElementById("dc-date").textContent).toBe("วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569");
+    expect(document.getElementById("dc-date").textContent).toBe("วันอาทิตย์ที่ 15 มีนาคม พ.ศ. 2569");
   });
 
   it("shows ceremony and lunch times in dc-time", () => {

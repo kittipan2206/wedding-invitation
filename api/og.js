@@ -70,16 +70,28 @@ export default async function handler(req, res) {
 
   const cfg = await getConfig();
 
+  // After the wedding day, shared links read as a memory album, not an invite
+  // (GAS may return event_date_iso as a full ISO datetime — take the date part)
+  const datePart = String(cfg.event_date_iso || "").slice(0, 10);
+  const postEvent =
+    /^\d{4}-\d{2}-\d{2}$/.test(datePart) &&
+    new Date() > new Date(`${datePart}T23:59:59+07:00`);
+
+  const couple = `${cfg.groom_name} & ${cfg.bride_name}`;
   const title = escAttr(
-    `${cfg.groom_name} & ${cfg.bride_name} — ขอเรียนเชิญร่วมงานแต่งงาน ${cfg.event_date_display}`,
+    postEvent
+      ? `${couple} — ขอบคุณที่ร่วมงานแต่งงานของเรา`
+      : `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน ${cfg.event_date_display}`,
   );
   const description = escAttr(
-    `ขอเรียนเชิญร่วมงานแต่งงาน ${cfg.groom_name} & ${cfg.bride_name} ` +
-      `ใน${cfg.event_date_display}` +
-      (cfg.venue_name ? ` ณ ${cfg.venue_name}` : "") +
-      (cfg.rsvp_deadline_display
-        ? ` กรุณาตอบรับภายในวันที่ ${cfg.rsvp_deadline_display}`
-        : ""),
+    postEvent
+      ? `ภาพความทรงจำจากงานแต่งงาน ${couple} ${cfg.event_date_display}`
+      : `ขอเรียนเชิญร่วมงานแต่งงาน ${couple} ` +
+          `ใน${cfg.event_date_display}` +
+          (cfg.venue_name ? ` ณ ${cfg.venue_name}` : "") +
+          (cfg.rsvp_deadline_display
+            ? ` กรุณาตอบรับภายในวันที่ ${cfg.rsvp_deadline_display}`
+            : ""),
   );
   const ogImage = escAttr(cfg.og_image || DEFAULTS.og_image);
 

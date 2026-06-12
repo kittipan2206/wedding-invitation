@@ -17,7 +17,9 @@ export function initRsvp() {
     return;
   }
 
-  // Deadline check — disable form if past rsvp_deadline_iso
+  // Deadline check — hide the form entirely when past rsvp_deadline_iso.
+  // A grayed-out form reads as "broken"; a clear closed card + direct-contact
+  // hint tells late guests what to do instead.
   const deadlineIso = window.__weddingConfig?.rsvp_deadline_iso;
   if (deadlineIso) {
     const deadline = new Date(`${deadlineIso}T23:59:59+07:00`);
@@ -30,11 +32,10 @@ export function initRsvp() {
           window.__weddingConfig?.rsvp_deadline_display || deadlineIso;
         closedDate.textContent = `หมดเขตวันที่ ${display}`;
       }
-      // Gray out all interactive elements
-      form.classList.add("rsvp-form--closed");
-      form.querySelectorAll("input, select, textarea, button").forEach((el) => {
-        el.disabled = true;
-      });
+      const deadlineText = document.getElementById("rsvp-deadline-text");
+      if (deadlineText) deadlineText.style.display = "none";
+      const formCard = form.closest(".rsvp-form") || form;
+      formCard.style.display = "none";
       return;
     }
   }

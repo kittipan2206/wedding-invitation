@@ -550,6 +550,21 @@ export async function initGalleryPreview() {
   cachedPhotos = photos; // store ALL photos for overlay use
   const preview = photos.slice(0, PREVIEW_LIMIT);
 
+  // Footer note must match what's on screen: placeholders → "photos coming",
+  // real photos pre-event → "wedding-day photos coming", post-event → hidden
+  const note = document.querySelector(".gallery-note");
+  if (note && preview.length > 0) {
+    const iso = window.__weddingConfig?.event_date_iso;
+    const postEvent =
+      /^\d{4}-\d{2}-\d{2}$/.test(iso || "") &&
+      new Date() > new Date(`${iso}T23:59:59+07:00`);
+    if (postEvent) {
+      note.style.display = "none";
+    } else {
+      note.textContent = "รูปจากวันงานจะเพิ่มเข้ามาหลังวันงาน ♡";
+    }
+  }
+
   if (preview.length === 0) {
     // Keep the existing placeholders
     return;

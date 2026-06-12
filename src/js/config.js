@@ -51,6 +51,62 @@ function normalizeConfigValues(data) {
   return out;
 }
 
+// ── Display-string validation ────────────────────────────────────────────────
+// Admin edits the sheet by hand — guard guests from common slips: trailing
+// punctuation, and a weekday word that doesn't match the actual date.
+
+const THAI_WEEKDAYS = [
+  "อาทิตย์",
+  "จันทร์",
+  "อังคาร",
+  "พุธ",
+  "พฤหัสบดี",
+  "ศุกร์",
+  "เสาร์",
+];
+
+export function cleanDisplayString(value) {
+  if (typeof value !== "string") return value;
+  return value.trim().replace(/[.,\s]+$/, "");
+}
+
+export function fixWeekday(display, iso) {
+  if (typeof display !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(iso || ""))
+    return display;
+  const day = new Date(`${iso}T00:00:00Z`).getUTCDay();
+  const correct = THAI_WEEKDAYS[day];
+  const m = display.match(
+    /วัน(อาทิตย์|จันทร์|อังคาร|พุธ|พฤหัสบดี|พฤหัสฯ|พฤหัส|ศุกร์|เสาร์)/,
+  );
+  if (!m) return display;
+  const found = m[1].startsWith("พฤหัส") ? "พฤหัสบดี" : m[1];
+  if (found === correct) return display;
+  console.warn(
+    `[wedding-config] "${m[0]}" ใน "${display}" ไม่ตรงกับวันที่จริง ${iso} (วัน${correct}) — แก้ให้อัตโนมัติแล้ว กรุณาแก้ในชีต Admin ด้วย`,
+  );
+  return display.replace(m[0], `วัน${correct}`);
+}
+
+export function validateConfig(c) {
+  const out = { ...c };
+  out.event_date_display = fixWeekday(
+    cleanDisplayString(out.event_date_display),
+    out.event_date_iso,
+  );
+  out.rsvp_deadline_display = cleanDisplayString(out.rsvp_deadline_display);
+  if (out.rsvp_deadline_iso && out.event_date_iso) {
+    const deadline = new Date(`${out.rsvp_deadline_iso}T23:59:59+07:00`);
+    const eventEnd = new Date(`${out.event_date_iso}T23:59:59+07:00`);
+    const now = new Date();
+    if (now > deadline && now < eventEnd) {
+      console.warn(
+        "[wedding-config] RSVP ปิดรับแล้ว (เลย rsvp_deadline_iso) แต่วันงานยังมาไม่ถึง — ตรวจสอบ deadline ในชีต Admin",
+      );
+    }
+  }
+  return out;
+}
+
 const CACHE_KEY = "weddingConfig";
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
@@ -110,7 +166,7 @@ export async function fetchConfig() {
 }
 
 export function injectConfig(cfg) {
-  const c = { ...CONFIG_DEFAULTS, ...(cfg || {}) };
+  const c = validateConfig({ ...CONFIG_DEFAULTS, ...(cfg || {}) });
   window.__weddingConfig = c;
 
   // [data-config] simple text injection (travel items, etc.)
@@ -178,6 +234,10 @@ export function injectConfig(cfg) {
   if (rsvpDeadline)
     rsvpDeadline.textContent = `กรุณาตอบรับภายในวันที่ ${c.rsvp_deadline_display}`;
 
+  // Envelope front — couple names
+  const envCouple = document.querySelector(".env-couple");
+  if (envCouple) envCouple.textContent = `${c.groom_name} & ${c.bride_name}`;
+
   // Loader title
   const loaderTitle = document.getElementById("loader-title");
   if (loaderTitle)
@@ -218,7 +278,9 @@ export function injectConfig(cfg) {
     calBtn.href = `https://calendar.google.com/calendar/render?${params}`;
   }
 
-  // Page title + meta tags
+  // Page title + meta tags — after the event, memory mode owns these
+  // (SWR background re-inject must not flip them back to invite wording)
+  if (document.body.classList.contains("post-event")) return;
   const couple = `${c.groom_name} & ${c.bride_name}`;
   document.title = `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน`;
   const metaDesc = `ขอเรียนเชิญร่วมงานแต่งงาน ${couple} ${c.event_date_display} ณ ${c.venue_name}`;

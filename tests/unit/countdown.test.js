@@ -1,22 +1,19 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { initCountdown } from "../../src/js/countdown.js";
 
-const FLIP_CARD_HTML = (id) => `
-  <div class="flip-card" id="${id}">
-    <div class="flip-card__upper"><span>00</span></div>
-    <div class="flip-card__lower"><span>00</span></div>
-    <div class="flip-card__flip--top"><span></span></div>
-    <div class="flip-card__flip--bottom"><span></span></div>
+const COUNTDOWN_UNIT_HTML = (id) => `
+  <div class="countdown-unit">
+    <div class="countdown-number" id="${id}">00</div>
   </div>`;
 
 function setupCountdownDOM() {
   document.body.innerHTML = `
     <div class="countdown-heading">นับถอยหลัง</div>
     <div class="countdown-grid">
-      ${FLIP_CARD_HTML("cd-days")}
-      ${FLIP_CARD_HTML("cd-hours")}
-      ${FLIP_CARD_HTML("cd-mins")}
-      ${FLIP_CARD_HTML("cd-secs")}
+      ${COUNTDOWN_UNIT_HTML("cd-days")}
+      ${COUNTDOWN_UNIT_HTML("cd-hours")}
+      ${COUNTDOWN_UNIT_HTML("cd-mins")}
+      ${COUNTDOWN_UNIT_HTML("cd-secs")}
     </div>
     <div id="countdown-ended" style="display:none">
       <span class="countdown-ended-names"></span>
@@ -92,18 +89,18 @@ describe("initCountdown — future event", () => {
     expect(document.getElementById("countdown-ended").style.display).toBe("none");
   });
 
-  it("populates flip card spans with non-zero values for a far-future date", () => {
+  it("populates countdown numbers with non-zero values for a far-future date", () => {
     window.__weddingConfig = {
       event_date_iso: "2099-01-01",
       event_time_ceremony: "10:00",
     };
     initCountdown();
-    const days = document.getElementById("cd-days").querySelector(".flip-card__upper span").textContent;
+    const days = document.getElementById("cd-days").textContent;
     expect(Number(days)).toBeGreaterThan(0);
   });
 
-  it("does nothing when flip card elements are missing from DOM", () => {
-    document.body.innerHTML = ""; // no flip cards
+  it("does nothing when countdown elements are missing from DOM", () => {
+    document.body.innerHTML = ""; // no countdown units
     window.__weddingConfig = { event_date_iso: "2099-01-01", event_time_ceremony: "10:00" };
     expect(() => initCountdown()).not.toThrow();
   });

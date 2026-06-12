@@ -199,6 +199,14 @@
           <div class="flap-dot flap-dot-l"></div>
           <div class="flap-dot flap-dot-r"></div>
         </div>
+
+        <!-- Address on envelope front: guest name (from ?to=) + couple names -->
+        <div class="env-address" aria-hidden="true">
+          <p class="env-to" style="display: none">
+            ถึง <span class="env-to-name"></span>
+          </p>
+          <p class="env-couple">นนท์ &amp; เมย์</p>
+        </div>
       </div>
       <p class="envelope-label">คลิกหรือแตะเพื่อเปิด</p>
 
@@ -851,13 +859,29 @@
         <p class="rsvp-sub reveal reveal-delay-2" id="rsvp-deadline-text">
           กรุณาตอบรับภายในวันที่ 28 กุมภาพันธ์ 2569
         </p>
-        <!-- Shown when rsvp_deadline_iso has passed -->
+        <!-- Shown when rsvp_deadline_iso has passed (form is hidden) -->
         <div id="rsvp-closed-banner" style="display: none">
-          <span class="rsvp-closed-icon">🔒</span>
-          <div>
-            <p class="rsvp-closed-title">หมดเขตตอบรับแล้ว</p>
-            <p class="rsvp-closed-sub" id="rsvp-closed-date"></p>
-          </div>
+          <span class="rsvp-closed-icon" aria-hidden="true">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="4" y="11" width="16" height="10" rx="3" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+          </span>
+          <p class="rsvp-closed-title">หมดเขตตอบรับแล้ว</p>
+          <p class="rsvp-closed-sub" id="rsvp-closed-date"></p>
+          <p class="rsvp-closed-contact">
+            หากต้องการแจ้งเข้าร่วมเพิ่มเติม
+            ติดต่อเจ้าบ่าวเจ้าสาวโดยตรงได้เลยนะคะ ♡
+          </p>
         </div>
         <div class="rsvp-form reveal reveal-delay-3">
           <form id="rsvp-form" novalidate>
