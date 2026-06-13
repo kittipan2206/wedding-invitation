@@ -146,11 +146,12 @@ export function initHearts() {
     const scRect = sessionCountWrap.getBoundingClientRect();
     const cRect = countEl.getBoundingClientRect();
 
-    // Spawn fixed clone at session counter position
+    // Kill any stale GSAP tweens on sessionCountEl (prevents stale "+0" reset)
+    if (sessionCountEl) gsap.killTweensOf(sessionCountEl);
+
+    // Spawn fixed clone — always use displayCount, never read DOM text (stale risk)
     const flyEl = document.createElement("div");
-    flyEl.textContent = sessionCountEl
-      ? sessionCountEl.textContent
-      : `+${displayCount}`;
+    flyEl.textContent = `+${displayCount}`;
     flyEl.setAttribute("aria-hidden", "true");
     Object.assign(flyEl.style, {
       position: "fixed",
@@ -166,7 +167,10 @@ export function initHearts() {
     });
     document.body.appendChild(flyEl);
 
-    // Fade out original session counter immediately via CSS transition
+    // Reset session counter text immediately (before clone flies away)
+    if (sessionCountEl) sessionCountEl.textContent = "+0";
+
+    // Fade out original session counter via CSS transition
     sessionCountWrap.classList.remove("sc-active");
 
     const targetX =
@@ -204,10 +208,7 @@ export function initHearts() {
           clearProps: "color,scale",
         },
         "<",
-      )
-      .call(() => {
-        if (sessionCountEl) sessionCountEl.textContent = "+0";
-      });
+      );
   }
 
   function flush() {
