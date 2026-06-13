@@ -28,47 +28,246 @@
   opacity: 0.85;
 }
 
-/* ── Send-heart button ── */
-.send-heart-row {
+/* ── Send-heart block ── */
+.send-heart-block {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
+  gap: 9px;
   margin-bottom: 36px;
 }
 
 .send-heart-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 11px 22px;
+  gap: 9px;
+  padding: 12px 26px;
   border: 1.5px solid rgba(212, 83, 126, 0.35);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.82);
   color: #c0577e;
   font-family: var(--font-sans);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
+  letter-spacing: 0.01em;
   cursor: pointer;
   transition:
-    transform 0.25s var(--transition-ease),
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
     box-shadow 0.25s ease,
-    background 0.25s ease;
+    background 0.25s ease,
+    border-color 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .send-heart-btn:hover {
   background: #fdf2f6;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(212, 83, 126, 0.18);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 28px rgba(212, 83, 126, 0.2);
+  border-color: rgba(212, 83, 126, 0.55);
 }
 
+/* Dual heart icons — outline fades out, solid fades in on first tap */
+.heart-icons {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.hi {
+  position: absolute;
+  transition:
+    opacity 0.3s ease,
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hi--outline {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hi--solid {
+  opacity: 0;
+  transform: scale(0.5);
+  color: #d4537e;
+}
+
+.send-heart-btn.heart-filled {
+  background: rgba(253, 237, 244, 0.9);
+  border-color: rgba(212, 83, 126, 0.5);
+}
+
+.send-heart-btn.heart-filled .hi--outline {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.send-heart-btn.heart-filled .hi--solid {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Spring pop animation — scale up → slight overshoot → settle */
 .send-heart-btn.heart-pop {
-  animation: heartPop 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+  animation: heartPop 0.5s cubic-bezier(0.34, 1.3, 0.64, 1) forwards;
 }
 
+@keyframes heartPop {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  30% {
+    transform: scale(1.14) translateY(-2px);
+  }
+  60% {
+    transform: scale(0.94) translateY(1px);
+  }
+  80% {
+    transform: scale(1.05) translateY(-1px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* "ส่งแล้ว! ♡" flash label */
+.heart-feedback {
+  font-size: 13px;
+  color: #c44469;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  min-height: 18px;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.heart-feedback--on {
+  animation: hfb 1.6s ease forwards;
+}
+
+@keyframes hfb {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* Counter "N หัวใจจากแขกที่รัก" */
 .heart-count-wrap {
   font-size: 13px;
   color: var(--color-muted);
+  letter-spacing: 0.01em;
+}
+
+/* Number bump when counter increments */
+.heart-count-bump {
+  display: inline-block;
+  animation: hcbump 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes hcbump {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.6);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Floating heart emoji (position: fixed, appended to body) */
+.heart-float {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  user-select: none;
+  line-height: 1;
+  animation: hfloat var(--hf-dur, 1.4s) ease-out forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes hfloat {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.3);
+  }
+  14% {
+    opacity: 1;
+    transform: translate(calc(var(--hf-dx) * 0.15), calc(var(--hf-dy) * 0.12))
+      scale(1.15);
+  }
+  55% {
+    opacity: 0.85;
+    transform: translate(calc(var(--hf-dx) * 0.65), calc(var(--hf-dy) * 0.6))
+      scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--hf-dx), var(--hf-dy)) scale(0.55);
+  }
+}
+
+/* Milestone toast — slides up from bottom */
+#heart-milestone-toast {
+  position: fixed;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(212, 83, 126, 0.28);
+  border-radius: 999px;
+  padding: 11px 24px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: #c44469;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 9998;
+  white-space: nowrap;
+}
+
+#heart-milestone-toast.hmt--show {
+  animation: hmt 2.8s ease forwards;
+}
+
+@keyframes hmt {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  72% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
 }
 
 .guestbook-card {
