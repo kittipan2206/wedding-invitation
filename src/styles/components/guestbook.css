@@ -139,38 +139,50 @@
   pointer-events: none;
 }
 
-/* "ส่งแล้ว! ♡" flash label */
-.heart-feedback {
-  font-size: 13px;
-  color: #c44469;
-  font-weight: 500;
-  letter-spacing: 0.015em;
-  min-height: 18px;
-  opacity: 0;
+/* Session tap counter "+N" — fades in above total counter while tapping */
+.session-counter-wrap {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
-  user-select: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
-.heart-feedback--on {
-  animation: hfb 1.6s ease forwards;
+.session-counter-wrap.sc-active {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-@keyframes hfb {
+.session-count {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  color: #d4537e;
+  letter-spacing: 0.01em;
+}
+
+/* Hero fly — "+N" dives down to merge with the total counter */
+.session-counter-wrap.sc-flying {
+  animation: scHeroFly 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes scHeroFly {
   0% {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  12% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
-  65% {
-    opacity: 1;
-    transform: translateY(0);
+  55% {
+    opacity: 0.75;
+    transform: translateY(calc(var(--hero-dy, 28px) * 0.75)) scale(1.12);
   }
   100% {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(var(--hero-dy, 28px)) scale(0.6);
   }
 }
 
@@ -231,49 +243,14 @@
   }
 }
 
-/* Milestone toast — slides up from bottom */
-#heart-milestone-toast {
-  position: fixed;
-  bottom: 36px;
-  left: 50%;
-  transform: translateX(-50%) translateY(16px);
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(212, 83, 126, 0.28);
-  border-radius: 999px;
-  padding: 11px 24px;
+/* Milestone floating number — same hfloat keyframe, larger font */
+.heart-milestone-float {
   font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 600;
-  color: #c44469;
-  pointer-events: none;
-  opacity: 0;
-  z-index: 9998;
-  white-space: nowrap;
-}
-
-#heart-milestone-toast.hmt--show {
-  animation: hmt 2.8s ease forwards;
-}
-
-@keyframes hmt {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(16px);
-  }
-  10% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-  72% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-10px);
-  }
+  font-size: 32px;
+  font-weight: 700;
+  color: #d4537e;
+  text-shadow: 0 1px 6px rgba(212, 83, 126, 0.28);
+  line-height: 1;
 }
 
 .guestbook-card {

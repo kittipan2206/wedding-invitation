@@ -114,6 +114,8 @@ describe("initHearts — backend capability gating + batching", () => {
     expect(document.getElementById("heart-count").textContent).toBe("42");
 
     document.getElementById("send-heart-btn").click();
+    // Counter updates when flush fires (after FLUSH_DELAY_MS), not immediately on click
+    await vi.advanceTimersByTimeAsync(1000);
     expect(document.getElementById("heart-count").textContent).toBe("43");
   });
 
