@@ -125,21 +125,20 @@
   }
 }
 
-/* Hint text — fades out after first tap */
+/* Hint text — GSAP collapses height + fades on first tap */
 .heart-hint {
   font-size: 12px;
   color: var(--color-muted);
   letter-spacing: 0.015em;
   opacity: 0.65;
-  transition: opacity 0.6s ease;
+  overflow: hidden;
 }
 
 .heart-hint.hidden {
-  opacity: 0;
   pointer-events: none;
 }
 
-/* Session tap counter "+N" — fades in above total counter while tapping */
+/* Session tap counter "+N" — GSAP pulses the number; CSS fades the wrapper in/out */
 .session-counter-wrap {
   height: 22px;
   display: flex;
@@ -164,26 +163,7 @@
   font-weight: 700;
   color: #d4537e;
   letter-spacing: 0.01em;
-}
-
-/* Hero fly — "+N" dives down to merge with the total counter */
-.session-counter-wrap.sc-flying {
-  animation: scHeroFly 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes scHeroFly {
-  0% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  55% {
-    opacity: 0.75;
-    transform: translateY(calc(var(--hero-dy, 28px) * 0.75)) scale(1.12);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(var(--hero-dy, 28px)) scale(0.6);
-  }
+  display: inline-block; /* required for GSAP scale transform */
 }
 
 /* Counter "N หัวใจจากแขกที่รัก" */
@@ -193,57 +173,18 @@
   letter-spacing: 0.01em;
 }
 
-/* Number bump when counter increments */
-.heart-count-bump {
-  display: inline-block;
-  animation: hcbump 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes hcbump {
-  0% {
-    transform: scale(1);
-  }
-  45% {
-    transform: scale(1.6);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* Floating heart emoji (position: fixed, appended to body) */
+/* Floating elements — base only; GSAP drives opacity/transform/scale */
 .heart-float {
   position: fixed;
   pointer-events: none;
   z-index: 9999;
   user-select: none;
   line-height: 1;
-  animation: hfloat var(--hf-dur, 1.4s) ease-out forwards;
+  opacity: 0;
   will-change: transform, opacity;
 }
 
-@keyframes hfloat {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.3);
-  }
-  14% {
-    opacity: 1;
-    transform: translate(calc(var(--hf-dx) * 0.15), calc(var(--hf-dy) * 0.12))
-      scale(1.15);
-  }
-  55% {
-    opacity: 0.85;
-    transform: translate(calc(var(--hf-dx) * 0.65), calc(var(--hf-dy) * 0.6))
-      scale(0.9);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--hf-dx), var(--hf-dy)) scale(0.55);
-  }
-}
-
-/* Milestone floating number — same hfloat keyframe, larger font */
+/* Milestone floating number */
 .heart-milestone-float {
   font-family: var(--font-sans);
   font-size: 32px;

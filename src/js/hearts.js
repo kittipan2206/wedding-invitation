@@ -1,9 +1,12 @@
+import gsap from "gsap";
+
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 
 const FLUSH_DELAY_MS = 900;
 const FLOAT_CHARS = ["❤️", "🩷", "💗", "💖", "💝", "🌸"];
 const STORED_KEY = "hearts_sent_v1";
+const MILESTONE_EVERY = 25;
 
 // IMPORTANT: the POST fires ONLY after GET ?type=hearts confirms the backend
 // supports hearts. The GAS doPost treats any unrecognized POST as an RSVP
@@ -22,12 +25,12 @@ export function initHearts() {
   let pending = 0;
   let flushTimer = null;
   let sessionTaps = 0; // cumulative this session — never resets (drives milestone)
-  let sessionDisplay = 0; // current burst — resets after each idle period
+  let sessionDisplay = 0; // current burst — resets on each idle
 
-  // Restore filled state from previous visit
+  // Restore filled state — collapse hint immediately on revisit
   if (localStorage.getItem(STORED_KEY) === "1") {
     btn.classList.add("heart-filled");
-    if (hintEl) hintEl.classList.add("hidden");
+    if (hintEl) gsap.set(hintEl, { display: "none" });
   }
 
   // Capability probe — backend must answer {count: N} to unlock sending
@@ -42,48 +45,177 @@ export function initHearts() {
     })
     .catch(() => {});
 
-  // Animate "+N" flying from session counter down to total counter
-  function startFlyAnimation() {
-    if (!sessionCountWrap || !countEl) return;
-    const scRect = sessionCountWrap.getBoundingClientRect();
-    const cRect = countEl.getBoundingClientRect();
-    const dy = cRect.top + cRect.height / 2 - (scRect.top + scRect.height / 2);
-    sessionCountWrap.style.setProperty("--hero-dy", `${dy}px`);
-    sessionCountWrap.classList.remove("sc-flying");
-    void sessionCountWrap.offsetWidth;
-    sessionCountWrap.classList.add("sc-flying");
+  // Floating heart emoji — single per tap, GSAP-controlled
+  function spawnFloat() {
+    const bRect = btn.getBoundingClientRect();
+    const cx = bRect.left + bRect.width / 2;
+    const cy = bRect.top + bRect.height / 2;
+
+    const el = document.createElement("span");
+    el.className = "heart-float";
+    el.setAttribute("aria-hidden", "true");
+    el.textContent =
+      FLOAT_CHARS[Math.floor(Math.random() * FLOAT_CHARS.length)];
+
+    const size = 18 + Math.random() * 10;
+    const driftX = (Math.random() - 0.5) * 60;
+    const riseY = 100 + Math.random() * 70;
+
+    el.style.cssText = `left:${cx - size / 2}px;top:${cy - size / 2}px;font-size:${size}px;`;
+    document.body.appendChild(el);
+
+    gsap.to(el, {
+      keyframes: [
+        {
+          opacity: 1,
+          scale: 1.25,
+          x: driftX * 0.12,
+          y: -riseY * 0.1,
+          duration: 0.18,
+          ease: "power2.out",
+        },
+        {
+          opacity: 0.88,
+          scale: 0.92,
+          x: driftX * 0.6,
+          y: -riseY * 0.55,
+          duration: 0.42,
+        },
+        {
+          opacity: 0,
+          scale: 0.6,
+          x: driftX,
+          y: -riseY,
+          duration: 0.52,
+          ease: "power1.in",
+        },
+      ],
+      onComplete: () => el.remove(),
+    });
   }
 
-  // Rapid taps batch into one POST — also drives session counter hero animation
+  // Milestone number — big pop + float up every MILESTONE_EVERY session taps
+  function spawnMilestoneFloat(n) {
+    const bRect = btn.getBoundingClientRect();
+    const cx = bRect.left + bRect.width / 2;
+    const cy = bRect.top + bRect.height / 2;
+
+    const el = document.createElement("span");
+    el.className = "heart-float heart-milestone-float";
+    el.setAttribute("aria-hidden", "true");
+    el.textContent = String(n);
+
+    el.style.cssText = `left:${cx - 24}px;top:${cy - 20}px;opacity:0;`;
+    document.body.appendChild(el);
+
+    const driftX = (Math.random() - 0.5) * 18;
+
+    gsap.to(el, {
+      keyframes: [
+        {
+          opacity: 1,
+          scale: 1.8,
+          y: -24,
+          duration: 0.24,
+          ease: "back.out(2.8)",
+        },
+        { scale: 1.1, duration: 0.14, ease: "power2.out" },
+        {
+          opacity: 0,
+          scale: 0.7,
+          y: -145,
+          x: driftX,
+          duration: 1.2,
+          ease: "power2.out",
+        },
+      ],
+      onComplete: () => el.remove(),
+    });
+  }
+
+  // Hero fly — "+N" clone dives into the total counter with spring bounce on landing
+  // Falls back to a direct sync update in test/server env (sessionCountWrap absent)
+  function triggerHeroFly(displayCount) {
+    if (!sessionCountWrap || !countEl) {
+      if (heartsSupported && displayCount > 0 && countEl) {
+        countEl.textContent = Number(countEl.textContent || 0) + displayCount;
+      }
+      return;
+    }
+
+    const scRect = sessionCountWrap.getBoundingClientRect();
+    const cRect = countEl.getBoundingClientRect();
+
+    // Spawn fixed clone at session counter position
+    const flyEl = document.createElement("div");
+    flyEl.textContent = sessionCountEl
+      ? sessionCountEl.textContent
+      : `+${displayCount}`;
+    flyEl.setAttribute("aria-hidden", "true");
+    Object.assign(flyEl.style, {
+      position: "fixed",
+      left: `${scRect.left + scRect.width / 2}px`,
+      top: `${scRect.top + scRect.height / 2}px`,
+      transform: "translate(-50%, -50%)",
+      fontFamily: "var(--font-sans)",
+      fontSize: "15px",
+      fontWeight: "700",
+      color: "#d4537e",
+      zIndex: "9999",
+      pointerEvents: "none",
+    });
+    document.body.appendChild(flyEl);
+
+    // Fade out original session counter immediately via CSS transition
+    sessionCountWrap.classList.remove("sc-active");
+
+    const targetX =
+      cRect.left + cRect.width / 2 - (scRect.left + scRect.width / 2);
+    const targetY =
+      cRect.top + cRect.height / 2 - (scRect.top + scRect.height / 2);
+
+    gsap
+      .timeline()
+      // Clone accelerates and shrinks toward counter (like a coin into a slot)
+      .to(flyEl, {
+        x: targetX,
+        y: targetY,
+        scale: 0.3,
+        opacity: 0,
+        duration: 0.46,
+        ease: "power3.in",
+      })
+      // On landing: update value + spring bounce on counter
+      .call(() => {
+        flyEl.remove();
+        if (heartsSupported && countEl) {
+          const next = Number(countEl.textContent || 0) + displayCount;
+          countEl.textContent = next;
+        }
+      })
+      .fromTo(
+        countEl,
+        { scale: 1.55, color: "#d4537e" },
+        {
+          scale: 1,
+          color: "#8a7f7a",
+          duration: 0.65,
+          ease: "elastic.out(1.3, 0.45)",
+          clearProps: "color,scale",
+        },
+        "<",
+      )
+      .call(() => {
+        if (sessionCountEl) sessionCountEl.textContent = "+0";
+      });
+  }
+
   function flush() {
     const displayCount = sessionDisplay;
     sessionDisplay = 0;
 
-    if (heartsSupported && displayCount > 0 && countEl) {
-      // Update total counter immediately (data correctness + test compatibility)
-      const next = Number(countEl.textContent || 0) + displayCount;
-      countEl.textContent = next;
-      // Delay bump to visually align with hero fly landing (~280ms into 500ms animation)
-      setTimeout(() => {
-        countEl.classList.remove("heart-count-bump");
-        void countEl.offsetWidth;
-        countEl.classList.add("heart-count-bump");
-      }, 280);
-      startFlyAnimation();
-    } else if (displayCount > 0 && sessionCountWrap) {
-      sessionCountWrap.classList.remove("sc-active");
-    }
+    if (displayCount > 0) triggerHeroFly(displayCount);
 
-    // Clean up session counter after animation completes
-    if (displayCount > 0) {
-      setTimeout(() => {
-        if (sessionCountWrap)
-          sessionCountWrap.classList.remove("sc-active", "sc-flying");
-        if (sessionCountEl) sessionCountEl.textContent = "+0";
-      }, 600);
-    }
-
-    // Network — only if supported and there are pending taps
     if (!pending) return;
     const count = pending;
     pending = 0;
@@ -103,49 +235,8 @@ export function initHearts() {
     }
   });
 
-  // Floating heart emoji — fixed position, appended to body so nothing clips it
-  function spawnFloat() {
-    const bRect = btn.getBoundingClientRect();
-    const cx = bRect.left + bRect.width / 2;
-    const cy = bRect.top + bRect.height / 2;
-
-    const el = document.createElement("span");
-    el.className = "heart-float";
-    el.setAttribute("aria-hidden", "true");
-    el.textContent =
-      FLOAT_CHARS[Math.floor(Math.random() * FLOAT_CHARS.length)];
-
-    const size = 18 + Math.random() * 10;
-    const driftX = (Math.random() - 0.5) * 60;
-    const riseY = 100 + Math.random() * 70;
-    const dur = 1.2 + Math.random() * 0.5;
-
-    el.style.cssText = `left:${cx - size / 2}px;top:${cy - size / 2}px;font-size:${size}px;animation-duration:${dur}s;--hf-dx:${driftX}px;--hf-dy:${-riseY}px;`;
-    document.body.appendChild(el);
-    el.addEventListener("animationend", () => el.remove(), { once: true });
-  }
-
-  // Milestone number floats up from heart center (every 5 session taps)
-  function spawnMilestoneFloat(n) {
-    const bRect = btn.getBoundingClientRect();
-    const cx = bRect.left + bRect.width / 2;
-    const cy = bRect.top + bRect.height / 2;
-
-    const el = document.createElement("span");
-    el.className = "heart-float heart-milestone-float";
-    el.setAttribute("aria-hidden", "true");
-    el.textContent = String(n);
-
-    const driftX = (Math.random() - 0.5) * 20;
-    const riseY = 120 + Math.random() * 30;
-
-    el.style.cssText = `left:${cx - 20}px;top:${cy - 16}px;animation-duration:1.6s;--hf-dx:${driftX}px;--hf-dy:${-riseY}px;`;
-    document.body.appendChild(el);
-    el.addEventListener("animationend", () => el.remove(), { once: true });
-  }
-
   btn.addEventListener("click", () => {
-    // Spring pop — higher specificity on .heart-tap-btn.heart-pop .heart-svg overrides breathe
+    // Spring pop — CSS handles breathing; pop overrides during animation
     btn.classList.remove("heart-pop");
     void btn.offsetWidth;
     btn.classList.add("heart-pop");
@@ -153,31 +244,49 @@ export function initHearts() {
     // Haptic pulse (Android)
     if (navigator.vibrate) navigator.vibrate([8, 20, 8]);
 
-    // Filled state + hide hint on first tap ever
+    // Filled state — on first tap, GSAP collapses the hint (eliminates gap)
     if (!btn.classList.contains("heart-filled")) {
       btn.classList.add("heart-filled");
       localStorage.setItem(STORED_KEY, "1");
-      if (hintEl) hintEl.classList.add("hidden");
+      if (hintEl) {
+        hintEl.classList.add("hidden");
+        gsap.to(hintEl, {
+          opacity: 0,
+          height: 0,
+          duration: 0.4,
+          ease: "power2.out",
+          onComplete: () => gsap.set(hintEl, { display: "none" }),
+        });
+      }
     }
 
-    // Exactly one floating heart per tap
+    // Single floating heart per tap
     spawnFloat();
 
     // Session tap counters
     sessionTaps++;
     sessionDisplay++;
 
-    // Update session counter "+N" display
-    if (sessionCountEl) sessionCountEl.textContent = "+" + sessionDisplay;
-    if (sessionCountWrap) {
-      sessionCountWrap.classList.remove("sc-flying"); // cancel any in-flight animation
-      sessionCountWrap.classList.add("sc-active");
+    // Session counter: show "+N" with a little elastic pulse on each tap
+    if (sessionCountEl) {
+      sessionCountEl.textContent = "+" + sessionDisplay;
+      gsap.fromTo(
+        sessionCountEl,
+        { scale: 1.38, color: "#c44469" },
+        {
+          scale: 1,
+          color: "#d4537e",
+          duration: 0.34,
+          ease: "elastic.out(1.2, 0.5)",
+        },
+      );
     }
+    if (sessionCountWrap) sessionCountWrap.classList.add("sc-active");
 
-    // Dynamic milestone: every 5 session taps, float the count as a number
-    if (sessionTaps % 5 === 0) spawnMilestoneFloat(sessionTaps);
+    // Dynamic milestone: every N taps, a large number pops up
+    if (sessionTaps % MILESTONE_EVERY === 0) spawnMilestoneFloat(sessionTaps);
 
-    // Schedule flush — handles both visual hero animation and network send
+    // Schedule flush — handles hero animation + network send
     clearTimeout(flushTimer);
     flushTimer = setTimeout(flush, FLUSH_DELAY_MS);
 
