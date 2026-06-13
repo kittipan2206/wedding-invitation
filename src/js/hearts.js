@@ -4,7 +4,9 @@ const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 
 const FLUSH_DELAY_MS = 900;
-const MILESTONES = [10, 25, 50, 100, 200];
+// Milestone at session taps — counts only what THIS user tapped right now,
+// not the global total (which starts at hundreds and would never hit these).
+const SESSION_MILESTONES = [5, 10, 20];
 const FLOAT_CHARS = ["❤️", "🩷", "💗", "💖", "💝", "🌸"];
 const STORED_KEY = "hearts_sent_v1";
 
@@ -18,14 +20,17 @@ export function initHearts() {
   const countEl = document.getElementById("heart-count");
   const countWrap = document.querySelector(".heart-count-wrap");
   const feedbackEl = document.getElementById("heart-feedback");
+  const hintEl = document.getElementById("heart-hint");
 
   let heartsSupported = false;
   let pending = 0;
   let flushTimer = null;
+  let sessionTaps = 0;
 
   // Restore filled state from previous visit
   if (localStorage.getItem(STORED_KEY) === "1") {
     btn.classList.add("heart-filled");
+    if (hintEl) hintEl.classList.add("hidden");
   }
 
   // Capability probe — backend must answer {count: N} to unlock sending
@@ -98,14 +103,13 @@ export function initHearts() {
   }
 
   function triggerMilestone(n) {
-    // Double burst — full screen + from button
     burstBloom(window.innerWidth / 2, window.innerHeight / 2);
     const r = btn.getBoundingClientRect();
     setTimeout(
       () => burstBloom(r.left + r.width / 2, r.top + r.height / 2),
       180,
     );
-    showMilestoneToast(`${n} หัวใจแล้ว! 💕`);
+    showMilestoneToast(`ส่งแล้ว ${n} หัวใจ! 💕`);
   }
 
   function showMilestoneToast(msg) {
@@ -124,7 +128,7 @@ export function initHearts() {
   }
 
   btn.addEventListener("click", () => {
-    // Spring pop on button
+    // Spring pop — applied to button; CSS targets .heart-tap-btn.heart-pop .heart-svg
     btn.classList.remove("heart-pop");
     void btn.offsetWidth;
     btn.classList.add("heart-pop");
@@ -132,10 +136,11 @@ export function initHearts() {
     // Haptic pulse (Android)
     if (navigator.vibrate) navigator.vibrate([8, 20, 8]);
 
-    // Persist filled state across reloads
+    // Filled state + hide hint on first tap ever
     if (!btn.classList.contains("heart-filled")) {
       btn.classList.add("heart-filled");
       localStorage.setItem(STORED_KEY, "1");
+      if (hintEl) hintEl.classList.add("hidden");
     }
 
     // Floating hearts — 2 usually, 3 occasionally for variety
@@ -149,9 +154,13 @@ export function initHearts() {
     // "ส่งแล้ว! ♡" flash label
     flashFeedback();
 
+    // Session tap counter — milestone is per-session, not global total
+    sessionTaps++;
+    if (SESSION_MILESTONES.includes(sessionTaps)) triggerMilestone(sessionTaps);
+
     if (!heartsSupported) return;
 
-    // Bump counter
+    // Bump global counter display
     const next = Number(countEl?.textContent || 0) + 1;
     if (countEl) {
       countEl.textContent = next;
@@ -159,8 +168,6 @@ export function initHearts() {
       void countEl.offsetWidth;
       countEl.classList.add("heart-count-bump");
     }
-
-    if (MILESTONES.includes(next)) triggerMilestone(next);
 
     pending++;
     clearTimeout(flushTimer);
