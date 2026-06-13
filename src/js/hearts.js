@@ -178,16 +178,33 @@ export function initHearts() {
     const targetY =
       cRect.top + cRect.height / 2 - (scRect.top + scRect.height / 2);
 
+    // Arc left to avoid the heart button sitting between the two counters
+    const arcX = targetX / 2 - 65;
+    const arcY = targetY * 0.5;
+
     gsap
       .timeline()
-      // Clone accelerates and shrinks toward counter (like a coin into a slot)
+      // Phase 1: sweep left and up (visible arc)
+      // Phase 2: converge on counter and shrink to nothing
       .to(flyEl, {
-        x: targetX,
-        y: targetY,
-        scale: 0.3,
-        opacity: 0,
-        duration: 0.46,
-        ease: "power3.in",
+        keyframes: [
+          {
+            x: arcX,
+            y: arcY,
+            scale: 1.15,
+            opacity: 1,
+            duration: 0.5,
+            ease: "power1.out",
+          },
+          {
+            x: targetX,
+            y: targetY,
+            scale: 0.25,
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.in",
+          },
+        ],
       })
       // On landing: update value + spring bounce on counter
       .call(() => {
