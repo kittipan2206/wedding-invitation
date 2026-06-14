@@ -218,6 +218,8 @@ function setupFilters() {
 // full image loads.
 
 let _pswpOpen = false;
+let activePswp = null;
+let _overlayOpen = false;
 
 async function openPhotoSwipe(photos, index) {
   if (!Array.isArray(photos) || photos.length === 0) return;
@@ -266,7 +268,16 @@ async function openPhotoSwipe(photos, index) {
 
   pswp.on("destroy", () => {
     _pswpOpen = false;
+    activePswp = null;
+    if (typeof window !== "undefined" && window.history && history.state?.pswpOpen) {
+      history.back();
+    }
   });
+
+  if (typeof window !== "undefined" && window.history) {
+    history.pushState({ pswpOpen: true }, "");
+  }
+  activePswp = pswp;
 
   pswp.init();
   _pswpOpen = true;
@@ -310,6 +321,11 @@ function openOverlay() {
   if (!el) return;
   el.classList.add("overlay--open");
   el.setAttribute("aria-hidden", "false");
+  _overlayOpen = true;
+
+  if (typeof window !== "undefined" && window.history) {
+    history.pushState({ overlayOpen: true }, "");
+  }
 
   // Lazy-init: render grid on first open
   if (!el.dataset.initialized) {
@@ -326,6 +342,11 @@ function closeOverlay() {
   if (!el) return;
   el.classList.remove("overlay--open");
   el.setAttribute("aria-hidden", "true");
+  _overlayOpen = false;
+
+  if (typeof window !== "undefined" && window.history && history.state?.overlayOpen) {
+    history.back();
+  }
 
   // Release all decoded bitmaps from RAM when overlay closes
   // Observer is still attached — images will reload when overlay opens again
@@ -494,6 +515,35 @@ export async function initGalleryPreview() {
 }
 
 // ── Entry point: auto-detect which page ───────────────────────────────────────
+
+if (typeof window !== "undefined" && window.history) {
+  // Clear any stale state on reload
+  if (history.state?.pswpOpen || history.state?.overlayOpen) {
+    history.replaceState(null, "");
+  }
+
+  window.addEventListener("popstate", (e) => {
+    const state = e.state || {};
+
+    if (_pswpOpen && !state.pswpOpen && activePswp) {
+      activePswp.close();
+    }
+
+    if (_overlayOpen && !state.overlayOpen) {
+      const el = document.getElementById("gallery-overlay");
+      if (el) {
+        el.classList.remove("overlay--open");
+        el.setAttribute("aria-hidden", "true");
+        _overlayOpen = false;
+
+        document.querySelectorAll("#overlay-gallery-grid img").forEach((img) => {
+          releaseImg(img);
+        });
+        if (el.dataset.initialized) delete el.dataset.initialized;
+      }
+    }
+  });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("gallery-grid")) {
