@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Digital Card — นนท์ &amp; เมย์</title>
+    <title>Digital Invitation Card — นนท์ &amp; เมย์</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Nunito:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap"
       rel="stylesheet"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -16,90 +16,195 @@
     <script type="module" src="/src/js/card-export.js"></script>
   </head>
   <body class="card-page">
-    <div class="card-viewport">
-      <div class="card-canvas">
-        <div class="card-floral-top">
-          <svg width="500" height="160" viewBox="0 0 500 160" fill="none">
-            <path
-              d="M250 160 Q245 110 220 80"
-              stroke="#B8E8D8"
-              stroke-width="2"
-              fill="none"
-              stroke-linecap="round"
+    <div class="bg-gradient" aria-hidden="true"></div>
+
+    <div class="card-page-wrapper">
+      <!-- Page Header -->
+      <header class="card-page-header">
+        <h1 class="card-page-title">Digital Invitation Card</h1>
+        <p class="card-page-subtitle">ออกแบบการ์ดเชิญส่วนตัวสำหรับส่งต่อให้แขกคนพิเศษ</p>
+      </header>
+
+      <!-- Control Panel -->
+      <section class="card-controls-card glass-card">
+        <div class="control-row">
+          <div class="control-group">
+            <label class="control-label" for="card-guest-name">ระบุชื่อแขกบนการ์ด</label>
+            <input 
+              type="text" 
+              id="card-guest-name" 
+              class="control-input" 
+              placeholder="พิมพ์ชื่อแขกที่นี่... (เช่น คุณสมชาย และครอบครัว)" 
+              value="" 
             />
-            <path
-              d="M250 160 Q255 105 280 75"
-              stroke="#C9B8E8"
-              stroke-width="2"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <path
-              d="M250 160 Q250 100 250 55"
-              stroke="#F9C8D4"
-              stroke-width="1.5"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <path
-              d="M232 115 Q210 95 198 105 Q208 120 232 115Z"
-              fill="#B8E8D8"
-              opacity="0.7"
-            />
-            <path
-              d="M268 110 Q290 90 302 102 Q290 117 268 110Z"
-              fill="#C9B8E8"
-              opacity="0.7"
-            />
-            <circle cx="220" cy="75" r="5" fill="#F9C8D4" opacity="0.85" />
-            <circle cx="220" cy="75" r="10" fill="#F9C8D4" opacity="0.3" />
-            <circle cx="280" cy="70" r="5" fill="#C9B8E8" opacity="0.85" />
-            <circle cx="280" cy="70" r="10" fill="#C9B8E8" opacity="0.3" />
-            <circle cx="250" cy="50" r="6" fill="#F8D8B8" opacity="0.85" />
-            <circle cx="250" cy="50" r="12" fill="#F8D8B8" opacity="0.3" />
-          </svg>
+          </div>
         </div>
-        <p class="card-badge">Wedding Invitation</p>
-        <h1 class="card-names">นนท์<span class="ampersand">&amp;</span>เมย์</h1>
-        <div class="card-divider"></div>
-        <p class="card-date" data-config="event_date_display">
-          วันเสาร์ที่ 15 มีนาคม พ.ศ. 2570
-        </p>
-        <p class="card-tagline">You are cordially invited</p>
-        <div class="card-floral-bottom">
-          <svg width="400" height="120" viewBox="0 0 400 120" fill="none">
-            <path
-              d="M200 10 Q195 55 178 75"
-              stroke="#B8E8D8"
-              stroke-width="1.8"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <path
-              d="M200 10 Q205 52 222 72"
-              stroke="#C9B8E8"
-              stroke-width="1.8"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <path
-              d="M178 75 Q158 60 152 70 Q164 82 178 75Z"
-              fill="#B8E8D8"
-              opacity="0.65"
-            />
-            <path
-              d="M222 72 Q242 58 248 68 Q236 80 222 72Z"
-              fill="#C9B8E8"
-              opacity="0.65"
-            />
-            <circle cx="178" cy="76" r="4" fill="#F9C8D4" opacity="0.8" />
-            <circle cx="222" cy="73" r="4" fill="#F8D8B8" opacity="0.8" />
-          </svg>
+
+        <div class="control-row">
+          <div class="control-group">
+            <label class="control-label">สไตล์การ์ด</label>
+            <div class="template-selector">
+              <button class="btn-template active" data-template="classic">
+                <span class="btn-template-dot"></span>Classic Minimal
+              </button>
+              <button class="btn-template" data-template="floral">
+                <span class="btn-template-dot"></span>Floral Pastel
+              </button>
+              <button class="btn-template" data-template="photo">
+                <span class="btn-template-dot"></span>Photo Card
+              </button>
+            </div>
+          </div>
         </div>
+      </section>
+
+      <!-- Preview Mockup Area -->
+      <main class="card-preview-area">
+        <div class="mockup-frame">
+          <div class="mockup-header">
+            <span class="mockup-dot"></span>
+            <span class="mockup-dot"></span>
+            <span class="mockup-dot"></span>
+          </div>
+          <div class="card-preview-container">
+            <!-- JavaScript will clone the template here -->
+          </div>
+        </div>
+      </main>
+
+      <!-- Save Button Wrapper -->
+      <div class="share-btn-wrapper">
+        <button class="btn-share" id="share-btn">บันทึก / แชร์การ์ด</button>
       </div>
     </div>
-    <div class="share-btn-wrapper">
-      <button class="btn-share" id="share-btn">บันทึก / แชร์การ์ด</button>
+
+    <!-- Hidden container for 1080x1080px export rendering -->
+    <div class="export-container" aria-hidden="true" style="position: absolute; left: -9999px; top: -9999px; width: 1080px; height: 1080px; overflow: hidden; pointer-events: none;">
+      <!-- JavaScript will clone the template here -->
     </div>
+
+    <!-- REUSABLE CARD TEMPLATE -->
+    <template id="card-template">
+      <div class="card-canvas theme-classic">
+        <!-- Photo background for Photo template -->
+        <div class="card-photo-bg" style="display: none"></div>
+        <div class="card-photo-overlay" style="display: none"></div>
+        
+        <!-- Glass panel overlay for Photo template structure -->
+        <div class="card-glass-panel">
+          <!-- Top Ornament -->
+          <div class="card-floral-top">
+            <svg width="500" height="160" viewBox="0 0 500 160" fill="none">
+              <path
+                d="M250 160 Q245 110 220 80"
+                stroke="#B8E8D8"
+                stroke-width="2.2"
+                fill="none"
+                stroke-linecap="round"
+              />
+              <path
+                d="M250 160 Q255 105 280 75"
+                stroke="#C9B8E8"
+                stroke-width="2.2"
+                fill="none"
+                stroke-linecap="round"
+              />
+              <path
+                d="M250 160 Q250 100 250 55"
+                stroke="#F9C8D4"
+                stroke-width="1.8"
+                fill="none"
+                stroke-linecap="round"
+              />
+              <path
+                d="M232 115 Q210 95 198 105 Q208 120 232 115Z"
+                fill="#B8E8D8"
+                opacity="0.65"
+              />
+              <path
+                d="M268 110 Q290 90 302 102 Q290 117 268 110Z"
+                fill="#C9B8E8"
+                opacity="0.65"
+              />
+              <circle cx="220" cy="75" r="5" fill="#F9C8D4" opacity="0.8" />
+              <circle cx="220" cy="75" r="11" fill="#F9C8D4" opacity="0.25" />
+              <circle cx="280" cy="70" r="5" fill="#C9B8E8" opacity="0.8" />
+              <circle cx="280" cy="70" r="11" fill="#C9B8E8" opacity="0.25" />
+              <circle cx="250" cy="50" r="6" fill="#F8D8B8" opacity="0.8" />
+              <circle cx="250" cy="50" r="12" fill="#F8D8B8" opacity="0.25" />
+            </svg>
+          </div>
+
+          <div class="card-text-content">
+            <p class="card-badge">Wedding Invitation</p>
+            
+            <!-- Personalized Greeting Area -->
+            <div class="card-invite-greeting" style="display: none">
+              <span class="card-to-label">ขอเรียนเชิญ</span>
+              <span class="card-to-name">คุณผู้มีเกียรติ</span>
+            </div>
+            
+            <h1 class="card-names">นนท์<span class="ampersand">&amp;</span>เมย์</h1>
+            
+            <div class="card-divider"></div>
+            
+            <p class="card-date" data-config="event_date_display">
+              วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569
+            </p>
+            
+            <!-- Time, Venue, and Dress Code Details -->
+            <div class="card-details-block">
+              <p class="card-time">
+                เริ่มพิธี <span data-config="event_time_ceremony">11:00</span> น. &nbsp;·&nbsp; ร่วมรับประทานอาหาร <span data-config="event_time_lunch">12:00</span> น.
+              </p>
+              <p class="card-venue">
+                ณ <span data-config="venue_name">ตำบลแป-ระ อำเภอท่าแพ จังหวัดสตูล</span>
+              </p>
+              <p class="card-dress">
+                การแต่งกาย: <span data-config="dress_code">Pastel Formal</span>
+              </p>
+            </div>
+            
+            <!-- Dynamic QR Code Container -->
+            <div class="card-qr-container">
+              <img class="card-qr-image" src="" alt="QR Code" />
+              <span class="card-qr-label">สแกนดูรายละเอียด &amp; ยืนยันร่วมงาน</span>
+            </div>
+          </div>
+
+          <!-- Bottom Ornament -->
+          <div class="card-floral-bottom">
+            <svg width="400" height="120" viewBox="0 0 400 120" fill="none">
+              <path
+                d="M200 10 Q195 55 178 75"
+                stroke="#B8E8D8"
+                stroke-width="2"
+                fill="none"
+                stroke-linecap="round"
+              />
+              <path
+                d="M200 10 Q205 52 222 72"
+                stroke="#C9B8E8"
+                stroke-width="2"
+                fill="none"
+                stroke-linecap="round"
+              />
+              <path
+                d="M178 75 Q158 60 152 70 Q164 82 178 75Z"
+                fill="#B8E8D8"
+                opacity="0.6"
+              />
+              <path
+                d="M222 72 Q242 58 248 68 Q236 80 222 72Z"
+                fill="#C9B8E8"
+                opacity="0.6"
+              />
+              <circle cx="178" cy="76" r="4.5" fill="#F9C8D4" opacity="0.75" />
+              <circle cx="222" cy="73" r="4.5" fill="#F8D8B8" opacity="0.75" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </template>
   </body>
 </html>
