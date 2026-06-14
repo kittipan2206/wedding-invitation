@@ -48,6 +48,19 @@ function escAttr(str) {
     .replace(/>/g, "&gt;");
 }
 
+// Short deterministic hash (FNV-1a, base36) — used to version the og:image URL
+// so Facebook/LINE/Twitter re-scrape when shared details change. The image is
+// evergreen, but the cache-bust forces crawlers to drop their old cached preview
+// (which may still hold the previous static image + stale description).
+function shortHash(str) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(36);
+}
+
 export default async function handler(req, res) {
   // Locate the template HTML:
   // - Production (Vercel): dist/_template.html (renamed by postbuild so it's not served statically)
@@ -93,7 +106,20 @@ export default async function handler(req, res) {
             ? ` กรุณาตอบรับภายในวันที่ ${cfg.rsvp_deadline_display}`
             : ""),
   );
-  const ogImage = escAttr(cfg.og_image || DEFAULTS.og_image);
+  // Evergreen image, but version the URL so crawlers re-scrape when the couple
+  // changes any shared detail (date/venue/names/deadline → new hash → new URL).
+  const baseImage = cfg.og_image || DEFAULTS.og_image;
+  const ver = shortHash(
+    [
+      couple,
+      cfg.event_date_display,
+      cfg.venue_name,
+      cfg.rsvp_deadline_display,
+      postEvent ? "post" : "pre",
+    ].join("|"),
+  );
+  const sep = baseImage.includes("?") ? "&" : "?";
+  const ogImage = escAttr(`${baseImage}${sep}v=${ver}`);
 
   html = html
     .replaceAll("{{og_title}}", title)

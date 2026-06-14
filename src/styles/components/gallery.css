@@ -215,6 +215,20 @@
   transition: transform 0.4s ease;
   border-radius: var(--radius-md);
 }
+
+/* LQIP — blurred 32px thumbnail behind the image while the full one loads
+   (or after its bitmap is released from RAM). Upscaling smooths it into a soft
+   blur; the full image fades in on top once decoded. */
+.gallery-item.lqip {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.polaroid img.lqip {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 .gallery-item img.loading {
   opacity: 0;
   transition: opacity 0.3s;
@@ -572,4 +586,22 @@
 }
 #overlay-lightbox-next {
   right: clamp(10px, 2vw, 24px);
+}
+
+/* ── PhotoSwipe caption ─────────────────────────────────────────
+   Admin-written captions shown under the photo in the viewer. */
+.pswp__custom-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  text-align: center;
+  color: #fff;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(15px, 2.4vw, 19px);
+  letter-spacing: 0.01em;
+  padding: 8px 56px;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
 }

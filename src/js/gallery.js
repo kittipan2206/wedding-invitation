@@ -1,4 +1,5 @@
 import { setHeroPhoto } from "./hero-photo.js";
+import "photoswipe/style.css";
 
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
@@ -7,19 +8,14 @@ const PREVIEW_LIMIT = 6; // photos shown on index.html
 
 let allPhotos = [];
 let filteredPhotos = [];
-let currentLightboxIndex = 0;
-let lightboxOpen = false;
 
 // Cache of ALL photos fetched by initGalleryPreview (reused by overlay)
 let cachedPhotos = [];
 
-// Overlay state (separate from preview lightbox)
+// Overlay state
 let overlayFiltered = [];
 let _previewWired = false; // prevent duplicate event listeners on re-init
-let _lightboxWired = false; // prevent duplicate lightbox listeners
-let _overlayLbWired = false; // prevent duplicate overlay lightbox listeners
-let overlayLbIndex = 0;
-let overlayLbOpen = false;
+let _overlayKeysWired = false; // prevent duplicate overlay Escape listener
 
 // ── URL helper ────────────────────────────────────────────────────────────────
 
@@ -133,11 +129,24 @@ function renderGrid(photos, containerId, clickCallback) {
     const sizedUrl = getSizedUrl(photo.url, 800);
     img.alt = photo.caption || "";
     img.classList.add("loading");
+
+    // LQIP: a tiny 32px thumbnail (blurred by upscale) sits behind the image so
+    // there's a soft preview instead of a blank box while the full one loads or
+    // after its bitmap is released from RAM. Only Google-hosted URLs can be
+    // resized this cheaply; others fall back to the plain loading state.
+    if (photo.url.includes("googleusercontent.com")) {
+      item.classList.add("lqip");
+      item.style.backgroundImage = `url("${getSizedUrl(photo.url, 32)}")`;
+    }
+
     img.addEventListener("load", () => {
       img.classList.remove("loading");
       // Store aspect-ratio so layout is preserved when src is cleared (no layout shift)
       if (img.naturalWidth && img.naturalHeight) {
         img.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+        // Capture real dimensions for PhotoSwipe's zoom math
+        photo._w = img.naturalWidth;
+        photo._h = img.naturalHeight;
       }
     });
     img.addEventListener("error", () => {
@@ -195,133 +204,77 @@ function setupFilters() {
   });
 }
 
-// ── Lightbox ──────────────────────────────────────────────────────────────────
+// ── Lightbox (PhotoSwipe) ─────────────────────────────────────────────────────
+// PhotoSwipe powers the viewer for both the gallery page and the overlay,
+// adding pinch/double-tap zoom, drag-to-close, momentum swipe and a built-in
+// counter the old hand-rolled lightbox lacked. We open it programmatically with
+// the PhotoSwipe core (not the Lightbox wrapper, which assumes a DOM thumbnail
+// to zoom from) and a dynamic dataSource. The core module is code-split, so it
+// only loads on the first open.
+//
+// Remote images have no intrinsic dimensions, so each slide declares a fixed
+// 1600-wide canvas using the aspect captured from the grid thumbnail (falling
+// back to 3:2). msrc is the already-cached thumbnail, shown instantly while the
+// full image loads.
 
+let _pswpOpen = false;
+
+async function openPhotoSwipe(photos, index) {
+  if (!Array.isArray(photos) || photos.length === 0) return;
+
+  const dataSource = photos.map((p) => {
+    const aspect = p._w && p._h ? p._w / p._h : 1600 / 1067;
+    const width = 1600;
+    return {
+      src: getSizedUrl(p.url, 1600),
+      msrc: getSizedUrl(p.url, 800),
+      width,
+      height: Math.round(width / aspect),
+      alt: p.caption || "",
+    };
+  });
+
+  const { default: PhotoSwipe } = await import("photoswipe");
+  const pswp = new PhotoSwipe({
+    dataSource,
+    index,
+    bgOpacity: 0.94,
+    showHideAnimationType: "none",
+    wheelToZoom: true,
+    padding: { top: 24, bottom: 24, left: 12, right: 12 },
+  });
+
+  // Caption pinned below the image — mirrors the admin-written captions
+  pswp.on("uiRegister", () => {
+    pswp.ui.registerElement({
+      name: "caption",
+      order: 9,
+      isButton: false,
+      appendTo: "root",
+      onInit: (el) => {
+        el.className = "pswp__custom-caption";
+        const sync = () => {
+          const text = pswp.currSlide?.data?.alt || "";
+          el.textContent = text;
+          el.style.display = text ? "block" : "none";
+        };
+        pswp.on("change", sync);
+        sync();
+      },
+    });
+  });
+
+  pswp.on("destroy", () => {
+    _pswpOpen = false;
+  });
+
+  pswp.init();
+  _pswpOpen = true;
+}
+
+// Gallery page entry point (keeps the old name so renderGrid callbacks are unchanged)
 function openLightbox(index) {
-  currentLightboxIndex = index;
-  updateLightboxContent();
-  const lb = document.getElementById("lightbox");
-  if (!lb) return;
-  lb.classList.add("lightbox--open");
-  document.body.style.overflow = "hidden";
-  lightboxOpen = true;
-}
-
-function closeLightbox() {
-  const lb = document.getElementById("lightbox");
-  if (!lb) return;
-  lb.classList.remove("lightbox--open");
-  document.body.style.overflow = "";
-  lightboxOpen = false;
-}
-
-function setLightboxLoading(loading) {
-  const lb = document.getElementById("lightbox");
-  if (loading) lb?.classList.add("lightbox--loading");
-  else lb?.classList.remove("lightbox--loading");
-}
-
-function updateLightboxContent() {
-  const photo = filteredPhotos[currentLightboxIndex];
-  if (!photo) return;
-
-  const img = document.getElementById("lightbox-img");
-  const caption = document.getElementById("lightbox-caption");
-  const counter = document.getElementById("lightbox-counter");
-
-  const prevBtn = document.getElementById("lightbox-prev");
-  const nextBtn = document.getElementById("lightbox-next");
-  if (prevBtn) prevBtn.disabled = currentLightboxIndex === 0;
-  if (nextBtn)
-    nextBtn.disabled = currentLightboxIndex === filteredPhotos.length - 1;
-  if (caption) caption.textContent = photo.caption || "";
-  if (counter)
-    counter.textContent = `${currentLightboxIndex + 1} / ${filteredPhotos.length}`;
-
-  if (!img) return;
-  const newSrc = getSizedUrl(photo.url, 1600);
-
-  // Preload in memory first, then swap — avoids blank flash
-  setLightboxLoading(true);
-  img.style.opacity = "0";
-  const preload = new Image();
-  preload.onload = () => {
-    img.src = newSrc;
-    img.alt = photo.caption || "";
-    img.style.opacity = "1";
-    setLightboxLoading(false);
-  };
-  preload.onerror = () => {
-    img.src = newSrc; // show broken-img rather than blank
-    img.style.opacity = "1";
-    setLightboxLoading(false);
-  };
-  preload.src = newSrc;
-}
-
-function lightboxPrev() {
-  if (currentLightboxIndex > 0) {
-    currentLightboxIndex--;
-    updateLightboxContent();
-  }
-}
-
-function lightboxNext() {
-  if (currentLightboxIndex < filteredPhotos.length - 1) {
-    currentLightboxIndex++;
-    updateLightboxContent();
-  }
-}
-
-function initLightbox() {
-  if (_lightboxWired) return;
-  _lightboxWired = true;
-
-  document
-    .getElementById("lightbox-close")
-    ?.addEventListener("click", closeLightbox);
-  document
-    .getElementById("lightbox-prev")
-    ?.addEventListener("click", lightboxPrev);
-  document
-    .getElementById("lightbox-next")
-    ?.addEventListener("click", lightboxNext);
-
-  // Click backdrop to close
-  document.getElementById("lightbox")?.addEventListener("click", (e) => {
-    if (e.target === e.currentTarget) closeLightbox();
-  });
-
-  // Keyboard
-  document.addEventListener("keydown", (e) => {
-    if (!lightboxOpen) return;
-    if (e.key === "Escape") closeLightbox();
-    if (e.key === "ArrowLeft") {
-      e.preventDefault();
-      lightboxPrev();
-    }
-    if (e.key === "ArrowRight") {
-      e.preventDefault();
-      lightboxNext();
-    }
-  });
-
-  // Touch swipe
-  let touchStartX = 0;
-  document.getElementById("lightbox")?.addEventListener(
-    "touchstart",
-    (e) => {
-      touchStartX = e.touches[0].clientX;
-    },
-    { passive: true },
-  );
-  document.getElementById("lightbox")?.addEventListener("touchend", (e) => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) > 50) {
-      if (dx < 0) lightboxNext();
-      else lightboxPrev();
-    }
-  });
+  openPhotoSwipe(filteredPhotos, index);
 }
 
 // ── Full gallery page (gallery.html) ─────────────────────────────────────────
@@ -337,7 +290,6 @@ function revealPage() {
 }
 
 export async function initGallery() {
-  initLightbox();
   setupFilters();
 
   // Wait for fonts before fetching so there's no reflow flash
@@ -359,13 +311,13 @@ function openOverlay() {
   el.classList.add("overlay--open");
   el.setAttribute("aria-hidden", "false");
 
-  // Lazy-init: render grid + wire lightbox on first open
+  // Lazy-init: render grid on first open
   if (!el.dataset.initialized) {
     el.dataset.initialized = "1";
     overlayFiltered = [...cachedPhotos];
     renderGrid(overlayFiltered, "overlay-gallery-grid", openOverlayLightbox);
     setupOverlayFilters();
-    initOverlayLightbox();
+    wireOverlayKeys();
   }
 }
 
@@ -374,7 +326,6 @@ function closeOverlay() {
   if (!el) return;
   el.classList.remove("overlay--open");
   el.setAttribute("aria-hidden", "true");
-  if (overlayLbOpen) closeOverlayLightbox();
 
   // Release all decoded bitmaps from RAM when overlay closes
   // Observer is still attached — images will reload when overlay opens again
@@ -405,139 +356,20 @@ function setupOverlayFilters() {
   });
 }
 
+// Overlay entry point — opens the shared PhotoSwipe over the overlay grid
 function openOverlayLightbox(index) {
-  overlayLbIndex = index;
-  updateOverlayLbContent();
-  document.getElementById("overlay-lightbox")?.classList.add("lightbox--open");
-  overlayLbOpen = true;
+  openPhotoSwipe(overlayFiltered, index);
 }
 
-function closeOverlayLightbox() {
-  document
-    .getElementById("overlay-lightbox")
-    ?.classList.remove("lightbox--open");
-  overlayLbOpen = false;
-}
-
-function setOverlayLbLoading(loading) {
-  const lb = document.getElementById("overlay-lightbox");
-  if (loading) lb?.classList.add("lightbox--loading");
-  else lb?.classList.remove("lightbox--loading");
-}
-
-function updateOverlayLbContent() {
-  const photo = overlayFiltered[overlayLbIndex];
-  if (!photo) return;
-  const img = document.getElementById("overlay-lightbox-img");
-  const caption = document.getElementById("overlay-lightbox-caption");
-  const counter = document.getElementById("overlay-lightbox-counter");
-  if (counter)
-    counter.textContent = `${overlayLbIndex + 1} / ${overlayFiltered.length}`;
-  const prev = document.getElementById("overlay-lightbox-prev");
-  const next = document.getElementById("overlay-lightbox-next");
-  if (prev) prev.disabled = overlayLbIndex === 0;
-  if (next) next.disabled = overlayLbIndex === overlayFiltered.length - 1;
-
-  if (!img) return;
-  const newSrc = getSizedUrl(photo.url, 1600);
-  setOverlayLbLoading(true);
-  img.style.opacity = "0";
-  const preload = new Image();
-  preload.onload = () => {
-    img.src = newSrc;
-    img.alt = photo.caption || "";
-    img.style.opacity = "1";
-    setOverlayLbLoading(false);
-  };
-  preload.onerror = () => {
-    img.src = newSrc;
-    img.alt = photo.caption || "";
-    img.style.opacity = "1";
-    setOverlayLbLoading(false);
-  };
-  preload.src = newSrc;
-}
-
-function initOverlayLightbox() {
-  if (_overlayLbWired) return;
-  _overlayLbWired = true;
-
-  document
-    .getElementById("overlay-lightbox-close")
-    ?.addEventListener("click", closeOverlayLightbox);
-  document
-    .getElementById("overlay-lightbox-prev")
-    ?.addEventListener("click", () => {
-      if (overlayLbIndex > 0) {
-        overlayLbIndex--;
-        updateOverlayLbContent();
-      }
-    });
-  document
-    .getElementById("overlay-lightbox-next")
-    ?.addEventListener("click", () => {
-      if (overlayLbIndex < overlayFiltered.length - 1) {
-        overlayLbIndex++;
-        updateOverlayLbContent();
-      }
-    });
-  document
-    .getElementById("overlay-lightbox")
-    ?.addEventListener("click", (e) => {
-      if (e.target === e.currentTarget) closeOverlayLightbox();
-    });
-
-  // Keyboard: Escape closes lightbox first, then overlay on next press
+// Escape closes the overlay grid (PhotoSwipe handles its own Escape while open)
+function wireOverlayKeys() {
+  if (_overlayKeysWired) return;
+  _overlayKeysWired = true;
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      if (overlayLbOpen) {
-        closeOverlayLightbox();
-      } else if (
-        document
-          .getElementById("gallery-overlay")
-          ?.classList.contains("overlay--open")
-      ) {
-        closeOverlay();
-      }
-    }
-    if (!overlayLbOpen) return;
-    if (e.key === "ArrowLeft") {
-      e.preventDefault();
-      if (overlayLbIndex > 0) {
-        overlayLbIndex--;
-        updateOverlayLbContent();
-      }
-    }
-    if (e.key === "ArrowRight") {
-      e.preventDefault();
-      if (overlayLbIndex < overlayFiltered.length - 1) {
-        overlayLbIndex++;
-        updateOverlayLbContent();
-      }
-    }
-  });
-
-  // Touch swipe
-  let tx = 0;
-  const lb = document.getElementById("overlay-lightbox");
-  lb?.addEventListener(
-    "touchstart",
-    (e) => {
-      tx = e.touches[0].clientX;
-    },
-    { passive: true },
-  );
-  lb?.addEventListener("touchend", (e) => {
-    const dx = e.changedTouches[0].clientX - tx;
-    if (Math.abs(dx) > 50) {
-      if (dx < 0 && overlayLbIndex < overlayFiltered.length - 1) {
-        overlayLbIndex++;
-        updateOverlayLbContent();
-      } else if (dx > 0 && overlayLbIndex > 0) {
-        overlayLbIndex--;
-        updateOverlayLbContent();
-      }
-    }
+    if (e.key !== "Escape") return;
+    if (_pswpOpen) return; // lightbox open → let PhotoSwipe handle it
+    const ov = document.getElementById("gallery-overlay");
+    if (ov?.classList.contains("overlay--open")) closeOverlay();
   });
 }
 
@@ -565,7 +397,18 @@ function renderPolaroidStrip(photos, containerId, clickCallback) {
     const img = document.createElement("img");
     img.alt = photo.caption || "";
     img.classList.add("loading");
-    img.addEventListener("load", () => img.classList.remove("loading"));
+    // LQIP: tiny blurred thumbnail behind the polaroid image while it loads
+    if (photo.url.includes("googleusercontent.com")) {
+      img.classList.add("lqip");
+      img.style.backgroundImage = `url("${getSizedUrl(photo.url, 32)}")`;
+    }
+    img.addEventListener("load", () => {
+      img.classList.remove("loading");
+      if (img.naturalWidth && img.naturalHeight) {
+        photo._w = img.naturalWidth;
+        photo._h = img.naturalHeight;
+      }
+    });
     img.addEventListener("error", () => {
       img.src = "";
     });
@@ -625,7 +468,7 @@ export async function initGalleryPreview() {
   // Clicking a preview item opens the overlay (all photos) and jumps to that photo
   renderPolaroidStrip(preview, "gallery-preview-grid", (previewIndex) => {
     const clickedUrl = preview[previewIndex]?.url;
-    openOverlay(); // lazy-inits overlay grid + initOverlayLightbox if first open
+    openOverlay(); // lazy-inits overlay grid on first open
     const fullIndex = cachedPhotos.findIndex((p) => p.url === clickedUrl);
     openOverlayLightbox(fullIndex >= 0 ? fullIndex : previewIndex);
   });

@@ -44,27 +44,19 @@
   </g>
 
   <!-- Wedding Invitation label -->
-  <text x="600" y="210" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#8A7F7A" letter-spacing="8">WEDDING INVITATION</text>
+  <text x="600" y="235" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#8A7F7A" letter-spacing="8">WEDDING INVITATION</text>
 
   <!-- Divider line -->
-  <rect x="300" y="228" width="600" height="1" fill="url(#line)"/>
+  <rect x="300" y="257" width="600" height="1" fill="url(#line)"/>
 
-  <!-- Names -->
-  <text x="600" y="330" text-anchor="middle" font-family="Georgia, serif" font-size="96" fill="#4A3F5C" font-weight="300">นนท์ &amp; เมย์</text>
-
-  <!-- Ampersand flourish already in names -->
+  <!-- Names (hero) -->
+  <text x="600" y="370" text-anchor="middle" font-family="Georgia, serif" font-size="104" fill="#4A3F5C" font-weight="300">นนท์ &amp; เมย์</text>
 
   <!-- Divider line -->
-  <rect x="300" y="358" width="600" height="1" fill="url(#line)"/>
+  <rect x="300" y="400" width="600" height="1" fill="url(#line)"/>
 
-  <!-- Date -->
-  <text x="600" y="408" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#8A7F7A" letter-spacing="4">วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569</text>
-
-  <!-- Venue -->
-  <text x="600" y="452" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#A89FC0" letter-spacing="2">ตำบลแป-ระ • อำเภอท่าแพ • จังหวัดสตูล</text>
-
-  <!-- Bottom petals -->
-  <g opacity="0.4" transform="translate(540, 500)">
+  <!-- Bottom petals flourish -->
+  <g opacity="0.45" transform="translate(540, 458)">
     <circle cx="0" cy="0" r="5" fill="#F9C8D4"/>
     <circle cx="30" cy="-8" r="4" fill="#C9B8E8"/>
     <circle cx="60" cy="0" r="5" fill="#B8E8D8"/>

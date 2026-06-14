@@ -25,6 +25,9 @@ const PHOTOS = [
   },
 ];
 
+// The photo viewer is PhotoSwipe: root is `.pswp` (open => `.pswp--open`), with
+// `.pswp__button--arrow--next/prev`, `.pswp__button--close`, a `.pswp__counter`
+// indicator, and our `.pswp__custom-caption`.
 test.describe("Gallery page (/gallery.html) — lightbox", () => {
   test.beforeEach(async ({ page }) => {
     await mockGAS(page, { photos: PHOTOS });
@@ -36,65 +39,55 @@ test.describe("Gallery page (/gallery.html) — lightbox", () => {
 
   test("clicking a photo opens the lightbox", async ({ page }) => {
     await page.locator(".gallery-item").first().click();
-    await expect(page.locator("#lightbox")).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator(".pswp")).toBeVisible({ timeout: 5_000 });
   });
 
   test("lightbox shows the clicked photo", async ({ page }) => {
     await page.locator(".gallery-item").first().click();
-    const lb = page.locator("#lightbox");
-    await expect(lb).toBeVisible({ timeout: 5_000 });
-    await expect(lb.locator("img")).toBeVisible();
+    await expect(page.locator(".pswp")).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator(".pswp__img").first()).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
-  test("lightbox next button advances to next photo", async ({ page }) => {
+  test("lightbox next button advances to next photo", async ({ page, isMobile }) => {
+    test.skip(isMobile, "PhotoSwipe next/prev buttons are hidden on mobile");
     await page.locator(".gallery-item").first().click();
-    await expect(page.locator("#lightbox")).toBeVisible({ timeout: 5_000 });
-    const imgSrcBefore = await page
-      .locator("#lightbox img")
-      .getAttribute("src");
-    await page.click("#lightbox-next");
-    // Wait for src to change
-    await expect(page.locator("#lightbox img")).not.toHaveAttribute(
-      "src",
-      imgSrcBefore ?? "",
-      { timeout: 5_000 },
-    );
+    await expect(page.locator(".pswp")).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator(".pswp__counter")).toHaveText(/1\s*\/\s*3/, {
+      timeout: 5_000,
+    });
+    await page.click(".pswp__button--arrow--next");
+    await expect(page.locator(".pswp__counter")).toHaveText(/2\s*\/\s*3/, {
+      timeout: 5_000,
+    });
   });
-
-  test("lightbox prev button goes back", async ({ page }) => {
+ 
+  test("lightbox prev button goes back", async ({ page, isMobile }) => {
+    test.skip(isMobile, "PhotoSwipe next/prev buttons are hidden on mobile");
     await page.locator(".gallery-item").nth(1).click();
-    await expect(page.locator("#lightbox")).toBeVisible({ timeout: 5_000 });
-    const imgSrcBefore = await page
-      .locator("#lightbox img")
-      .getAttribute("src");
-    await page.click("#lightbox-prev");
-    await expect(page.locator("#lightbox img")).not.toHaveAttribute(
-      "src",
-      imgSrcBefore ?? "",
-      { timeout: 5_000 },
-    );
+    await expect(page.locator(".pswp")).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator(".pswp__counter")).toHaveText(/2\s*\/\s*3/, {
+      timeout: 5_000,
+    });
+    await page.click(".pswp__button--arrow--prev");
+    await expect(page.locator(".pswp__counter")).toHaveText(/1\s*\/\s*3/, {
+      timeout: 5_000,
+    });
   });
 
   test("pressing Escape closes the lightbox", async ({ page }) => {
     await page.locator(".gallery-item").first().click();
-    await expect(page.locator("#lightbox")).toHaveClass(/lightbox--open/, {
-      timeout: 5_000,
-    });
+    await expect(page.locator(".pswp")).toBeVisible({ timeout: 5_000 });
     await page.keyboard.press("Escape");
-    await expect(page.locator("#lightbox")).not.toHaveClass(/lightbox--open/, {
-      timeout: 5_000,
-    });
+    await expect(page.locator(".pswp")).toBeHidden({ timeout: 5_000 });
   });
 
   test("clicking the close button closes the lightbox", async ({ page }) => {
     await page.locator(".gallery-item").first().click();
-    await expect(page.locator("#lightbox")).toHaveClass(/lightbox--open/, {
-      timeout: 5_000,
-    });
-    await page.click("#lightbox-close");
-    await expect(page.locator("#lightbox")).not.toHaveClass(/lightbox--open/, {
-      timeout: 5_000,
-    });
+    await expect(page.locator(".pswp")).toBeVisible({ timeout: 5_000 });
+    await page.click(".pswp__button--close");
+    await expect(page.locator(".pswp")).toBeHidden({ timeout: 5_000 });
   });
 });
 
@@ -105,12 +98,12 @@ test.describe("Gallery page (/gallery.html) — captions", () => {
     await expect(page.locator(".gallery-item").first()).toBeVisible({
       timeout: 15_000,
     });
-    // Open lightbox and check caption area
     await page.locator(".gallery-item").first().click();
-    await expect(page.locator("#lightbox")).toBeVisible({ timeout: 5_000 });
-    // The lightbox should contain caption text for photo 1
-    const lbText = await page.locator("#lightbox").textContent();
-    expect(lbText).toContain("รูปที่ 1");
+    await expect(page.locator(".pswp")).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator(".pswp__custom-caption")).toContainText(
+      "รูปที่ 1",
+      { timeout: 5_000 },
+    );
   });
 });
 
@@ -161,18 +154,13 @@ test.describe("Gallery page (/gallery.html) — mobile", () => {
     });
 
     await page.locator(".gallery-item").first().click();
-    await expect(page.locator("#lightbox")).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator(".pswp")).toBeVisible({ timeout: 5_000 });
 
-    const lb = page.locator("#lightbox");
+    const lb = page.locator(".pswp");
     const box = await lb.boundingBox();
     if (!box) return;
 
-    const imgSrcBefore = await page
-      .locator("#lightbox img")
-      .getAttribute("src");
-
-    // Swipe left = next photo
-    await page.touchscreen.tap(box.x + box.width * 0.8, box.y + box.height / 2);
+    // Swipe left = next photo (PhotoSwipe handles touch drag)
     await page.mouse.move(box.x + box.width * 0.8, box.y + box.height / 2);
     await page.mouse.down();
     await page.mouse.move(box.x + box.width * 0.2, box.y + box.height / 2, {
@@ -180,13 +168,8 @@ test.describe("Gallery page (/gallery.html) — mobile", () => {
     });
     await page.mouse.up();
 
-    // Either photo changed or test passes (swipe may not trigger on all builds)
-    const imgSrcAfter = await page
-      .locator("#lightbox img")
-      .getAttribute("src")
-      .catch(() => imgSrcBefore);
-    // At minimum, the lightbox should still be visible
-    await expect(page.locator("#lightbox")).toBeVisible();
+    // At minimum, the viewer should still be open after the gesture
+    await expect(page.locator(".pswp")).toBeVisible();
   });
 
   test("page loads on 375px mobile without horizontal scroll", async ({

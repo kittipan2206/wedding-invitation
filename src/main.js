@@ -12,6 +12,7 @@ import { initFullscreen } from "./js/fullscreen.js";
 import { initTypewriter } from "./js/typewriter.js";
 import { initGuestbook } from "./js/guestbook.js";
 import { initParallax } from "./js/parallax.js";
+import { initScrollFX } from "./js/scroll-fx.js";
 import { initGalleryPreview } from "./js/gallery.js";
 import { fetchConfig, injectConfig } from "./js/config.js";
 import { applyMemoryMode } from "./js/memory-mode.js";
@@ -69,6 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initFullscreen();
   initGuestbook();
   initParallax();
+  initScrollFX();
   initGalleryPreview();
   initHearts();
 
@@ -83,12 +85,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     afterEnvelope();
     if (gotoSection) {
       const target = document.getElementById(gotoSection);
-      if (target) {
-        // Small delay lets fonts/layout settle before scrolling
-        setTimeout(
-          () => target.scrollIntoView({ behavior: "smooth", block: "start" }),
-          300,
-        );
+      const wrap = document.querySelector(".snap-wrap");
+      if (target && wrap) {
+        // Wait for fonts to load and ScrollTrigger to refresh, then scroll
+        document.fonts.ready.then(() => {
+          setTimeout(
+            () => wrap.scrollTo({ top: target.offsetTop, behavior: "auto" }),
+            350,
+          );
+        });
       }
     }
   } else {

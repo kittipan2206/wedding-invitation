@@ -237,9 +237,7 @@ test.describe("Homepage — gallery preview", () => {
     expect(isHidden || hasItems === 0).toBe(true);
   });
 
-  test("clicking a preview photo opens the overlay lightbox", async ({
-    page,
-  }) => {
+  test("clicking a preview photo opens the photo viewer", async ({ page }) => {
     await mockGAS(page, { photos: PREVIEW_PHOTOS });
     await page.goto("/?goto=guestbook");
     await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
@@ -250,11 +248,8 @@ test.describe("Homepage — gallery preview", () => {
       .first();
     await item.waitFor({ state: "visible", timeout: 10_000 });
     await item.click();
-    // The overlay lightbox opens when a preview photo is clicked
-    await expect(page.locator("#overlay-lightbox")).toHaveClass(
-      /lightbox--open/,
-      { timeout: 5_000 },
-    );
+    // Clicking a preview photo opens the PhotoSwipe viewer
+    await expect(page.locator(".pswp")).toBeVisible({ timeout: 5_000 });
   });
 });
 

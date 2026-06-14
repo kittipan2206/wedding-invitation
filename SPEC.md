@@ -127,9 +127,11 @@
 
 - A preview of up to 6 photos is shown as a horizontal polaroid strip with the
   admin-written captions under each photo
-- Clicking a photo opens a fullscreen lightbox overlay
-- Arrow buttons or swipe navigate between photos in the lightbox
-- Pressing Escape or clicking the backdrop closes the lightbox
+- Clicking a photo opens a fullscreen photo viewer (PhotoSwipe)
+- The viewer supports pinch / double-tap / wheel zoom, drag-to-close, momentum
+  swipe, arrow buttons, a photo counter, and the admin caption
+- Pressing Escape, the close button, or swiping down closes the viewer
+- While the full image loads, the already-cached thumbnail is shown immediately
 - If no photos exist, the section is hidden or shows a placeholder
 - A "View All" button appears when there are more than 6 photos
 - The footer note matches reality: placeholders → "photos coming after the wedding"; real photos before the event → "wedding-day photos will be added"; after the event → note hidden
@@ -157,12 +159,13 @@
 
 ## Persona: Guest — Gallery Page (`/gallery.html`)
 
-- All photos load and display in a grid
-- Clicking a photo opens a fullscreen lightbox
+- All photos load and display in a grid (each with a blurred LQIP placeholder
+  while it loads)
+- Clicking a photo opens the fullscreen PhotoSwipe viewer (zoom, swipe, counter)
 - Photos show captions if available
 - Filtering by category works (pre-wedding, wedding day)
 - Page works with zero photos (no crash, empty state shown)
-- Page works on mobile (375px wide, touch swipe in lightbox)
+- Page works on mobile (375px wide, touch swipe + pinch zoom in the viewer)
 
 ---
 
@@ -275,6 +278,31 @@ flips to a keepsake album with no redeploy:
 - Pages load using cached/default data if the server is slow (> 5s) or unreachable
 - Error states are shown with a retry option where appropriate
 - No page crashes or shows a blank screen due to a network failure
+
+### Visual Polish (motion & loading)
+
+- **RSVP success confetti**: submitting the RSVP fires a celebratory confetti
+  burst (center pop + two side cannons + heart accents) in the wedding palette.
+  Backed by `canvas-confetti`; respects `prefers-reduced-motion`
+- **Gallery LQIP**: each photo shows a blurred 32px thumbnail (served by the
+  image host) behind it while the full image lazy-loads or after its bitmap is
+  released from RAM — no blank boxes while scrolling a photo-heavy gallery
+- **Hero scroll parallax**: on the main page, the couple photo drifts up and
+  zooms slightly slower than the page as you scroll away from the first screen,
+  with the florals drifting the opposite way for depth. Backed by GSAP
+  ScrollTrigger (scoped to the `.snap-wrap` scroller); skipped for reduced motion
+
+### Shared-Link Previews (Open Graph / `api/og.js`)
+
+- `og:title` and `og:description` are server-rendered from live config, so the
+  date/venue/RSVP-deadline in the link preview text always reflect the latest
+  admin edits (no redeploy needed)
+- The `og:image` is an **evergreen** graphic (couple names + wordmark only, no
+  date) — it never goes stale when shared details change
+- The `og:image` URL carries a `?v=<hash>` derived from the shared details
+  (names, date, venue, deadline, pre/post-event). When any of these change the
+  hash changes, so Facebook/LINE/Twitter treat it as a new image and drop their
+  cached preview instead of serving the old one
 
 ### Mobile / Responsive
 
