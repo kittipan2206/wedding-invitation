@@ -5,9 +5,6 @@
   "functions": {
     "api/og.js": {
       "includeFiles": "dist/_template.html"
-    },
-    "api/og-image.js": {
-      "includeFiles": "public/fonts/*.ttf"
     }
   },
   "rewrites": [{ "source": "/", "destination": "/api/og" }],

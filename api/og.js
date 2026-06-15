@@ -90,55 +90,36 @@ export default async function handler(req, res) {
     /^\d{4}-\d{2}-\d{2}$/.test(datePart) &&
     new Date() > new Date(`${datePart}T23:59:59+07:00`);
 
-  // Guest name from ?to= param — used to personalize og:title and og:image
-  const reqUrl = new URL(req.url, `http://${req.headers.host}`);
-  const rawTo = reqUrl.searchParams.get("to") || "";
-  const guestName = rawTo.replace(/[<>"]/g, "").slice(0, 40).trim();
-
   const couple = `${cfg.groom_name} & ${cfg.bride_name}`;
   const title = escAttr(
     postEvent
       ? `${couple} — ขอบคุณที่ร่วมงานแต่งงานของเรา`
-      : guestName
-        ? `ถึงคุณ${guestName} — ${couple} ขอเรียนเชิญร่วมงานแต่งงาน`
-        : `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน ${cfg.event_date_display}`,
+      : `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน ${cfg.event_date_display}`,
   );
   const description = escAttr(
     postEvent
       ? `ภาพความทรงจำจากงานแต่งงาน ${couple} ${cfg.event_date_display}`
-      : guestName
-        ? `ถึงคุณ${guestName} ขอเรียนเชิญร่วมงานแต่งงาน ${couple} ใน${cfg.event_date_display}${cfg.venue_name ? ` ณ ${cfg.venue_name}` : ""}`
-        : `ขอเรียนเชิญร่วมงานแต่งงาน ${couple} ` +
+      : `ขอเรียนเชิญร่วมงานแต่งงาน ${couple} ` +
           `ใน${cfg.event_date_display}` +
           (cfg.venue_name ? ` ณ ${cfg.venue_name}` : "") +
           (cfg.rsvp_deadline_display
             ? ` กรุณาตอบรับภายในวันที่ ${cfg.rsvp_deadline_display}`
             : ""),
   );
-
-  // Dynamic og:image — personalized per guest when ?to= is present
-  const proto = req.headers["x-forwarded-proto"] || "https";
-  const origin = `${proto}://${req.headers.host}`;
-  let ogImage;
-  if (!postEvent && guestName) {
-    ogImage = escAttr(
-      `${origin}/api/og-image?to=${encodeURIComponent(guestName)}`,
-    );
-  } else {
-    // Evergreen static image, versioned so crawlers re-scrape on detail changes
-    const baseImage = cfg.og_image || DEFAULTS.og_image;
-    const ver = shortHash(
-      [
-        couple,
-        cfg.event_date_display,
-        cfg.venue_name,
-        cfg.rsvp_deadline_display,
-        postEvent ? "post" : "pre",
-      ].join("|"),
-    );
-    const sep = baseImage.includes("?") ? "&" : "?";
-    ogImage = escAttr(`${baseImage}${sep}v=${ver}`);
-  }
+  // Evergreen image, but version the URL so crawlers re-scrape when the couple
+  // changes any shared detail (date/venue/names/deadline → new hash → new URL).
+  const baseImage = cfg.og_image || DEFAULTS.og_image;
+  const ver = shortHash(
+    [
+      couple,
+      cfg.event_date_display,
+      cfg.venue_name,
+      cfg.rsvp_deadline_display,
+      postEvent ? "post" : "pre",
+    ].join("|"),
+  );
+  const sep = baseImage.includes("?") ? "&" : "?";
+  const ogImage = escAttr(`${baseImage}${sep}v=${ver}`);
 
   html = html
     .replaceAll("{{og_title}}", title)
