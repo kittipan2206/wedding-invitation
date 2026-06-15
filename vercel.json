@@ -5,6 +5,9 @@
   "functions": {
     "api/og.js": {
       "includeFiles": "dist/_template.html"
+    },
+    "api/og-image.js": {
+      "includeFiles": "public/fonts/NotoSerifThai.woff2"
     }
   },
   "rewrites": [{ "source": "/", "destination": "/api/og" }],
