@@ -91,6 +91,9 @@
 - An embedded map shows the venue location
 - A "Navigate" button opens Google Maps with the venue coordinates
 - A "Add to Calendar" button opens Google Calendar pre-filled with event details
+- An "iPhone Calendar" button downloads an .ics file with the same event details
+  (date, ceremony time, venue, invitation link) so Apple Calendar users can add
+  the event natively; times are stored in UTC (Bangkok has no DST)
 
 ### RSVP Section
 
@@ -174,6 +177,10 @@
 - The card displays couple names, date, and venue
 - The design is suitable for screenshot/sharing
 - An export/download button generates an image of the card
+- The card shows a QR code linking back to the invitation (personalized with
+  `?to=` when a guest name is entered)
+- The QR code is generated locally in the wedding theme (rounded pastel style,
+  heart logo) — no third-party QR service, so exports never break on CORS
 
 ---
 
@@ -184,6 +191,9 @@
 - No user interaction is required — it runs autonomously
 - If no photos are available, it shows a default graphic
 - The page does not require the user to click anything to start
+- A themed QR code invites guests to scan and write a guestbook message
+  (`?goto=guestbook`); it is generated locally so the venue screen works even
+  if third-party QR services are unreachable
 
 ---
 

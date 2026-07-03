@@ -1,8 +1,10 @@
+import { qrDataUrl } from "./qr.js";
+
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 
 const POLL_INTERVAL = 30_000; // poll every 30 s
-const SLIDE_INTERVAL  = 10_000; // switch photo every 10 s
+const SLIDE_INTERVAL = 10_000; // switch photo every 10 s
 const PAGE_ROTATE_MS = 20_000; // auto-rotate every 20 s
 
 function getPageSize() {
@@ -101,7 +103,13 @@ function initQrCode() {
   const img = document.getElementById("display-qr");
   if (!img) return;
   const url = window.location.origin + "/?goto=guestbook";
-  img.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=2e2a28&margin=6`;
+  // Themed local render (2× the 140px CSS size for TV sharpness);
+  // fall back to the old external API so the venue screen never lacks a QR
+  qrDataUrl(url, 280).then((dataUrl) => {
+    img.src =
+      dataUrl ||
+      `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=2e2a28&margin=6`;
+  });
 }
 
 // ── Card builder ──────────────────────────────────────────────────────────────
@@ -325,8 +333,14 @@ function preloadImage(url, timeoutMs = 8000) {
   return new Promise((resolve) => {
     const img = new Image();
     const t = setTimeout(() => resolve(false), timeoutMs);
-    img.onload  = () => { clearTimeout(t); resolve(true);  };
-    img.onerror = () => { clearTimeout(t); resolve(false); };
+    img.onload = () => {
+      clearTimeout(t);
+      resolve(true);
+    };
+    img.onerror = () => {
+      clearTimeout(t);
+      resolve(false);
+    };
     img.src = url;
   });
 }
@@ -347,7 +361,7 @@ function initSlideshow() {
   // Previously both layers were set to z-index:1, so DOM order decided —
   // #slide-b always beat #slide-a → alternating fade / no-fade pattern.
   function activateLayer(layer, url) {
-    layer.querySelector(".slide-blur").style.backgroundImage  = `url('${url}')`;
+    layer.querySelector(".slide-blur").style.backgroundImage = `url('${url}')`;
     layer.querySelector(".slide-sharp").style.backgroundImage = `url('${url}')`;
     layer.style.zIndex = "2"; // incoming on top
     layer.className = "slide";
@@ -376,7 +390,7 @@ function initSlideshow() {
 
     if (bgGrad) bgGrad.style.display = "none";
 
-    let idx  = 0;
+    let idx = 0;
     let useA = true;
     let paused = false;
 
@@ -392,8 +406,8 @@ function initSlideshow() {
     async function advance() {
       if (paused) return; // skip tick while tab hidden
 
-      const nextIdx   = (idx + 1) % photos.length;
-      const url       = photos[nextIdx].url;
+      const nextIdx = (idx + 1) % photos.length;
+      const url = photos[nextIdx].url;
       const nextLayer = useA ? layerB : layerA;
       const prevLayer = useA ? layerA : layerB;
 
@@ -401,13 +415,13 @@ function initSlideshow() {
       await preloadImage(url);
 
       prevLayer.style.zIndex = "1"; // downgrade outgoing to middle tier immediately
-      activateLayer(nextLayer, url);  // incoming gets z-index:2 — always on top
+      activateLayer(nextLayer, url); // incoming gets z-index:2 — always on top
       setTimeout(() => {
         prevLayer.className = "slide";
         prevLayer.style.zIndex = "0"; // fully retire
       }, 1600);
 
-      idx  = nextIdx;
+      idx = nextIdx;
       useA = !useA;
 
       // Prefetch the one after next while current is showing
@@ -457,8 +471,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("slideshow-toggle");
   if (toggleBtn) {
     const enabled = isSlideshowEnabled();
-    toggleBtn.textContent  = enabled ? "🖼" : "🎨";
-    toggleBtn.title        = enabled ? "ปิดสไลด์รูป" : "เปิดสไลด์รูป";
+    toggleBtn.textContent = enabled ? "🖼" : "🎨";
+    toggleBtn.title = enabled ? "ปิดสไลด์รูป" : "เปิดสไลด์รูป";
     toggleBtn.addEventListener("click", toggleSlideshow);
   }
 

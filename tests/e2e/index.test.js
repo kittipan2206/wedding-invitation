@@ -1,3 +1,4 @@
+import fs from "fs";
 import { test, expect } from "@playwright/test";
 import { mockGAS, DEFAULT_CONFIG } from "./helpers/mock-gas.js";
 
@@ -267,5 +268,31 @@ test.describe("Homepage — envelope localStorage", () => {
     await expect(page.locator("#envelope-overlay")).toBeHidden({
       timeout: 5_000,
     });
+  });
+});
+
+test.describe("Details — Apple Calendar (.ics)", () => {
+  test("clicking the iPhone calendar button downloads a valid .ics file", async ({
+    page,
+  }) => {
+    await mockGAS(page);
+    await page.goto("/?goto=details");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    const btn = page.locator("#calendar-ics-btn");
+    await btn.scrollIntoViewIfNeeded();
+    await expect(btn).toBeVisible({ timeout: 10_000 });
+
+    const downloadPromise = page.waitForEvent("download");
+    await btn.click();
+    const download = await downloadPromise;
+
+    expect(download.suggestedFilename()).toMatch(/\.ics$/);
+    const filePath = await download.path();
+    const content = fs.readFileSync(filePath, "utf-8");
+    expect(content).toContain("BEGIN:VCALENDAR");
+    expect(content).toContain("SUMMARY:งานแต่งงาน นนท์ & เมย์");
+    // Mock config: 2099-08-01 11:00 Bangkok → 04:00 UTC
+    expect(content).toContain("DTSTART:20990801T040000Z");
+    expect(content).toContain("END:VCALENDAR");
   });
 });

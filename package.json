@@ -25,6 +25,7 @@
   "dependencies": {
     "canvas-confetti": "^1.9.4",
     "gsap": "^3.15.0",
-    "photoswipe": "^5.4.4"
+    "photoswipe": "^5.4.4",
+    "qr-code-styling": "^1.9.2"
   }
 }

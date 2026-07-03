@@ -146,3 +146,25 @@ test.describe("Admin page (/admin.html)", () => {
     await expect(page.locator("#admin-screen")).toBeHidden({ timeout: 10_000 });
   });
 });
+
+test.describe("Themed QR codes (local render)", () => {
+  test("card QR renders locally as a data URL", async ({ page }) => {
+    await mockGAS(page);
+    await page.goto("/card.html");
+    await expect(page.locator(".card-qr-image").first()).toHaveAttribute(
+      "src",
+      /^data:image\/png/,
+      { timeout: 15_000 },
+    );
+  });
+
+  test("display QR renders locally as a data URL", async ({ page }) => {
+    await mockGAS(page, { photos: [] });
+    await page.goto("/display.html");
+    await expect(page.locator("#display-qr")).toHaveAttribute(
+      "src",
+      /^data:image\/png/,
+      { timeout: 15_000 },
+    );
+  });
+});

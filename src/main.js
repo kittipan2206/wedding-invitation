@@ -18,6 +18,7 @@ import { fetchConfig, injectConfig } from "./js/config.js";
 import { applyMemoryMode } from "./js/memory-mode.js";
 import { showLetter } from "./js/letter.js";
 import { initHearts } from "./js/hearts.js";
+import { initIcsButton } from "./js/ics.js";
 
 function afterEnvelope() {
   initPetals();
@@ -73,6 +74,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initScrollFX();
   initGalleryPreview();
   initHearts();
+  initIcsButton();
 
   // If ?goto=<sectionId> is in the URL, OR the envelope was already opened
   // on a previous visit, skip the envelope animation entirely.

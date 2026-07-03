@@ -1,4 +1,5 @@
 import { fetchConfig, injectConfig } from "./config.js";
+import { qrDataUrl } from "./qr.js";
 
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
@@ -59,13 +60,33 @@ function bootstrapTemplates() {
   });
 }
 
+// Monotonic token so a slow older QR render can't overwrite a newer one
+// while the user is still typing the guest name
+let qrRenderToken = 0;
+
+function updateQrCodes(targetUrl) {
+  const token = ++qrRenderToken;
+  // 512px source → stays crisp inside the 2160px export canvas
+  qrDataUrl(targetUrl, 512).then((dataUrl) => {
+    if (token !== qrRenderToken) return; // superseded by a newer render
+    // Fallback: old external API (cors=true so html2canvas still works)
+    const src =
+      dataUrl ||
+      `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}&cors=true`;
+    [previewCard, exportCard].forEach((card) => {
+      const qrImage = card?.querySelector(".card-qr-image");
+      if (qrImage) qrImage.src = src;
+    });
+  });
+}
+
 function updateCards() {
   if (!previewCard || !exportCard) return;
 
   const targetUrl = currentGuestName
     ? `${BASE_URL}?to=${encodeURIComponent(currentGuestName)}`
     : BASE_URL;
-  const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}&cors=true`;
+  updateQrCodes(targetUrl);
 
   const cards = [previewCard, exportCard];
 
@@ -85,11 +106,7 @@ function updateCards() {
       }
     }
 
-    // 3. Update QR Code
-    const qrImage = card.querySelector(".card-qr-image");
-    if (qrImage) {
-      qrImage.src = qrCodeApiUrl;
-    }
+    // 3. QR code is updated async by updateQrCodes() above
 
     // 4. Update Background Photo (for Photo template)
     const photoBg = card.querySelector(".card-photo-bg");
@@ -168,7 +185,10 @@ export function initCardExport() {
   }
 
   // Load template style if specified
-  if (themeParam && ["classic", "floral", "photo"].includes(themeParam.toLowerCase())) {
+  if (
+    themeParam &&
+    ["classic", "floral", "photo"].includes(themeParam.toLowerCase())
+  ) {
     currentTemplate = themeParam.toLowerCase();
     templateBtns.forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.template === currentTemplate);
@@ -295,4 +315,3 @@ document.addEventListener("DOMContentLoaded", () => {
   initCardExport();
   applyCardConfig();
 });
-

@@ -53,6 +53,7 @@ export default defineConfig({
         "src/js/envelope.js",
         "src/js/share.js",
         "src/js/main.js",
+        "src/js/qr.js",
       ],
       reporter: ["text", "html"],
       thresholds: { lines: 60, functions: 60 },
@@ -68,7 +69,10 @@ export default defineConfig({
           proxy.on("proxyReq", (proxyReq, req) => {
             proxyReq.setHeader("Content-Type", "application/json");
             if (req.body) {
-              const body = JSON.stringify({ type: "music_upload", ...req.body });
+              const body = JSON.stringify({
+                type: "music_upload",
+                ...req.body,
+              });
               proxyReq.setHeader("Content-Length", Buffer.byteLength(body));
               proxyReq.write(body);
             }

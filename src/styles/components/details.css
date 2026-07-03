@@ -172,6 +172,8 @@
   align-items: center;
   gap: 12px;
   transition: all 0.4s var(--transition-ease);
+  /* .ics button is a <button> — match anchor affordance */
+  cursor: pointer;
 }
 
 .map-btn--navigate {
