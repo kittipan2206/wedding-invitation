@@ -2,8 +2,22 @@
    LETTER TEXT
    Lives inside .env-letter-content — the envelope's letter card expands
    into the readable letter (see envelope.css .env-letter--open).
-   The staggered line reveals start when the content becomes visible.
+   The reveal is orchestrated by GSAP in envelope.js (typewriter salutation,
+   pen-stroke signature, heart stamp); CSS only holds the resting/hidden
+   states. Tapping the paper completes everything instantly.
    ══════════════════════════════ */
+
+/* Letterhead date, top right — like a real letter */
+.letter-date {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  text-align: right;
+  margin-bottom: 10px;
+  opacity: 0;
+  transform: translateY(8px);
+}
 
 .letter-to {
   font-family: var(--font-serif);
@@ -11,8 +25,30 @@
   font-size: clamp(20px, 5vw, 26px);
   color: var(--color-text);
   margin-bottom: 18px;
-  opacity: 0;
-  animation: letterLine 0.7s ease 0.3s forwards;
+  /* Typewriter target — starts empty, stays visible */
+  min-height: 1.4em;
+}
+
+/* Blinking ink caret while the salutation is being typed */
+.letter-to.typing::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 3px;
+  vertical-align: -0.12em;
+  background: var(--color-text);
+  animation: caretBlink 0.9s steps(1) infinite;
+}
+
+@keyframes caretBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 .letter-body {
@@ -22,7 +58,15 @@
   color: var(--color-text);
   margin-bottom: 22px;
   opacity: 0;
-  animation: letterLine 0.7s ease 0.9s forwards;
+  transform: translateY(10px);
+}
+
+.letter-sign-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
 }
 
 .letter-sign {
@@ -30,10 +74,23 @@
   font-style: italic;
   font-size: 17px;
   color: var(--color-muted);
-  text-align: right;
-  margin-bottom: 28px;
+  /* Revealed left-to-right like a pen stroke (GSAP animates the inset) */
+  clip-path: inset(0 100% 0 0);
+}
+
+/* Tiny wax-stamp callback to the seal the guest just cracked */
+.letter-stamp {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e07a9d, #d4537e 62%, #c44469);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 1px 5px rgba(196, 68, 105, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   opacity: 0;
-  animation: letterLine 0.7s ease 1.5s forwards;
 }
 
 .letter-continue {
@@ -54,31 +111,10 @@
     transform 0.3s var(--transition-ease),
     box-shadow 0.3s ease;
   opacity: 0;
-  animation: letterLine 0.7s ease 2s forwards;
+  transform: translateY(10px);
 }
 
 .letter-continue:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 36px rgba(201, 184, 232, 0.5);
-}
-
-@keyframes letterLine {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .letter-to,
-  .letter-body,
-  .letter-sign,
-  .letter-continue {
-    animation: none;
-    opacity: 1;
-  }
 }

@@ -99,7 +99,15 @@ test.describe("Homepage — envelope", () => {
     await expect(page.locator(".env-letter--open")).toBeVisible({
       timeout: 8_000,
     });
-    await expect(page.locator(".letter-to")).toContainText("คุณสมชาย");
+    // The salutation types itself onto the paper
+    await expect(page.locator(".letter-to")).toContainText("คุณสมชาย", {
+      timeout: 5_000,
+    });
+    // Tapping the paper completes the whole reveal instantly (never trap
+    // the reader) — signature stroke + heart stamp included
+    await page.click(".env-letter--open");
+    await expect(page.locator(".letter-stamp")).toBeVisible();
+    await expect(page.locator(".letter-sign")).toContainText("ด้วยรัก");
     // Guest closes the letter — it melts into the invitation page
     await page.click(".letter-continue");
     await expect(page.locator("#envelope-overlay")).toBeHidden({

@@ -45,15 +45,23 @@ export function initEnvelope(onComplete) {
   }
   const guestName = new URLSearchParams(window.location.search).get("to");
   const content = letterContent(c, guestName);
+  const dateEl = overlay.querySelector(".letter-date");
   const toEl = overlay.querySelector(".letter-to");
   const bodyEl = overlay.querySelector(".letter-body");
   const signEl = overlay.querySelector(".letter-sign");
-  if (toEl) toEl.textContent = content.to;
+  const stampEl = overlay.querySelector(".letter-stamp");
+  const continueBtn = overlay.querySelector(".letter-continue");
+  // Letterhead date, top right — the wedding date, like a real letter
+  if (dateEl && c?.event_date_display)
+    dateEl.textContent = c.event_date_display;
+  // Salutation stays empty — the typewriter writes it when the letter opens
   if (bodyEl) bodyEl.textContent = content.body;
   if (signEl) signEl.textContent = content.sign;
 
   let opened = false;
   let closing = false;
+  let revealTl = null;
+  let revealed = false;
 
   // ── Idle life: gentle float + seal breathing (transform-only = GPU) ──
   const idle = gsap.timeline({
@@ -135,11 +143,92 @@ export function initEnvelope(onComplete) {
   }
 
   function wireReadingState() {
-    letter
-      .querySelector(".letter-continue")
-      ?.addEventListener("click", closeLetter);
+    continueBtn?.addEventListener("click", closeLetter);
     overlay.addEventListener("click", onOverlayTap);
     document.addEventListener("keydown", onLetterKeydown);
+    // Tapping the paper before the text has finished writing itself
+    // completes everything instantly — the reveal never traps the reader.
+    // Capture phase so it also intercepts the (still invisible) button.
+    letter.addEventListener(
+      "click",
+      (e) => {
+        if (revealed) return;
+        e.stopPropagation();
+        completeReveal();
+      },
+      true,
+    );
+  }
+
+  // ── Letter text choreography: type → read → sign → stamp ──
+  // Typewriter as a tween on a proxy index, so revealTl.progress(1)
+  // (tap-to-complete) finishes it instantly with the full text.
+  function typewriterTween(el, text, secondsPerChar = 0.05) {
+    const chars = [...text]; // code-point order = Thai keyboard typing order
+    const proxy = { i: 0 };
+    return gsap.to(proxy, {
+      i: chars.length,
+      duration: chars.length * secondsPerChar,
+      ease: "none",
+      onUpdate: () => {
+        el.textContent = chars.slice(0, Math.round(proxy.i)).join("");
+      },
+    });
+  }
+
+  function completeReveal() {
+    if (revealTl && !revealed) revealTl.progress(1);
+  }
+
+  function revealLetterText() {
+    revealTl = gsap.timeline({
+      onComplete: () => {
+        revealed = true;
+        toEl?.classList.remove("typing");
+      },
+    });
+    revealTl
+      // letterhead date settles in first
+      .to(dateEl, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.4)
+      // your name is written onto the paper in front of you
+      .call(() => toEl?.classList.add("typing"), null, 0.75)
+      .add(typewriterTween(toEl, content.to), 0.75)
+      .call(() => toEl?.classList.remove("typing"))
+      // the message itself fades in as one readable block
+      .to(bodyEl, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, ">")
+      // the signature is signed, not typed — a pen stroke sweeping across
+      .to(
+        signEl,
+        { clipPath: "inset(0 0% 0 0)", duration: 0.8, ease: "power2.inOut" },
+        ">+0.25",
+      )
+      // ...and the little wax stamp presses down beside it
+      .fromTo(
+        stampEl,
+        { opacity: 0, scale: 1.8, rotation: -16 },
+        {
+          opacity: 1,
+          scale: 1,
+          rotation: -8,
+          duration: 0.45,
+          ease: "back.out(2.5)",
+        },
+        ">-0.1",
+      )
+      .to(
+        continueBtn,
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+        ">+0.15",
+      );
+  }
+
+  // Reduced motion / instant paths show everything at once
+  function showLetterTextInstant() {
+    if (toEl) toEl.textContent = content.to;
+    gsap.set([dateEl, bodyEl, continueBtn], { opacity: 1, y: 0 });
+    if (signEl) gsap.set(signEl, { clipPath: "inset(0 0% 0 0)" });
+    if (stampEl) gsap.set(stampEl, { opacity: 1, rotation: -8 });
+    revealed = true;
   }
 
   // ── Hero transition: the risen card expands into the readable letter ──
@@ -171,6 +260,7 @@ export function initEnvelope(onComplete) {
       duration: 0.85,
       ease: "power2.inOut",
     });
+    revealLetterText();
     wireReadingState();
   }
 
@@ -218,6 +308,7 @@ export function initEnvelope(onComplete) {
       letter.classList.add("env-letter--open");
       overlay.appendChild(letter);
       gsap.set(letter, { clearProps: "transform", zIndex: 9 });
+      showLetterTextInstant();
       wireReadingState();
       return;
     }

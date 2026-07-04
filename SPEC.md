@@ -67,9 +67,16 @@
 ### Personal Letter (part of the envelope sequence)
 
 - The expanded letter shows a short personal note before the invitation
-- With `?to=NAME` the letter starts "ถึง คุณNAME" (no doubled "คุณ" when the
-  name already includes it); otherwise "ถึงคนสำคัญของเรา"
+- The wedding date appears top-right like a real letterhead
+- With `?to=NAME` the salutation "ถึง คุณNAME" types itself character by
+  character with a blinking ink caret (no doubled "คุณ" when the name already
+  includes it); otherwise "ถึงคนสำคัญของเรา"
 - The letter mentions the event date and is signed with the couple's names
+- The signature sweeps in left-to-right like a pen stroke (not typed), then a
+  small heart stamp presses down beside it
+- Tapping anywhere on the paper completes all text instantly — the reveal
+  never holds the guest hostage
+- With reduced-motion preference all text is simply shown at once
 - The "เปิดการ์ดเชิญ" button (or tapping outside / Enter / Escape) melts the
   letter into the invitation page
 - Returning visitors (same session), the skip button, and `?goto=` links
