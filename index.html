@@ -123,92 +123,67 @@
       <div
         class="envelope-body"
         role="button"
-        aria-label="คลิกเพื่อเปิดการ์ด"
+        aria-label="แตะเพื่อเปิดการ์ดเชิญ"
         tabindex="0"
       >
-        <!-- Static parts: rectangle body + fold lines + wax seal (SVG, no animation) -->
-        <svg
-          class="env-body-svg"
-          width="280"
-          height="200"
-          viewBox="0 0 280 200"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <!-- Rectangle -->
-          <rect
-            x="1"
-            y="1"
-            width="278"
-            height="198"
-            rx="6"
-            fill="white"
-            stroke="#C9B8E8"
-            stroke-width="1.5"
-          />
-          <!-- Side fold shading (subtle depth) -->
-          <path d="M1 1 L140 112 L1 199Z" fill="rgba(201,184,232,0.07)" />
-          <path d="M279 1 L140 112 L279 199Z" fill="rgba(201,184,232,0.07)" />
-          <!-- Fold lines: top corners → seal center -->
-          <line
-            x1="1"
-            y1="1"
-            x2="140"
-            y2="112"
-            stroke="#C9B8E8"
-            stroke-width="1"
-            opacity="0.45"
-            stroke-linecap="round"
-          />
-          <line
-            x1="279"
-            y1="1"
-            x2="140"
-            y2="112"
-            stroke="#C9B8E8"
-            stroke-width="1"
-            opacity="0.45"
-            stroke-linecap="round"
-          />
-          <!-- Bottom fold -->
-          <path
-            d="M1 199 L140 112 L279 199Z"
-            fill="rgba(249,200,212,0.22)"
-            stroke="#C9B8E8"
-            stroke-width="1"
-            stroke-opacity="0.5"
-          />
-          <!-- Wax seal -->
-          <circle cx="140" cy="116" r="21" fill="#D4C4EA" opacity="0.4" />
-          <circle cx="140" cy="116" r="14" fill="#C9B8E8" opacity="0.9" />
-          <text
-            x="140"
-            y="121"
-            text-anchor="middle"
-            font-size="13"
-            fill="white"
-            font-family="Georgia, serif"
-          >
-            &amp;
-          </text>
-        </svg>
+        <!-- All idle/tilt motion happens on this inner stage so the tappable
+             .envelope-body itself never moves (stable hit target) -->
+        <div class="env-stage">
+          <!-- Back panel -->
+          <div class="env-back"></div>
 
-        <!-- Flap: CSS div — pivots at bottom edge (fold line) for correct 3D animation -->
-        <div class="envelope-flap">
-          <div class="flap-dot flap-dot-c"></div>
-          <div class="flap-dot flap-dot-l"></div>
-          <div class="flap-dot flap-dot-r"></div>
-        </div>
+          <!-- Letter card — rises out of the pocket, then morphs into the page -->
+          <div class="env-letter" aria-hidden="true">
+            <div class="env-letter-inner">
+              <p class="env-letter-names">นนท์ &amp; เมย์</p>
+              <span class="env-letter-rule"></span>
+              <p class="env-letter-sub">Wedding Invitation</p>
+            </div>
+          </div>
 
-        <!-- Address on envelope front: guest name (from ?to=) + couple names -->
-        <div class="env-address" aria-hidden="true">
-          <p class="env-to" style="display: none">
-            ถึง <span class="env-to-name"></span>
-          </p>
-          <p class="env-couple">นนท์ &amp; เมย์</p>
+          <!-- Front pocket (covers the lower part of the letter) -->
+          <div class="env-pocket"></div>
+
+          <!-- Address on envelope front: guest name (from ?to=) + couple names -->
+          <div class="env-address" aria-hidden="true">
+            <p class="env-to" style="display: none">
+              ถึง <span class="env-to-name"></span>
+            </p>
+            <p class="env-couple">นนท์ &amp; เมย์</p>
+          </div>
+
+          <!-- Flap: two faces (front + patterned liner) so the 3D flip reveals
+             the envelope interior naturally via backface culling -->
+          <div class="env-flap" aria-hidden="true">
+            <div class="env-flap-face env-flap-front">
+              <div class="flap-dot flap-dot-c"></div>
+              <div class="flap-dot flap-dot-l"></div>
+              <div class="flap-dot flap-dot-r"></div>
+            </div>
+            <div class="env-flap-face env-flap-liner">
+              <div class="env-flap-shade"></div>
+            </div>
+          </div>
+
+          <!-- Wax seal — the tap target of the story; cracks open on tap -->
+          <div class="env-seal" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 20.5l-1.3-1.2C6 15.1 3 12.3 3 8.9 3 6.1 5.2 4 7.9 4c1.6 0 3.1.7 4.1 1.9C13 4.7 14.5 4 16.1 4 18.8 4 21 6.1 21 8.9c0 3.4-3 6.2-7.7 10.5L12 20.5z"
+                fill="white"
+                opacity="0.95"
+              />
+            </svg>
+          </div>
+
+          <div class="env-particles" aria-hidden="true"></div>
         </div>
       </div>
-      <p class="envelope-label">คลิกหรือแตะเพื่อเปิด</p>
+      <p class="envelope-label">แตะเพื่อเปิดซอง</p>
+
+      <button id="env-skip-btn" class="env-skip" type="button">
+        ข้ามไปที่การ์ด →
+      </button>
 
       <div class="env-controls">
         <button
@@ -1298,6 +1273,26 @@
             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
           </svg>
           แชร์การ์ดนี้
+        </button>
+        <button
+          id="replay-envelope-btn"
+          class="footer-replay-btn"
+          type="button"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <path d="m2 7 10 6 10-6" />
+          </svg>
+          เปิดซองอีกครั้ง
         </button>
         <div class="footer-petals" aria-hidden="true">
           <div class="petal"></div>

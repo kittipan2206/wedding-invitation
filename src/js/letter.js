@@ -6,8 +6,13 @@ export function letterContent(cfg, guestName) {
   const groom = cfg?.groom_name || "นนท์";
   const bride = cfg?.bride_name || "เมย์";
   const dateDisplay = cfg?.event_date_display || "วันสำคัญของเรา";
+  // ?to= links often already include the honorific ("?to=คุณสมชาย") —
+  // don't stack a second "คุณ" in front of it
+  const name = guestName?.trim();
+  const salutation =
+    name && (/^คุณ/.test(name) ? `ถึง ${name}` : `ถึง คุณ${name}`);
   return {
-    to: guestName ? `ถึง คุณ${guestName}` : "ถึงคนสำคัญของเรา",
+    to: salutation || "ถึงคนสำคัญของเรา",
     body:
       `ขอบคุณที่อยู่ในช่วงเวลาดีๆ ของเราเสมอมา ` +
       `${dateDisplay} คือวันที่สำคัญที่สุดของเราสองคน ` +

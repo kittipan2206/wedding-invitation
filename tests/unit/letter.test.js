@@ -12,6 +12,10 @@ describe("letterContent", () => {
     expect(letterContent(cfg, "สมชาย").to).toBe("ถึง คุณสมชาย");
   });
 
+  it("does not stack a second คุณ when the name already has one", () => {
+    expect(letterContent(cfg, "คุณสมชาย").to).toBe("ถึง คุณสมชาย");
+  });
+
   it("falls back to a generic salutation without a guest name", () => {
     expect(letterContent(cfg, null).to).toBe("ถึงคนสำคัญของเรา");
   });

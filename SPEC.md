@@ -46,11 +46,21 @@
 
 ### Envelope Animation
 
-- A sealed envelope is shown on first visit
+- A sealed envelope with a wax seal is shown on each new browser session
+  (sessionStorage — closing the browser and returning replays the experience)
 - The couple's names are printed on the envelope front
 - With `?to=NAME`, the envelope front is addressed "ถึง NAME"
-- Clicking/tapping the envelope opens it with an animation
+- While idle, the envelope floats gently and tilts toward the pointer (desktop)
+- Tapping plays one continuous sequence: the wax seal cracks with a small
+  particle burst (and a haptic pulse on supported devices), the flap swings
+  open revealing a patterned liner, a letter card rises out of the pocket,
+  then grows toward the viewer and melts into the invitation page
 - The envelope can also be opened with Enter or Space when focused (keyboard)
+- A "ข้ามไปที่การ์ด" skip button appears after a moment; skipping goes straight
+  to the invitation without the letter interstitial
+- With reduced-motion preference, the envelope simply fades out
+- A "เปิดซองอีกครั้ง" button in the footer replays the envelope from the top
+  (preserves `?to=`, drops `?goto=`)
 
 ### Letter Interstitial (first visit only)
 
@@ -62,7 +72,8 @@
 - After the envelope opens, the main invitation content is revealed
 - A music control button is visible on the envelope screen
 - A fullscreen button is visible on the envelope screen
-- If the guest has visited before (localStorage), the envelope is already open on reload
+- Within the same browser session (sessionStorage), the envelope is already
+  open on reload
 
 ### Hero Section
 

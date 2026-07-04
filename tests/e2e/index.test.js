@@ -87,15 +87,58 @@ test.describe("Homepage — envelope", () => {
     await expect(page.locator("#envelope-overlay")).toBeVisible();
   });
 
-  test("clicking the envelope opens it", async ({ page }) => {
+  test("tapping the envelope plays the sequence, then the letter appears", async ({
+    page,
+  }) => {
     await mockGAS(page);
     await page.goto("/");
     await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
     await expect(page.locator("#envelope-overlay")).toBeVisible();
     await page.click(".envelope-body");
+    // Full GSAP sequence runs ~2s, then the overlay hides
     await expect(page.locator("#envelope-overlay")).toBeHidden({
-      timeout: 5_000,
+      timeout: 6_000,
     });
+    // First open of the session shows the letter interstitial
+    await expect(page.locator("#letter-overlay")).toBeVisible({
+      timeout: 3_000,
+    });
+    await page.click(".letter-continue");
+    await expect(page.locator("#letter-overlay")).toBeHidden({
+      timeout: 3_000,
+    });
+    await expect(page.locator(".hero-names")).toBeVisible();
+  });
+
+  test("skip button goes straight to the card without the letter", async ({
+    page,
+  }) => {
+    await mockGAS(page);
+    await page.goto("/");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    const skip = page.locator("#env-skip-btn");
+    await skip.click();
+    await expect(page.locator("#envelope-overlay")).toBeHidden({
+      timeout: 3_000,
+    });
+    await expect(page.locator("#letter-overlay")).toBeHidden();
+    await expect(page.locator(".hero-names")).toBeVisible();
+  });
+
+  test("footer replay button shows the envelope again", async ({ page }) => {
+    await mockGAS(page);
+    await page.goto("/?goto=details");
+    await expect(page.locator("#envelope-overlay")).toBeHidden({
+      timeout: 10_000,
+    });
+    const replay = page.locator("#replay-envelope-btn");
+    await replay.scrollIntoViewIfNeeded();
+    await replay.click();
+    // Reloads without ?goto and replays the envelope
+    await expect(page.locator("#envelope-overlay")).toBeVisible({
+      timeout: 10_000,
+    });
+    expect(page.url()).not.toContain("goto=");
   });
 
   test("music and fullscreen buttons are visible on envelope screen", async ({
@@ -254,20 +297,31 @@ test.describe("Homepage — gallery preview", () => {
   });
 });
 
-test.describe("Homepage — envelope localStorage", () => {
-  test("envelope already open when localStorage flag is set", async ({
-    page,
-  }) => {
+test.describe("Homepage — envelope session memory", () => {
+  test("envelope already open when session flag is set", async ({ page }) => {
     await mockGAS(page);
-    // Set localStorage before loading
+    // Set sessionStorage before loading — same-session revisit skips the show
     await page.addInitScript(() => {
-      localStorage.setItem("envelope_opened", "1");
+      sessionStorage.setItem("envelope_opened", "1");
     });
     await page.goto("/");
     await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
     await expect(page.locator("#envelope-overlay")).toBeHidden({
       timeout: 5_000,
     });
+  });
+
+  test("reduced motion opens with a simple fade", async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: "reduce" });
+    const page = await context.newPage();
+    await mockGAS(page);
+    await page.goto("/");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    await page.click(".envelope-body");
+    await expect(page.locator("#envelope-overlay")).toBeHidden({
+      timeout: 3_000,
+    });
+    await context.close();
   });
 });
 

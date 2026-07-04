@@ -14,7 +14,12 @@ footer {
 .footer-divider {
   width: 80px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-pink), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-pink),
+    transparent
+  );
   margin: 0 auto 36px;
   opacity: 0.6;
 }
@@ -62,12 +67,36 @@ footer {
   letter-spacing: 0.08em;
   cursor: pointer;
   opacity: 0.8;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .footer-share-btn:hover {
   opacity: 0.75;
   transform: translateY(-1px);
+}
+
+/* ── Replay envelope link — quiet affordance under the share button ── */
+.footer-replay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 14px auto 0;
+  padding: 6px 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  opacity: 0.8;
+  transition: opacity 0.25s ease;
+}
+
+.footer-replay-btn:hover {
+  opacity: 1;
 }
 
 .footer-petals {
@@ -85,8 +114,23 @@ footer {
   animation: petalFloat 4s ease-in-out infinite;
 }
 
-.petal:nth-child(1) { background: var(--color-pink);    animation-delay: 0s; }
-.petal:nth-child(2) { background: var(--color-lavender); animation-delay: 0.4s; }
-.petal:nth-child(3) { background: var(--color-mint);    animation-delay: 0.8s; }
-.petal:nth-child(4) { background: var(--color-peach);   animation-delay: 1.2s; }
-.petal:nth-child(5) { background: var(--color-sky);     animation-delay: 1.6s; }
+.petal:nth-child(1) {
+  background: var(--color-pink);
+  animation-delay: 0s;
+}
+.petal:nth-child(2) {
+  background: var(--color-lavender);
+  animation-delay: 0.4s;
+}
+.petal:nth-child(3) {
+  background: var(--color-mint);
+  animation-delay: 0.8s;
+}
+.petal:nth-child(4) {
+  background: var(--color-peach);
+  animation-delay: 1.2s;
+}
+.petal:nth-child(5) {
+  background: var(--color-sky);
+  animation-delay: 1.6s;
+}

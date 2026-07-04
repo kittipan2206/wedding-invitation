@@ -1,5 +1,7 @@
 /* ══════════════════════════════
    ENVELOPE OVERLAY
+   Layer order (z): back 1 → letter 2 → pocket 3 → address 4 → flap 5 → seal 6 → particles 7
+   GSAP owns every animated transform — CSS keeps only static looks + entrance fades.
    ══════════════════════════════ */
 
 #envelope-overlay {
@@ -12,98 +14,103 @@
   align-items: center;
   justify-content: center;
   gap: 28px;
+  /* Gives the whole-envelope pointer tilt its 3D depth */
+  perspective: 1200px;
 }
 
-/* ── Envelope container (holds perspective for child 3D transforms) ── */
+/* ── Envelope container: the tap target. Never animated, so its hit area
+   stays perfectly still (humans and E2E runners both appreciate this). ── */
 .envelope-body {
   position: relative;
   width: 280px;
   height: 200px;
   cursor: pointer;
-  perspective: 1000px;
-  perspective-origin: 50% 40%;
+  /* Tighter perspective + eye slightly above = the fold reads clearly 3D */
+  perspective: 900px;
+  perspective-origin: 50% 30%;
   user-select: none;
-  transition: transform 0.25s ease;
+  touch-action: manipulation;
 }
 
-.envelope-body:hover {
-  transform: scale(1.025);
-}
-
-/* Static SVG body */
-.env-body-svg {
-  display: block;
-  filter: drop-shadow(0 6px 28px rgba(201, 184, 232, 0.25));
-  transition: filter 0.25s ease;
-}
-
-.envelope-body:hover .env-body-svg {
-  filter: drop-shadow(0 10px 36px rgba(201, 184, 232, 0.42));
-}
-
-/* ── Flap: CSS div that pivots at its bottom edge (the fold line) ──
-   Fold line is at y = 112px from the envelope top.
-   The div is 112px tall → its bottom edge sits exactly on the fold line.
-   transform-origin: center bottom  =  pivot at (140px, 112px).            */
-.envelope-flap {
+/* ── Inner stage: all idle float / pointer tilt / open motion lives here ── */
+.env-stage {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 280px;
-  height: 112px;
-
-  /* Triangle: base at bottom (fold line), tip near top-center */
-  /* clip-path: polygon(0 100%, 50% 3%, 100% 100%); */
-
-  /* Triangle: base at top, tip near bottom-center (more natural for folding) */
-  clip-path: polygon(0 0, 50% 100%, 100% 0);
-
-  background: linear-gradient(168deg, #f3eefe 0%, #e8d8f8 55%, #dac8f0 100%);
-
-  /* Pivot at the fold line (bottom of this div) */
-  transform-origin: center top;
+  inset: 0;
   transform-style: preserve-3d;
-  /* backface-visibility: hidden; */
-
-  z-index: 2;
+  will-change: transform;
 }
 
-/* ── Floral dots on flap ── */
-.flap-dot {
+/* ── Back panel ── */
+.env-back {
   position: absolute;
-  border-radius: 50%;
+  inset: 0;
+  background: #ffffff;
+  border: 1.5px solid #c9b8e8;
+  border-radius: 8px;
+  /* Static shadow on a non-animating element — cheap, never repaints per frame */
+  box-shadow: 0 18px 44px rgba(201, 184, 232, 0.3);
+  z-index: 1;
 }
 
-/* Positions verified to fall inside the clip-path triangle */
-.flap-dot-c {
-  width: 8px;
-  height: 8px;
-  background: rgba(249, 200, 212, 0.9);
-  top: 32%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+/* ── Letter card (rises out of the pocket) ── */
+.env-letter {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  right: 16px;
+  height: 172px;
+  background: #fffdfd;
+  border: 1px solid rgba(201, 184, 232, 0.4);
+  border-radius: 6px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
 }
 
-.flap-dot-l {
-  width: 6px;
-  height: 6px;
-  background: rgba(184, 232, 216, 0.85);
-  top: 50%;
-  left: 37%;
-  transform: translate(-50%, -50%);
+.env-letter-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
 
-.flap-dot-r {
-  width: 6px;
-  height: 6px;
-  background: rgba(184, 216, 248, 0.85);
-  top: 50%;
-  left: 63%;
-  transform: translate(-50%, -50%);
+.env-letter-names {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 21px;
+  color: var(--color-text);
 }
 
-/* ── Address on envelope front ──
-   Sits in the bottom-fold area (y 112–199px), below the wax seal. */
+.env-letter-rule {
+  width: 36px;
+  height: 1px;
+  background: rgba(212, 83, 126, 0.45);
+}
+
+.env-letter-sub {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* ── Front pocket ──
+   The top V matches the flap's edge exactly (same 0,0 → 50%,58% diagonals)
+   so the letter can never peek through the seam while closed. */
+.env-pocket {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
+  background: linear-gradient(180deg, #fdf9fc 0%, #f6eefa 100%);
+  border-radius: 8px;
+}
+
+/* ── Address on envelope front ── */
 .env-address {
   position: absolute;
   left: 16px;
@@ -111,7 +118,7 @@
   top: 144px;
   text-align: center;
   pointer-events: none;
-  z-index: 3;
+  z-index: 4;
 }
 
 .env-to {
@@ -134,9 +141,129 @@
   opacity: 0.85;
 }
 
-/* When addressed to a guest, tuck the couple names a touch tighter */
 .env-to[style*="block"] + .env-couple {
   font-size: 17px;
+}
+
+/* ── Flap: parent rotates (GSAP), two clipped faces + backface culling
+   make the patterned liner appear naturally past 90°. ── */
+.env-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 200px;
+  transform-origin: 50% 0;
+  transform-style: preserve-3d;
+  z-index: 5;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.env-flap-face {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 100% 0, 50% 58%);
+  border-radius: 8px 8px 0 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.env-flap-front {
+  background: linear-gradient(168deg, #f3eefe 0%, #e8d8f8 55%, #dac8f0 100%);
+}
+
+/* Inside of the flap — the liner is what makes a real envelope feel premium.
+   Pre-rotated 180° about the VERTICAL axis: the triangle is left-right
+   symmetric so its footprint stays glued to the fold line, and after the
+   flap's rotateX the liner lands exactly where the opened flap physically
+   is (rotateX(180) about center would teleport it off the fold — that was
+   the "detached floating triangle" bug). */
+.env-flap-liner {
+  transform: rotateY(180deg);
+  background-color: #faf3f8;
+  background-image: radial-gradient(
+    rgba(212, 83, 126, 0.16) 1.2px,
+    transparent 1.3px
+  );
+  background-size: 13px 13px;
+}
+
+/* Depth cue: the liner starts in shadow and brightens as the flap opens */
+.env-flap-shade {
+  position: absolute;
+  inset: 0;
+  background: #5a3a55;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Floral dots on flap front ── */
+.flap-dot {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.flap-dot-c {
+  width: 8px;
+  height: 8px;
+  background: rgba(249, 200, 212, 0.9);
+  top: 18%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.flap-dot-l {
+  width: 6px;
+  height: 6px;
+  background: rgba(184, 232, 216, 0.85);
+  top: 29%;
+  left: 38%;
+  transform: translate(-50%, -50%);
+}
+
+.flap-dot-r {
+  width: 6px;
+  height: 6px;
+  background: rgba(184, 216, 248, 0.85);
+  top: 29%;
+  left: 62%;
+  transform: translate(-50%, -50%);
+}
+
+/* ── Wax seal (sits on the fold point, above the flap tip) ── */
+.env-seal {
+  position: absolute;
+  top: 92px;
+  left: 116px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e07a9d, #d4537e 62%, #c44469);
+  box-shadow:
+    0 2px 10px rgba(196, 68, 105, 0.35),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ── Seal-crack particles ── */
+.env-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.env-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 /* ── Label below envelope ── */
@@ -149,6 +276,26 @@
   text-align: center;
   opacity: 0;
   animation: fadeIn 0.6s ease 0.8s forwards;
+}
+
+/* ── Skip affordance (GSAP fades it in after a beat) ── */
+.env-skip {
+  position: absolute;
+  top: calc(20px + env(safe-area-inset-top, 0px));
+  right: 20px;
+  padding: 8px 16px;
+  border: 1px solid rgba(201, 184, 232, 0.45);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  cursor: pointer;
+  opacity: 0;
+  z-index: 10;
 }
 
 /* ── Envelope overlay controls (music + fullscreen) ── */
