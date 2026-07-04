@@ -87,25 +87,23 @@ test.describe("Homepage — envelope", () => {
     await expect(page.locator("#envelope-overlay")).toBeVisible();
   });
 
-  test("tapping the envelope plays the sequence, then the letter appears", async ({
+  test("tapping the envelope expands the card into the readable letter", async ({
     page,
   }) => {
     await mockGAS(page);
-    await page.goto("/");
+    await page.goto("/?to=สมชาย");
     await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
     await expect(page.locator("#envelope-overlay")).toBeVisible();
     await page.click(".envelope-body");
-    // Full GSAP sequence runs ~2s, then the overlay hides
-    await expect(page.locator("#envelope-overlay")).toBeHidden({
-      timeout: 6_000,
+    // The risen card expands (hero transition) into the personal letter
+    await expect(page.locator(".env-letter--open")).toBeVisible({
+      timeout: 8_000,
     });
-    // First open of the session shows the letter interstitial
-    await expect(page.locator("#letter-overlay")).toBeVisible({
-      timeout: 3_000,
-    });
+    await expect(page.locator(".letter-to")).toContainText("คุณสมชาย");
+    // Guest closes the letter — it melts into the invitation page
     await page.click(".letter-continue");
-    await expect(page.locator("#letter-overlay")).toBeHidden({
-      timeout: 3_000,
+    await expect(page.locator("#envelope-overlay")).toBeHidden({
+      timeout: 4_000,
     });
     await expect(page.locator(".hero-names")).toBeVisible();
   });
@@ -121,7 +119,7 @@ test.describe("Homepage — envelope", () => {
     await expect(page.locator("#envelope-overlay")).toBeHidden({
       timeout: 3_000,
     });
-    await expect(page.locator("#letter-overlay")).toBeHidden();
+    await expect(page.locator(".env-letter--open")).toBeHidden();
     await expect(page.locator(".hero-names")).toBeVisible();
   });
 
@@ -318,6 +316,11 @@ test.describe("Homepage — envelope session memory", () => {
     await page.goto("/");
     await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
     await page.click(".envelope-body");
+    // Reduced motion jumps straight to the readable letter, no theatrics
+    await expect(page.locator(".env-letter--open")).toBeVisible({
+      timeout: 3_000,
+    });
+    await page.click(".letter-continue");
     await expect(page.locator("#envelope-overlay")).toBeHidden({
       timeout: 3_000,
     });

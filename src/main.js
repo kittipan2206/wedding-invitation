@@ -16,7 +16,6 @@ import { initScrollFX } from "./js/scroll-fx.js";
 import { initGalleryPreview } from "./js/gallery.js";
 import { fetchConfig, injectConfig } from "./js/config.js";
 import { applyMemoryMode } from "./js/memory-mode.js";
-import { showLetter } from "./js/letter.js";
 import { initHearts } from "./js/hearts.js";
 import { initIcsButton } from "./js/ics.js";
 
@@ -112,11 +111,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
   } else {
-    initEnvelope((skipped) => {
+    initEnvelope(() => {
+      // The personal letter is part of the envelope sequence itself —
+      // by the time this fires the guest has read and closed it
       sessionStorage.setItem("envelope_opened", "1");
-      // Skip button = guest is in a hurry — no letter interstitial either
-      if (skipped) afterEnvelope();
-      else showLetter(afterEnvelope);
+      afterEnvelope();
     });
   }
 });

@@ -132,12 +132,21 @@
           <!-- Back panel -->
           <div class="env-back"></div>
 
-          <!-- Letter card — rises out of the pocket, then morphs into the page -->
-          <div class="env-letter" aria-hidden="true">
-            <div class="env-letter-inner">
+          <!-- Letter card — rises out of the pocket, then expands (hero
+               transition via GSAP Flip) into the readable personal letter -->
+          <div class="env-letter">
+            <div class="env-letter-inner" aria-hidden="true">
               <p class="env-letter-names">นนท์ &amp; เมย์</p>
               <span class="env-letter-rule"></span>
               <p class="env-letter-sub">Wedding Invitation</p>
+            </div>
+            <div class="env-letter-content">
+              <p class="letter-to"></p>
+              <p class="letter-body"></p>
+              <p class="letter-sign"></p>
+              <button type="button" class="letter-continue">
+                เปิดการ์ดเชิญ ♡
+              </button>
             </div>
           </div>
 

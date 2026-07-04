@@ -1,6 +1,6 @@
-// Letter interstitial — a short personal note shown right after the envelope
-// opens, before the main invitation. Personalized via ?to= when present.
-// Returning visitors (envelope already opened) and ?goto= links skip it.
+// Letter content — the short personal note the envelope's letter card
+// shows once it expands. Personalized via ?to= when present.
+// Returning visitors (same session) and ?goto= links skip it.
 
 export function letterContent(cfg, guestName) {
   const groom = cfg?.groom_name || "นนท์";
@@ -21,46 +21,7 @@ export function letterContent(cfg, guestName) {
   };
 }
 
-export function showLetter(onDone) {
-  const params = new URLSearchParams(window.location.search);
-  const guestName = params.get("to");
-  const { to, body, sign } = letterContent(window.__weddingConfig, guestName);
-
-  const overlay = document.createElement("div");
-  overlay.id = "letter-overlay";
-  overlay.innerHTML = `
-    <div class="letter-paper" role="dialog" aria-label="จดหมายจากเจ้าบ่าวเจ้าสาว">
-      <p class="letter-to"></p>
-      <p class="letter-body"></p>
-      <p class="letter-sign"></p>
-      <button type="button" class="letter-continue">เปิดการ์ดเชิญ ♡</button>
-    </div>`;
-  overlay.querySelector(".letter-to").textContent = to;
-  overlay.querySelector(".letter-body").textContent = body;
-  overlay.querySelector(".letter-sign").textContent = sign;
-  document.body.appendChild(overlay);
-
-  let closed = false;
-  function close() {
-    if (closed) return;
-    closed = true;
-    overlay.classList.add("letter--closing");
-    setTimeout(() => {
-      overlay.remove();
-      onDone();
-    }, 450);
-  }
-
-  overlay.querySelector(".letter-continue").addEventListener("click", close);
-  // Tapping outside the paper also continues — never trap the guest
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) close();
-  });
-  document.addEventListener(
-    "keydown",
-    (e) => {
-      if (e.key === "Enter" || e.key === "Escape" || e.key === " ") close();
-    },
-    { once: true },
-  );
-}
+// The letter overlay itself now lives inside the envelope sequence —
+// the card that rises out of the envelope expands into the readable
+// letter (see envelope.js expandLetter). This module keeps only the
+// content builder so the wording stays unit-testable.

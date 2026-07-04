@@ -54,22 +54,26 @@
 - Tapping plays one continuous sequence: the wax seal cracks with a small
   particle burst (and a haptic pulse on supported devices), the flap swings
   open revealing a patterned liner, a letter card rises out of the pocket,
-  then grows toward the viewer and melts into the invitation page
+  then the SAME card expands (hero transition) into the readable personal
+  letter — no cut, one continuous object
 - The envelope can also be opened with Enter or Space when focused (keyboard)
 - A "ข้ามไปที่การ์ด" skip button appears after a moment; skipping goes straight
   to the invitation without the letter interstitial
-- With reduced-motion preference, the envelope simply fades out
+- With reduced-motion preference, tapping jumps straight to the readable
+  letter with no animation
 - A "เปิดซองอีกครั้ง" button in the footer replays the envelope from the top
   (preserves `?to=`, drops `?goto=`)
 
-### Letter Interstitial (first visit only)
+### Personal Letter (part of the envelope sequence)
 
-- After the envelope opens, a short personal letter appears before the invitation
-- With `?to=NAME` the letter starts "ถึง คุณNAME"; otherwise "ถึงคนสำคัญของเรา"
+- The expanded letter shows a short personal note before the invitation
+- With `?to=NAME` the letter starts "ถึง คุณNAME" (no doubled "คุณ" when the
+  name already includes it); otherwise "ถึงคนสำคัญของเรา"
 - The letter mentions the event date and is signed with the couple's names
-- A continue button (or tapping outside / Enter / Escape) dismisses it
-- Returning visitors and `?goto=` links never see the letter
-- After the envelope opens, the main invitation content is revealed
+- The "เปิดการ์ดเชิญ" button (or tapping outside / Enter / Escape) melts the
+  letter into the invitation page
+- Returning visitors (same session), the skip button, and `?goto=` links
+  never see the letter
 - A music control button is visible on the envelope screen
 - A fullscreen button is visible on the envelope screen
 - Within the same browser session (sessionStorage), the envelope is already

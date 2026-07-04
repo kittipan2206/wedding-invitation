@@ -1,12 +1,16 @@
 // Envelope opening — one continuous GSAP timeline instead of chained
 // setTimeouts, so every beat lands exactly where the previous one ends.
 // Story: wax seal cracks → flap swings open (liner revealed by backface
-// culling) → letter rises from the pocket → letter grows toward the viewer
-// and melts into the page.
+// culling) → the letter rises from the pocket → the SAME card expands
+// (GSAP Flip hero transition) into the readable personal letter → guest
+// taps "เปิดการ์ดเชิญ" and the letter melts into the invitation page.
 //
-// onComplete(skipped) — skipped=true when the guest used the skip button;
-// main.js then goes straight to the card without the letter interstitial.
+// onComplete(skipped) — skipped=true when the guest used the skip button.
 import gsap from "gsap";
+import { Flip } from "gsap/Flip";
+import { letterContent } from "./letter.js";
+
+gsap.registerPlugin(Flip);
 
 const PARTICLE_COLORS = ["#f9c8d4", "#ed93b1", "#d4537e", "#c9b8e8"];
 
@@ -23,6 +27,7 @@ export function initEnvelope(onComplete) {
   const flap = overlay.querySelector(".env-flap");
   const linerShade = overlay.querySelector(".env-flap-shade");
   const letter = overlay.querySelector(".env-letter");
+  const letterInner = overlay.querySelector(".env-letter-inner");
   const seal = overlay.querySelector(".env-seal");
   const particles = overlay.querySelector(".env-particles");
   const label = overlay.querySelector(".envelope-label");
@@ -32,14 +37,23 @@ export function initEnvelope(onComplete) {
     "(prefers-reduced-motion: reduce)",
   ).matches;
 
-  // Letter card carries the couple names from live config
+  // Personalize from live config: card monogram + letter text (?to= greeting)
   const c = window.__weddingConfig;
   const namesEl = overlay.querySelector(".env-letter-names");
   if (namesEl && c?.groom_name && c?.bride_name) {
     namesEl.textContent = `${c.groom_name} & ${c.bride_name}`;
   }
+  const guestName = new URLSearchParams(window.location.search).get("to");
+  const content = letterContent(c, guestName);
+  const toEl = overlay.querySelector(".letter-to");
+  const bodyEl = overlay.querySelector(".letter-body");
+  const signEl = overlay.querySelector(".letter-sign");
+  if (toEl) toEl.textContent = content.to;
+  if (bodyEl) bodyEl.textContent = content.body;
+  if (signEl) signEl.textContent = content.sign;
 
   let opened = false;
+  let closing = false;
 
   // ── Idle life: gentle float + seal breathing (transform-only = GPU) ──
   const idle = gsap.timeline({
@@ -92,6 +106,74 @@ export function initEnvelope(onComplete) {
     if (label) label.style.animation = "none";
   }
 
+  // ── Reading state: close the letter into the page ──
+  function onLetterKeydown(e) {
+    if (e.key === "Enter" || e.key === "Escape" || e.key === " ") {
+      e.preventDefault();
+      closeLetter();
+    }
+  }
+  function onOverlayTap(e) {
+    // Tapping outside the paper also continues — never trap the guest
+    if (e.target === overlay) closeLetter();
+  }
+
+  function closeLetter() {
+    if (closing) return;
+    closing = true;
+    document.removeEventListener("keydown", onLetterKeydown);
+    overlay.removeEventListener("click", onOverlayTap);
+    // The letter grows toward the viewer and melts into the invitation
+    gsap
+      .timeline({ onComplete: () => finish(false) })
+      .to(
+        letter,
+        { scale: 1.15, opacity: 0, duration: 0.6, ease: "power2.in" },
+        0,
+      )
+      .to(overlay, { opacity: 0, duration: 0.55, ease: "power1.inOut" }, 0.15);
+  }
+
+  function wireReadingState() {
+    letter
+      .querySelector(".letter-continue")
+      ?.addEventListener("click", closeLetter);
+    overlay.addEventListener("click", onOverlayTap);
+    document.addEventListener("keydown", onLetterKeydown);
+  }
+
+  // ── Hero transition: the risen card expands into the readable letter ──
+  function expandLetter() {
+    const state = Flip.getState(letter);
+    letter.classList.add("env-letter--open");
+    // Re-parent out of the 3D stage so the letter escapes the envelope's
+    // perspective (and survives the stage sinking away underneath)
+    overlay.appendChild(letter);
+    gsap.set(letter, { clearProps: "transform", zIndex: 9 });
+    Flip.from(state, {
+      duration: 0.95,
+      ease: "power3.inOut",
+      absolute: true,
+      props: "borderRadius",
+    });
+    // Monogram face gives way to the letter text (its own staggered
+    // line reveals start as soon as the content becomes visible)
+    gsap.to(letterInner, {
+      opacity: 0,
+      duration: 0.3,
+      onComplete: () => gsap.set(letterInner, { display: "none" }),
+    });
+    // The emptied envelope bows out beneath the growing letter
+    gsap.to(stage, {
+      y: 46,
+      opacity: 0,
+      scale: 0.94,
+      duration: 0.85,
+      ease: "power2.inOut",
+    });
+    wireReadingState();
+  }
+
   // ── Seal-crack particle burst ──
   function burstParticles() {
     const count = 12;
@@ -127,18 +209,20 @@ export function initEnvelope(onComplete) {
     if (navigator.vibrate) navigator.vibrate(10);
 
     if (reduceMotion) {
-      gsap.to(overlay, {
-        opacity: 0,
-        duration: 0.4,
-        onComplete: () => finish(false),
-      });
+      // No theatrics — jump straight to the readable letter
+      gsap.set(seal, { opacity: 0 });
+      gsap.set([label, skipBtn], { opacity: 0 });
+      gsap.set(flap, { rotationX: -160, transformOrigin: "50% 0%", zIndex: 1 });
+      gsap.set(stage, { opacity: 0 });
+      gsap.set(letterInner, { display: "none" });
+      letter.classList.add("env-letter--open");
+      overlay.appendChild(letter);
+      gsap.set(letter, { clearProps: "transform", zIndex: 9 });
+      wireReadingState();
       return;
     }
 
-    const tl = gsap.timeline({
-      defaults: { force3D: true },
-      onComplete: () => finish(false),
-    });
+    const tl = gsap.timeline({ defaults: { force3D: true } });
 
     tl
       // settle any pointer tilt so the flap rotation reads clean
@@ -188,23 +272,10 @@ export function initEnvelope(onComplete) {
       .set(flap, { zIndex: 1 }, 0.82)
       // letter rises out of the pocket, unhurried, with a soft overshoot
       .to(letter, { y: -132, duration: 1.0, ease: "back.out(1.1)" }, 1.15)
-      // once fully out, the letter sits above everything for the morph
       .set(letter, { zIndex: 8 }, 2.2)
-      // a breath — let the guest actually read the card (0.6s hold),
-      // then it grows toward the viewer and melts into the page
-      .to(
-        letter,
-        {
-          scale: 2.2,
-          y: -75,
-          opacity: 0,
-          duration: 0.9,
-          ease: "power2.inOut",
-        },
-        2.75,
-      )
-      .to(stage, { scale: 1.05, duration: 0.9, ease: "power2.inOut" }, 2.75)
-      .to(overlay, { opacity: 0, duration: 0.8, ease: "power1.inOut" }, 3.0);
+      // a small beat, then the card expands into the readable letter —
+      // the guest closes it themselves with the "เปิดการ์ดเชิญ" button
+      .add(expandLetter, 2.35);
   }
 
   // role="button" divs don't fire click on Enter/Space — wire it manually

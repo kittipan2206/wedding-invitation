@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { letterContent, showLetter } from "../../src/js/letter.js";
+import { describe, it, expect } from "vitest";
+import { letterContent } from "../../src/js/letter.js";
 
 describe("letterContent", () => {
   const cfg = {
@@ -34,42 +34,5 @@ describe("letterContent", () => {
     const { to, sign } = letterContent(null, null);
     expect(to).toBe("ถึงคนสำคัญของเรา");
     expect(sign).toContain("นนท์");
-  });
-});
-
-describe("showLetter", () => {
-  beforeEach(() => {
-    document.body.innerHTML = "";
-    window.__weddingConfig = { groom_name: "นนท์", bride_name: "เมย์" };
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it("renders the overlay with a continue button", () => {
-    showLetter(() => {});
-    expect(document.getElementById("letter-overlay")).toBeTruthy();
-    expect(document.querySelector(".letter-continue")).toBeTruthy();
-  });
-
-  it("removes the overlay and calls onDone when continue is clicked", () => {
-    const onDone = vi.fn();
-    showLetter(onDone);
-    document.querySelector(".letter-continue").click();
-    vi.advanceTimersByTime(500);
-    expect(document.getElementById("letter-overlay")).toBeFalsy();
-    expect(onDone).toHaveBeenCalledOnce();
-  });
-
-  it("calls onDone only once even with repeated clicks", () => {
-    const onDone = vi.fn();
-    showLetter(onDone);
-    const btn = document.querySelector(".letter-continue");
-    btn.click();
-    btn.click();
-    vi.advanceTimersByTime(1000);
-    expect(onDone).toHaveBeenCalledOnce();
   });
 });
