@@ -27,9 +27,11 @@ export function applyMemoryMode(cfg, now = new Date()) {
   // Invite-only UI is no longer actionable
   const rsvp = document.getElementById("rsvp");
   if (rsvp) rsvp.style.display = "none";
-  document.querySelectorAll(".map-actions, .travel-info").forEach((el) => {
-    el.style.display = "none";
-  });
+  document
+    .querySelectorAll(".map-actions, .map-actions-alt, .travel-info")
+    .forEach((el) => {
+      el.style.display = "none";
+    });
 
   // The album is now the main event — surface it right after the thank-you
   const countdown = document.getElementById("countdown");

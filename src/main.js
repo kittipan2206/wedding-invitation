@@ -18,6 +18,7 @@ import { fetchConfig, injectConfig } from "./js/config.js";
 import { applyMemoryMode } from "./js/memory-mode.js";
 import { initHearts } from "./js/hearts.js";
 import { initIcsButton } from "./js/ics.js";
+import { initSmartCalendar } from "./js/smart-calendar.js";
 
 function afterEnvelope() {
   initPetals();
@@ -74,6 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initGalleryPreview();
   initHearts();
   initIcsButton();
+  initSmartCalendar();
 
   // Footer "เปิดซองอีกครั้ง" — clears the session flag and reloads from the
   // top (keeps ?to= personalization, drops ?goto= so the envelope plays)

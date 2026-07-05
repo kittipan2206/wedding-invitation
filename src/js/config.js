@@ -234,9 +234,18 @@ export function injectConfig(cfg) {
   if (rsvpDeadline)
     rsvpDeadline.textContent = `กรุณาตอบรับภายในวันที่ ${c.rsvp_deadline_display}`;
 
-  // Envelope front — couple names
-  const envCouple = document.querySelector(".env-couple");
-  if (envCouple) envCouple.textContent = `${c.groom_name} & ${c.bride_name}`;
+  // Envelope fronts — couple names (main envelope + RSVP mail-away envelope)
+  document.querySelectorAll(".env-couple").forEach((el) => {
+    el.textContent = `${c.groom_name} & ${c.bride_name}`;
+  });
+
+  // RSVP reply-letter + guestbook composer letterheads
+  const rsvpLetterTo = document.getElementById("rsvp-letter-to");
+  if (rsvpLetterTo)
+    rsvpLetterTo.textContent = `ถึง ${c.groom_name} & ${c.bride_name}`;
+  const gbLetterTo = document.getElementById("gb-letter-to");
+  if (gbLetterTo)
+    gbLetterTo.textContent = `ถึง ${c.groom_name} & ${c.bride_name}`;
 
   // Loader title
   const loaderTitle = document.getElementById("loader-title");
@@ -275,7 +284,11 @@ export function injectConfig(cfg) {
       details: `ขอเรียนเชิญร่วมงานแต่งงาน ${coupleName}`,
       location: c.venue_name || "",
     });
-    calBtn.href = `https://calendar.google.com/calendar/render?${params}`;
+    const gcalHref = `https://calendar.google.com/calendar/render?${params}`;
+    calBtn.href = gcalHref;
+    // Same link inside the RSVP thank-you nudge
+    const tyGcal = document.getElementById("ty-gcal-btn");
+    if (tyGcal) tyGcal.href = gcalHref;
   }
 
   // Page title + meta tags — after the event, memory mode owns these

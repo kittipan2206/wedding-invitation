@@ -337,9 +337,13 @@ test.describe("Homepage — envelope session memory", () => {
 });
 
 test.describe("Details — Apple Calendar (.ics)", () => {
-  test("clicking the iPhone calendar button downloads a valid .ics file", async ({
+  test("clicking the .ics option downloads a valid file (non-iOS)", async ({
     page,
-  }) => {
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name === "mobile",
+      "iOS navigates to /api/ics instead of a blob download",
+    );
     await mockGAS(page);
     await page.goto("/?goto=details");
     await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
@@ -359,5 +363,70 @@ test.describe("Details — Apple Calendar (.ics)", () => {
     // Mock config: 2099-08-01 11:00 Bangkok → 04:00 UTC
     expect(content).toContain("DTSTART:20990801T040000Z");
     expect(content).toContain("END:VCALENDAR");
+  });
+
+  test("iOS: the promoted calendar button opens /api/ics with event params", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile", "needs the iPhone UA");
+    await mockGAS(page);
+    // The dev server has no serverless functions — stub the endpoint
+    await page.route("**/api/ics*", (route) =>
+      route.fulfill({
+        status: 200,
+        headers: {
+          "Content-Type": "text/calendar; charset=utf-8",
+          "Content-Disposition": 'attachment; filename="wedding-non-may.ics"',
+        },
+        body: "BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n",
+      }),
+    );
+    await page.goto("/?goto=details");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    const btn = page.locator("#calendar-ics-btn");
+    await btn.scrollIntoViewIfNeeded();
+    await expect(btn).toBeVisible({ timeout: 10_000 });
+
+    const requestPromise = page.waitForRequest(/\/api\/ics/);
+    await btn.click();
+    const request = await requestPromise;
+
+    const url = new URL(request.url());
+    expect(url.searchParams.get("date")).toBe("2099-08-01");
+    expect(url.searchParams.get("start")).toBe("11:00");
+    expect(url.searchParams.get("groom")).toBe("นนท์");
+    // Regular Safari UA — no LINE breakout param
+    expect(url.searchParams.get("openExternalBrowser")).toBeNull();
+  });
+});
+
+test.describe("Details — smart calendar adapts to platform", () => {
+  test("promotes the platform's calendar option and demotes the other", async ({
+    page,
+  }, testInfo) => {
+    const apple = testInfo.project.name === "mobile"; // iPhone 14 UA
+    await mockGAS(page);
+    await page.goto("/?goto=details");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+
+    if (apple) {
+      // .ics is the big button, Google Calendar demotes to the alt row
+      await expect(page.locator("#calendar-ics-btn")).toHaveClass(/map-btn/);
+      await expect(page.locator("#calendar-ics-btn .map-btn-label")).toHaveText(
+        "บันทึกปฏิทิน",
+      );
+      await expect(page.locator("#map-actions-alt #calendar-btn")).toHaveClass(
+        /cal-alt-link/,
+      );
+      await expect(page.locator("#map-apple-link")).toBeVisible();
+    } else {
+      // Google Calendar stays primary, .ics demotes to the alt row
+      await expect(page.locator("#calendar-btn")).toHaveClass(/map-btn/);
+      await expect(
+        page.locator("#map-actions-alt #calendar-ics-btn"),
+      ).toHaveClass(/cal-alt-link/);
+      await expect(page.locator("#map-apple-link")).toBeHidden();
+    }
+    await expect(page.locator("#copy-address-btn")).toBeVisible();
   });
 });

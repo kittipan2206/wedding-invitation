@@ -1,8 +1,41 @@
-import { burstConfetti } from "./confetti.js";
+// (confetti retired — the mail-away envelope in rsvp-send-anim.js is the
+// celebratory moment now, and it's on-theme)
+import { playRsvpSendAnimation } from "./rsvp-send-anim.js";
+import { downloadIcs } from "./ics.js";
 
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 const STORAGE_KEY = "rsvp_submitted_v1";
+
+// Personalized thank-you: greet the guest by name; attendees also get the
+// event date and both add-to-calendar buttons right where the decision
+// just happened (the best moment for that nudge).
+export function fillThankYou({ name, attending }, cfg) {
+  const heading = document.getElementById("ty-heading");
+  const msg = document.getElementById("ty-msg");
+  const cal = document.getElementById("ty-calendar");
+  const trimmed = (name || "").trim();
+  const displayName =
+    trimmed && (/^คุณ/.test(trimmed) ? trimmed : `คุณ${trimmed}`);
+
+  if (attending) {
+    if (heading && displayName) heading.textContent = `ขอบคุณ ${displayName} ♡`;
+    if (msg)
+      msg.textContent = cfg?.event_date_display
+        ? `ได้รับคำยืนยันเรียบร้อยแล้ว แล้วพบกันวันที่ ${cfg.event_date_display} นะ ♡`
+        : "ได้รับคำยืนยันเรียบร้อยแล้ว ดีใจมากที่จะได้พบกันในวันพิเศษนี้ ♡";
+    if (cal) cal.style.display = "block";
+  } else {
+    if (heading)
+      heading.textContent = displayName
+        ? `ขอบคุณที่แจ้งให้ทราบนะ ${displayName}`
+        : "ขอบคุณที่แจ้งให้ทราบนะ ♡";
+    if (msg)
+      msg.textContent =
+        "เสียดายที่ไม่ได้เจอกันในวันงาน ขอบคุณจากใจที่ตอบกลับมา ไว้เจอกันโอกาสหน้านะ ♡";
+    if (cal) cal.style.display = "none";
+  }
+}
 
 export function initRsvp() {
   const form = document.getElementById("rsvp-form");
@@ -10,8 +43,21 @@ export function initRsvp() {
   const thankYou = document.getElementById("thank-you");
   const submitBtn = form.querySelector('button[type="submit"]');
 
-  // Already submitted — show thank-you immediately
-  if (localStorage.getItem(STORAGE_KEY)) {
+  // iPhone calendar button inside the thank-you card
+  document.getElementById("ty-ics-btn")?.addEventListener("click", downloadIcs);
+
+  // Already submitted — show the personalized thank-you immediately
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    let saved = {};
+    try {
+      saved = JSON.parse(stored) || {};
+    } catch {}
+    // Older saves had no `attending` flag — assume attending
+    fillThankYou(
+      { name: saved.name, attending: saved.attending !== false },
+      window.__weddingConfig,
+    );
     form.style.display = "none";
     if (thankYou) thankYou.style.display = "flex";
     return;
@@ -143,13 +189,20 @@ export function initRsvp() {
       });
     } catch (_) {}
 
+    const name = nameEl.value.trim();
+    const attending = attendVal.value === "ยินดีเข้าร่วม";
+
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ name: nameEl.value.trim(), ts: Date.now() }),
+      JSON.stringify({ name, attending, ts: Date.now() }),
     );
 
-    form.style.display = "none";
-    if (thankYou) thankYou.style.display = "flex";
-    burstConfetti();
+    // The reply is "mailed": paper folds into an envelope, gets sealed,
+    // and flies off — then the personalized thank-you takes its place
+    playRsvpSendAnimation(() => {
+      fillThankYou({ name, attending }, window.__weddingConfig);
+      form.style.display = "none";
+      if (thankYou) thankYou.style.display = "flex";
+    });
   });
 }

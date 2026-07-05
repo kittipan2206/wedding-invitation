@@ -8,6 +8,8 @@
   max-width: 760px;
   margin: 0 auto;
   padding: 80px 24px;
+  /* Anchors the mail-away envelope animation */
+  position: relative;
 }
 
 .rsvp-heading {
@@ -40,6 +42,18 @@
   overflow: hidden;
 }
 
+/* Reply-letter framing: same pastel wash as the personal letter */
+.rsvp-form::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #f9c8d4, #c9b8e8, #b8d8f8);
+  opacity: 0.7;
+}
+
 /* Subtle floral accent in form corner */
 .rsvp-form::after {
   content: "♡";
@@ -51,6 +65,75 @@
   opacity: 0.05;
   pointer-events: none;
   font-family: var(--font-serif);
+}
+
+/* ── Reply-letter letterhead ── */
+.rsvp-letterhead {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.rsvp-letterhead-to {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(19px, 4.5vw, 24px);
+  color: var(--color-text);
+  margin-bottom: 10px;
+}
+
+.rsvp-letterhead-rule {
+  display: inline-block;
+  width: 44px;
+  height: 1px;
+  background: rgba(212, 83, 126, 0.45);
+}
+
+/* ── Mail-away envelope (hidden until the send animation plays) ──
+   Fixed to the viewport centre: the RSVP section is taller than one
+   screen, so section-relative centring could land off-screen. */
+.rsvp-send-env {
+  position: fixed;
+  left: calc(50% - 140px);
+  top: calc(50% - 100px);
+  width: 280px;
+  height: 200px;
+  perspective: 900px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* ── Thank-you calendar nudge ── */
+.ty-calendar {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(201, 184, 232, 0.35);
+}
+
+.ty-calendar-label {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  margin-bottom: 14px;
+}
+
+.ty-calendar-btns {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Smaller calendar buttons inside the thank-you card */
+.ty-cal-btn {
+  padding: 12px 20px;
+  font-size: 13.5px;
+  border-radius: 16px;
+}
+
+/* Alt row inside the thank-you card sits tighter than the details one */
+.ty-cal-alt {
+  margin-top: 10px;
 }
 
 /* ── Form rows ── */

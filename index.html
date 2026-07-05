@@ -755,7 +755,7 @@
               />
               <circle cx="12" cy="9" r="2.5" />
             </svg>
-            นำทางเลย
+            <span class="map-btn-label">นำทางเลย</span>
           </a>
           <a
             id="calendar-btn"
@@ -779,7 +779,7 @@
               <path d="M8 3v2M16 3v2" />
               <path d="M8 13h2v2H8z" fill="currentColor" stroke="none" />
             </svg>
-            บันทึกปฏิทิน
+            <span class="map-btn-label">บันทึกปฏิทิน</span>
           </a>
           <button
             id="calendar-ics-btn"
@@ -802,7 +802,51 @@
               <path d="M12 12v6" />
               <path d="M9.5 15.5 12 18l2.5-2.5" />
             </svg>
-            ปฏิทิน iPhone
+            <span class="map-btn-label">ปฏิทิน iPhone</span>
+          </button>
+        </div>
+
+        <!-- Alt row: smart-calendar.js moves the demoted calendar option here;
+             Apple Maps link is unhidden on Apple devices only -->
+        <div class="map-actions-alt reveal" id="map-actions-alt">
+          <a
+            id="map-apple-link"
+            class="cal-alt-link"
+            href="https://maps.apple.com/?q=%E0%B8%95%E0%B8%B3%E0%B8%9A%E0%B8%A5%E0%B9%81%E0%B8%9B-%E0%B8%A3%E0%B8%B0"
+            target="_blank"
+            rel="noopener noreferrer"
+            hidden
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z"
+              />
+              <circle cx="12" cy="9" r="2.5" />
+            </svg>
+            <span class="map-btn-label">เปิดใน Apple Maps</span>
+          </a>
+          <button id="copy-address-btn" class="cal-alt-link" type="button">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="9" y="9" width="12" height="12" rx="2" />
+              <path
+                d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+              />
+            </svg>
+            <span class="map-btn-label">คัดลอกที่อยู่</span>
           </button>
         </div>
 
@@ -937,6 +981,12 @@
           </p>
         </div>
         <div class="rsvp-form reveal reveal-delay-3">
+          <div class="rsvp-letterhead" aria-hidden="true">
+            <p class="rsvp-letterhead-to" id="rsvp-letter-to">
+              ถึง นนท์ &amp; เมย์
+            </p>
+            <span class="rsvp-letterhead-rule"></span>
+          </div>
           <form id="rsvp-form" novalidate>
             <div class="form-row">
               <label class="form-label" for="guest-name"
@@ -1069,11 +1119,98 @@
                 </linearGradient>
               </defs>
             </svg>
-            <h2>ขอบคุณมาก ♡</h2>
-            <p>
+            <h2 id="ty-heading">ขอบคุณมาก ♡</h2>
+            <p id="ty-msg">
               ได้รับคำยืนยันของท่านเรียบร้อยแล้ว<br />ดีใจมากที่จะได้พบกันในวันพิเศษนี้
               ♡
             </p>
+            <div class="ty-calendar" id="ty-calendar" style="display: none">
+              <p class="ty-calendar-label">กันวันไว้ในปฏิทินเลยนะ</p>
+              <div class="ty-calendar-btns">
+                <a
+                  id="ty-gcal-btn"
+                  class="map-btn map-btn--calendar ty-cal-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="3" />
+                    <path d="M3 9h18" />
+                    <path d="M8 3v2M16 3v2" />
+                    <path d="M8 13h2v2H8z" fill="currentColor" stroke="none" />
+                  </svg>
+                  <span class="map-btn-label">Google Calendar</span>
+                </a>
+                <button
+                  id="ty-ics-btn"
+                  class="map-btn map-btn--calendar ty-cal-btn"
+                  type="button"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="3" />
+                    <path d="M3 9h18" />
+                    <path d="M8 3v2M16 3v2" />
+                    <path d="M12 12v6" />
+                    <path d="M9.5 15.5 12 18l2.5-2.5" />
+                  </svg>
+                  <span class="map-btn-label">ปฏิทิน iPhone</span>
+                </button>
+              </div>
+              <!-- smart-calendar.js moves the demoted option here -->
+              <div class="map-actions-alt ty-cal-alt" id="ty-cal-alt"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mini envelope for the "mail the reply" send animation.
+             Reuses the main envelope's component classes (same 280×200
+             coordinate system); rsvp-send-anim.js drives the timeline. -->
+        <div class="rsvp-send-env" id="rsvp-send-env" aria-hidden="true">
+          <div class="env-back"></div>
+          <div class="env-letter">
+            <div class="env-letter-inner">
+              <p class="env-letter-sub">คำตอบของคุณ</p>
+            </div>
+          </div>
+          <div class="env-pocket"></div>
+          <div class="env-address">
+            <p class="env-to" style="display: block">ถึง</p>
+            <p class="env-couple">นนท์ &amp; เมย์</p>
+          </div>
+          <div class="env-flap">
+            <div class="env-flap-face env-flap-front">
+              <div class="flap-dot flap-dot-c"></div>
+              <div class="flap-dot flap-dot-l"></div>
+              <div class="flap-dot flap-dot-r"></div>
+            </div>
+            <div class="env-flap-face env-flap-liner"></div>
+          </div>
+          <div class="env-seal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 20.5l-1.3-1.2C6 15.1 3 12.3 3 8.9 3 6.1 5.2 4 7.9 4c1.6 0 3.1.7 4.1 1.9C13 4.7 14.5 4 16.1 4 18.8 4 21 6.1 21 8.9c0 3.4-3 6.2-7.7 10.5L12 20.5z"
+                fill="white"
+                opacity="0.95"
+              />
+            </svg>
           </div>
         </div>
       </section>
@@ -1138,59 +1275,117 @@
             <span id="session-count">+0</span>
           </div>
         </div>
+        <!-- Empty slot on the blessing board — tap to write (expands into
+             the composer paper via a hero transition) -->
+        <button
+          id="gb-composer-trigger"
+          class="gb-slot reveal reveal-delay-3"
+          type="button"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 20h4L18.5 9.5a2.828 2.828 0 1 0-4-4L4 16v4" />
+            <path d="M13.5 6.5l4 4" />
+          </svg>
+          เขียนคำอวยพรถึงเรา
+        </button>
+
+        <div
+          class="guestbook-thanks"
+          id="guestbook-thanks"
+          style="display: none"
+        >
+          <div class="guestbook-thanks-icon">
+            <svg width="26" height="26" viewBox="0 0 64 64" fill="none">
+              <path
+                d="M32 54S8 38 8 22a12 12 0 0 1 24 0 12 12 0 0 1 24 0c0 16-24 32-24 32Z"
+                fill="white"
+                opacity="0.9"
+              />
+            </svg>
+          </div>
+          <h3>ขอบคุณนะ ♡</h3>
+          <p id="guestbook-thanks-msg">
+            คำอวยพรของท่านส่งถึงนนท์ &amp; เมย์แล้ว ♡
+          </p>
+        </div>
+
         <div id="guestbook-feed" class="guestbook-feed"></div>
         <button id="gb-show-more" class="gb-show-more" style="display: none">
           ดูทั้งหมด
         </button>
-        <div class="guestbook-card reveal reveal-delay-3">
-          <form id="guestbook-form" novalidate>
-            <div class="form-row">
-              <label class="form-label" for="gb-name"
-                >ชื่อของท่าน <span style="color: #c8888a">*</span></label
-              >
-              <input
-                class="form-input"
-                type="text"
-                id="gb-name"
-                placeholder="ใส่ชื่อที่ต้องการให้แสดง"
-                autocomplete="name"
-              />
-              <p class="field-error" id="gb-err-name">กรุณากรอกชื่อของท่าน</p>
-            </div>
-            <div class="form-row">
-              <label class="form-label" for="gb-message"
-                >คำอวยพร <span style="color: #c8888a">*</span></label
-              >
-              <textarea
-                class="form-textarea"
-                id="gb-message"
-                placeholder="ขอให้รักกันยาวนาน…"
-                rows="4"
-                maxlength="300"
-              ></textarea>
-              <p class="char-counter" id="gb-char-counter">0 / 300 ตัวอักษร</p>
-              <p class="field-error" id="gb-err-msg">กรุณากรอกคำอวยพร</p>
-            </div>
-            <button type="submit" class="btn-submit">ส่งคำอวยพร</button>
-          </form>
+
+        <!-- Composer: the slot expands into this letter paper (centered
+             overlay + dim backdrop, same language as the personal letter) -->
+        <div id="gb-composer" class="gb-composer" aria-hidden="true">
+          <div class="gb-composer-backdrop" id="gb-composer-backdrop"></div>
           <div
-            class="guestbook-thanks"
-            id="guestbook-thanks"
-            style="display: none"
+            class="gb-composer-paper"
+            role="dialog"
+            aria-label="เขียนคำอวยพรถึงบ่าวสาว"
           >
-            <div class="guestbook-thanks-icon">
-              <svg width="26" height="26" viewBox="0 0 64 64" fill="none">
-                <path
-                  d="M32 54S8 38 8 22a12 12 0 0 1 24 0 12 12 0 0 1 24 0c0 16-24 32-24 32Z"
-                  fill="white"
-                  opacity="0.9"
-                />
+            <button
+              id="gb-composer-close"
+              class="gb-composer-close"
+              type="button"
+              aria-label="ปิด"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
               </svg>
-            </div>
-            <h3>ขอบคุณนะ ♡</h3>
-            <p id="guestbook-thanks-msg">
-              คำอวยพรของท่านส่งถึงนนท์ &amp; เมย์แล้ว ♡
-            </p>
+            </button>
+            <p class="gb-paper-to" id="gb-letter-to">ถึง นนท์ &amp; เมย์</p>
+            <span class="gb-paper-rule"></span>
+            <form id="guestbook-form" novalidate>
+              <div class="form-row">
+                <label class="form-label" for="gb-message"
+                  >คำอวยพร <span style="color: #c8888a">*</span></label
+                >
+                <textarea
+                  class="form-textarea"
+                  id="gb-message"
+                  placeholder="ขอให้รักกันยาวนาน…"
+                  rows="4"
+                  maxlength="300"
+                ></textarea>
+                <p class="char-counter" id="gb-char-counter">
+                  0 / 300 ตัวอักษร
+                </p>
+                <p class="field-error" id="gb-err-msg">กรุณากรอกคำอวยพร</p>
+              </div>
+              <div class="form-row">
+                <label class="form-label" for="gb-name"
+                  >จาก — ชื่อของท่าน
+                  <span style="color: #c8888a">*</span></label
+                >
+                <input
+                  class="form-input"
+                  type="text"
+                  id="gb-name"
+                  placeholder="ใส่ชื่อที่ต้องการให้แสดง"
+                  autocomplete="name"
+                />
+                <p class="field-error" id="gb-err-name">กรุณากรอกชื่อของท่าน</p>
+              </div>
+              <button type="submit" class="btn-submit">ส่งคำอวยพร ♡</button>
+            </form>
           </div>
         </div>
       </section>

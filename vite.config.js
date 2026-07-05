@@ -54,12 +54,16 @@ export default defineConfig({
         "src/js/share.js",
         "src/js/main.js",
         "src/js/qr.js",
+        "src/js/rsvp-send-anim.js",
+        "src/js/gb-composer-anim.js",
       ],
       reporter: ["text", "html"],
       thresholds: { lines: 60, functions: 60 },
     },
   },
   server: {
+    // Tooling (e.g. preview harness) can assign a port via PORT; default 5173
+    port: Number(process.env.PORT) || 5173,
     proxy: {
       "/api/upload-music": {
         target: GAS_URL,

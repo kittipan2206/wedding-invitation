@@ -2,8 +2,10 @@
 // Google Calendar guests use the existing link button; iPhone guests download
 // this file and iOS offers "Add to Calendar" natively.
 import { CONFIG_DEFAULTS } from "./config.js";
+import { isIOS, isLineApp } from "./platform.js";
 
 const SITE_URL = "https://non-may.vercel.app";
+const ICS_API_PATH = "/api/ics";
 
 // Escape TEXT values per RFC 5545: backslash, semicolon, comma, newline.
 // (venue_name currently contains commas — they must not split the field)
@@ -68,19 +70,54 @@ export function buildIcs(cfg, now = new Date()) {
   return lines.join("\r\n") + "\r\n";
 }
 
+// URL to the server-side .ics endpoint, carrying the freshest client config
+// as query params (api/ics.js validates them and falls back to defaults).
+// Inside LINE's in-app browser the URL must be absolute and carry
+// openExternalBrowser=1 so LINE hands it to Safari.
+export function buildIcsApiUrl(cfg, ua = navigator.userAgent) {
+  const c = { ...CONFIG_DEFAULTS, ...(cfg || {}) };
+  const params = new URLSearchParams({
+    date: String(c.event_date_iso || "").slice(0, 10),
+    start: c.event_time_ceremony || "",
+    groom: c.groom_name || "",
+    bride: c.bride_name || "",
+    venue: c.venue_name || "",
+  });
+  if (isLineApp(ua)) {
+    params.set("openExternalBrowser", "1");
+    return `${SITE_URL}${ICS_API_PATH}?${params}`;
+  }
+  return `${ICS_API_PATH}?${params}`;
+}
+
 export function initIcsButton() {
   const btn = document.getElementById("calendar-ics-btn");
   if (!btn) return;
-  btn.addEventListener("click", () => {
-    // Read config at click time — always fresh even after SWR re-inject
-    const ics = buildIcs(window.__weddingConfig);
-    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+  btn.addEventListener("click", downloadIcs);
+}
+
+// Shared by the details button and the RSVP thank-you nudge.
+// Reads config at call time — always fresh even after SWR re-inject.
+export function downloadIcs() {
+  const cfg = window.__weddingConfig;
+  // iOS (Safari AND in-app browsers): navigate to the real /api/ics URL —
+  // blob downloads fail silently inside LINE/Facebook webviews, while a
+  // text/calendar response opens the native "add to calendar" preview.
+  if (isIOS()) {
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "wedding-non-may.ics";
+    a.href = buildIcsApiUrl(cfg);
     document.body.appendChild(a);
     a.click();
     a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  });
+    return;
+  }
+  const ics = buildIcs(cfg);
+  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "wedding-non-may.ics";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }

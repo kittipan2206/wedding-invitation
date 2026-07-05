@@ -36,6 +36,7 @@ describe("applyMemoryMode", () => {
       <section id="countdown"></section>
       <section id="details">
         <div class="map-actions"></div>
+        <div class="map-actions-alt"></div>
         <div class="travel-info"></div>
       </section>
       <section id="rsvp"></section>
@@ -62,6 +63,9 @@ describe("applyMemoryMode", () => {
     expect(document.body.classList.contains("post-event")).toBe(true);
     expect(document.getElementById("rsvp").style.display).toBe("none");
     expect(document.querySelector(".map-actions").style.display).toBe("none");
+    expect(document.querySelector(".map-actions-alt").style.display).toBe(
+      "none",
+    );
     expect(document.querySelector(".travel-info").style.display).toBe("none");
   });
 

@@ -94,6 +94,10 @@
   a photo the floral illustration shows instead
 - The event date appears as a typewriter animation after envelope opens
 - Floating petals/decorations animate in the background
+- While scrolling, decorative elements drift at slightly different speeds
+  (parallax depth): countdown digits, detail-card icons, gallery tiles, and
+  divider ornaments each move on their own layer; disabled entirely under
+  reduced-motion preference
 
 ### Countdown
 
@@ -112,19 +116,42 @@
 - Dress code card shows the required attire
 - An embedded map shows the venue location
 - A "Navigate" button opens Google Maps with the venue coordinates
-- A "Add to Calendar" button opens Google Calendar pre-filled with event details
-- An "iPhone Calendar" button downloads an .ics file with the same event details
-  (date, ceremony time, venue, invitation link) so Apple Calendar users can add
-  the event natively; times are stored in UTC (Bangkok has no DST)
+- A single smart "บันทึกปฏิทิน" button adapts to the guest's device:
+  - Apple devices (iPhone/iPad, incl. iPadOS reporting as Mac) open the
+    wedding event via `/api/ics` — a real URL, so it also works inside
+    LINE/Facebook in-app browsers where blob downloads fail silently; inside
+    LINE the URL carries `openExternalBrowser=1` so it opens in Safari
+  - Other devices open Google Calendar pre-filled with event details
+- The non-default calendar option demotes to a small text link in an alt row
+  under the buttons ("หรือใช้ Google Calendar" / "หรือโหลดไฟล์ .ics (Apple Calendar)");
+  on desktop/Android the .ics link downloads the file built client-side
+- The alt row also offers "เปิดใน Apple Maps" (Apple devices only) and a
+  "คัดลอกที่อยู่" link that copies the venue name with a "คัดลอกแล้ว ✓" flash
+- Calendar controls flash a "เปิดปฏิทินให้แล้ว ✓" confirmation (with a light
+  haptic tick) after use
+- `/api/ics` builds the .ics server-side from query params (validated, capped;
+  falls back to config defaults), serves `text/calendar` — inline preview on
+  iOS, attachment download elsewhere; event times are stored in UTC (Bangkok
+  has no DST)
 
 ### RSVP Section
 
+- The form reads as a reply letter: the paper carries the same pastel top
+  wash as the personal letter and is headed "ถึง {groom} & {bride}"
 - Guests can confirm attendance by filling out the RSVP form
 - Required fields: name, attendance selection
 - Optional fields: number of guests, contact info, message (max 300 characters)
 - A character counter updates as the guest types in the message field
-- Submitting the form shows a thank-you screen and hides the form
-- After submitting, reloading the page still shows the thank-you screen (localStorage persistence)
+- On submit, the reply is "mailed": the form paper shrinks away, a small
+  envelope appears, the letter slides inside, the flap folds shut, a wax
+  seal stamps it closed, and the envelope flies off — then the thank-you
+  screen appears (reduced-motion users skip straight to the thank-you)
+- The thank-you screen addresses the guest by name; when attending it says
+  "แล้วพบกันวันที่ {event date}" and offers the same smart calendar pairing
+  right there (platform-matched primary button + the other option as a small
+  text link); when declining it shows a warm message without calendar buttons
+- After submitting, reloading the page still shows the personalized
+  thank-you screen (localStorage persistence, including attendance)
 - The form cannot be submitted with required fields empty
 - After the RSVP deadline, the form is hidden entirely; a "closed" card shows the deadline date and a hint to contact the couple directly
 - Thai characters and special characters in all fields are handled correctly
@@ -133,6 +160,21 @@
 
 ### Guestbook Section
 
+- Each blessing renders as a mini letter: paper card with a pastel top wash
+  and a small wax heart stamp in the corner (same motif as the envelope
+  seal); cards tilt alternately like pinned notes
+- The always-open form is gone: an empty dashed slot on the board reads
+  "เขียนคำอวยพรถึงเรา" (border gently pulses)
+- Tapping the slot expands it (hero transition) into a letter paper —
+  centered overlay with a dim backdrop — headed "ถึง {groom} & {bride}",
+  with the message field first and the name field as "จาก — ชื่อของท่าน";
+  the message field is focused automatically
+- The composer closes via the × button, tapping the backdrop, or Escape
+- On send, the paper flies down onto the board and becomes the guest's own
+  mini-letter card at the top of the feed, then the wax heart stamp presses
+  onto it; the slot is replaced by a thank-you card
+- With reduced-motion preference the composer opens/closes with no
+  animation and the card simply appears in the feed
 - Guests can write a congratulatory message with their name
 - Both name and message are required
 - Submitting a blessing triggers a flower-bloom burst animation
@@ -287,7 +329,7 @@ flips to a keepsake album with no redeploy:
 - Hero badge reads "Our Wedding Memory" instead of "Wedding Invitation"
 - Countdown section shows the thank-you message; its label reads "ขอบคุณจากใจ"
 - The RSVP section is hidden
-- Travel info, "Navigate", and "Add to Calendar" buttons are hidden
+- Travel info, "Navigate", and all calendar controls (buttons + alt-link row) are hidden
 - The gallery section moves up to appear right after the countdown/thank-you
 - Page title and shared-link OG tags read as a thank-you/memory, not an invite
 

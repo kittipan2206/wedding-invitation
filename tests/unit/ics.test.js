@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { icsEscape, icsUtcStamp, buildIcs } from "../../src/js/ics.js";
+import {
+  icsEscape,
+  icsUtcStamp,
+  buildIcs,
+  buildIcsApiUrl,
+} from "../../src/js/ics.js";
 
 describe("icsEscape", () => {
   it("escapes commas, semicolons, backslashes, and newlines", () => {
@@ -93,5 +98,55 @@ describe("buildIcs", () => {
   it("stamps DTSTAMP from the provided clock", () => {
     const ics = buildIcs(cfg, now);
     expect(ics).toContain("DTSTAMP:20260704T100000Z");
+  });
+});
+
+describe("buildIcsApiUrl", () => {
+  const cfg = {
+    groom_name: "นนท์",
+    bride_name: "เมย์",
+    event_date_iso: "2027-02-28",
+    event_time_ceremony: "09:00",
+    venue_name: "ตำบลแป-ระ อำเภอท่าแพ จังหวัดสตูล",
+  };
+  const SAFARI_UA =
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1";
+  const LINE_UA =
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Line/14.05.0";
+
+  it("builds a relative /api/ics URL carrying the event params", () => {
+    const url = buildIcsApiUrl(cfg, SAFARI_UA);
+    expect(url.startsWith("/api/ics?")).toBe(true);
+    const params = new URL(url, "https://non-may.vercel.app").searchParams;
+    expect(params.get("date")).toBe("2027-02-28");
+    expect(params.get("start")).toBe("09:00");
+    expect(params.get("groom")).toBe("นนท์");
+    expect(params.get("bride")).toBe("เมย์");
+    expect(params.get("venue")).toBe("ตำบลแป-ระ อำเภอท่าแพ จังหวัดสตูล");
+    expect(params.get("openExternalBrowser")).toBeNull();
+  });
+
+  it("strips a full ISO datetime down to the date part", () => {
+    const url = buildIcsApiUrl(
+      { ...cfg, event_date_iso: "2027-02-28T00:00:00.000Z" },
+      SAFARI_UA,
+    );
+    const params = new URL(url, "https://non-may.vercel.app").searchParams;
+    expect(params.get("date")).toBe("2027-02-28");
+  });
+
+  it("inside LINE: absolute URL with openExternalBrowser=1 to break out to Safari", () => {
+    const url = buildIcsApiUrl(cfg, LINE_UA);
+    expect(url.startsWith("https://non-may.vercel.app/api/ics?")).toBe(true);
+    const params = new URL(url).searchParams;
+    expect(params.get("openExternalBrowser")).toBe("1");
+    expect(params.get("date")).toBe("2027-02-28");
+  });
+
+  it("falls back to config defaults when cfg is missing", () => {
+    const url = buildIcsApiUrl(null, SAFARI_UA);
+    const params = new URL(url, "https://non-may.vercel.app").searchParams;
+    expect(params.get("date")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(params.get("groom")).toBeTruthy();
   });
 });

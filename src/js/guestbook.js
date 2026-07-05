@@ -1,4 +1,9 @@
 import { burstBloom } from "./bloom.js";
+import {
+  openComposer,
+  closeComposer,
+  playGuestbookSendAnimation,
+} from "./gb-composer-anim.js";
 
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
@@ -90,6 +95,19 @@ export function initGuestbook() {
   const submitBtn = form?.querySelector('button[type="submit"]');
   if (!form) return;
 
+  // Composer: the empty slot on the board expands into the letter paper
+  const trigger = document.getElementById("gb-composer-trigger");
+  trigger?.addEventListener("click", openComposer);
+  document
+    .getElementById("gb-composer-close")
+    ?.addEventListener("click", closeComposer);
+  document
+    .getElementById("gb-composer-backdrop")
+    ?.addEventListener("click", closeComposer);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeComposer();
+  });
+
   // Auto-fill name from RSVP
   try {
     const rsvp = JSON.parse(localStorage.getItem(RSVP_KEY));
@@ -178,16 +196,14 @@ export function initGuestbook() {
       });
     } catch (_) {}
 
-    // Optimistic: prepend new entry to current feed immediately
-    const feed = document.getElementById("guestbook-feed");
-    if (feed) {
-      const card = makeEntryEl({ name, message });
-      card.classList.add("gb-entry--new");
-      feed.prepend(card);
-    }
-
-    form.style.display = "none";
-    if (thanks) thanks.style.display = "flex";
-    burstBloom();
+    // Optimistic: the guest's letter flies onto the board as the newest
+    // card (gb-entry--new also presses the wax stamp on via CSS)
+    const card = makeEntryEl({ name, message });
+    card.classList.add("gb-entry--new");
+    playGuestbookSendAnimation(card, () => {
+      if (trigger) trigger.style.display = "none";
+      if (thanks) thanks.style.display = "flex";
+      burstBloom();
+    });
   });
 }

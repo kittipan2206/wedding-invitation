@@ -180,17 +180,175 @@
   background: linear-gradient(135deg, #c9b8e8, #b8d8f8);
   color: #2e2a28;
   box-shadow: 0 10px 30px rgba(201, 184, 232, 0.4);
+  /* Shimmer sweep clips inside the pill */
+  position: relative;
+  overflow: hidden;
 }
 
+/* Slow shimmer sweep across the primary button — one pass every ~5s */
+.map-btn--navigate::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -70%;
+  width: 45%;
+  background: linear-gradient(
+    105deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  transform: skewX(-18deg);
+  animation: btn-shimmer 4.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes btn-shimmer {
+  0%,
+  72% {
+    left: -70%;
+  }
+  92%,
+  100% {
+    left: 130%;
+  }
+}
+
+/* Frosted glass + pastel gradient border — reads as one set with the primary */
 .map-btn--calendar {
-  background: white;
   color: var(--color-text);
-  border: 1px solid rgba(201, 184, 232, 0.5);
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--glass-bg), var(--glass-bg)) padding-box,
+    linear-gradient(
+        135deg,
+        rgba(201, 184, 232, 0.75),
+        rgba(184, 216, 248, 0.75)
+      )
+      border-box;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 22px rgba(201, 184, 232, 0.18);
 }
 
 .map-btn:hover {
   transform: translateY(-4px);
   box-shadow: 0 15px 40px rgba(201, 184, 232, 0.5);
+}
+
+/* Pressed: sink back with a quicker snap */
+.map-btn:active {
+  transform: translateY(-1px) scale(0.96);
+  transition-duration: 0.12s;
+}
+
+/* Icon micro-motion on hover */
+.map-btn svg {
+  flex-shrink: 0;
+}
+
+.map-btn--navigate:hover svg {
+  animation: map-pin-hop 0.6s var(--transition-ease);
+}
+
+.map-btn--calendar:hover svg {
+  animation: cal-wiggle 0.6s var(--transition-ease);
+}
+
+@keyframes map-pin-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-4px) scale(1.06);
+  }
+  70% {
+    transform: translateY(1px);
+  }
+}
+
+@keyframes cal-wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  30% {
+    transform: rotate(-8deg);
+  }
+  60% {
+    transform: rotate(6deg);
+  }
+}
+
+/* Post-click confirmation flash (smart-calendar.js toggles .is-done) */
+.map-btn.is-done {
+  background: linear-gradient(135deg, #cdeee0, var(--color-mint));
+  border-color: transparent;
+  color: #2b5a48;
+  box-shadow: 0 6px 22px rgba(184, 232, 216, 0.45);
+}
+
+/* ── Alt row: demoted calendar option + Apple Maps + copy address ── */
+.map-actions-alt {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 18px;
+}
+
+.cal-alt-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 6px 2px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--color-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(201, 184, 232, 0.65);
+  transition: color var(--transition-fast);
+}
+
+.cal-alt-link:hover {
+  color: var(--color-text);
+}
+
+.cal-alt-link svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.cal-alt-link[hidden] {
+  display: none;
+}
+
+.cal-alt-link.is-done {
+  color: #2b8a63;
+  text-decoration-color: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-btn--navigate::after {
+    animation: none;
+    display: none;
+  }
+
+  .map-btn--navigate:hover svg,
+  .map-btn--calendar:hover svg {
+    animation: none;
+  }
 }
 
 /* ── Travel info ── */
