@@ -62,7 +62,7 @@ test.describe("Gallery page (/gallery.html) — lightbox", () => {
       timeout: 5_000,
     });
   });
- 
+
   test("lightbox prev button goes back", async ({ page, isMobile }) => {
     test.skip(isMobile, "PhotoSwipe next/prev buttons are hidden on mobile");
     await page.locator(".gallery-item").nth(1).click();

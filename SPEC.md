@@ -127,6 +127,7 @@
   on desktop/Android the .ics link downloads the file built client-side
 - The alt row also offers "เปิดใน Apple Maps" (Apple devices only) and a
   "คัดลอกที่อยู่" link that copies the venue name with a "คัดลอกแล้ว ✓" flash
+  ("คัดลอกไม่สำเร็จ" when the browser blocks clipboard access — never silent)
 - Calendar controls flash a "เปิดปฏิทินให้แล้ว ✓" confirmation (with a light
   haptic tick) after use
 - `/api/ics` builds the .ics server-side from query params (validated, capped;

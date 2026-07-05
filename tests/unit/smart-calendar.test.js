@@ -162,4 +162,23 @@ describe("click feedback", () => {
       "คัดลอกแล้ว ✓",
     );
   });
+
+  it("flashes a failure notice (without success styling) when copy is blocked", async () => {
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: vi.fn().mockRejectedValue(new Error("denied")) },
+      configurable: true,
+    });
+    initSmartCalendar({ ua: WINDOWS_UA, maxTouchPoints: 0 });
+
+    const btn = document.getElementById("copy-address-btn");
+    btn.click();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(btn.querySelector(".map-btn-label").textContent).toBe(
+      "คัดลอกไม่สำเร็จ",
+    );
+    expect(btn.classList.contains("is-done")).toBe(false);
+  });
 });
