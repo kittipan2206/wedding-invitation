@@ -27,13 +27,14 @@ function setLabel(el, text) {
 }
 
 // Temporarily swap a control's label for a confirmation, with a haptic tick.
-function flashLabel(el, text) {
+// done=false flashes the text without the green success style.
+function flashLabel(el, text, done = true) {
   const span = labelEl(el);
   if (!span || el.dataset.flashing) return;
   el.dataset.flashing = "1";
   const original = span.textContent;
   span.textContent = text;
-  el.classList.add("is-done");
+  if (done) el.classList.add("is-done");
   if (navigator.vibrate) navigator.vibrate(10);
   setTimeout(() => {
     span.textContent = original;
