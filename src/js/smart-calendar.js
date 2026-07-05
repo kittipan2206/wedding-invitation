@@ -11,6 +11,7 @@ import { isApple } from "./platform.js";
 
 const DONE_LABEL = "เปิดปฏิทินให้แล้ว ✓";
 const COPIED_LABEL = "คัดลอกแล้ว ✓";
+const COPY_FAILED_LABEL = "คัดลอกไม่สำเร็จ";
 const FLASH_MS = 2400;
 
 function currentVenue() {
@@ -135,7 +136,8 @@ export function initSmartCalendar({
   if (copyBtn) {
     copyBtn.addEventListener("click", async () => {
       const ok = await copyText(currentVenue());
-      if (ok) flashLabel(copyBtn, COPIED_LABEL);
+      // Always answer the tap — a silent failure reads as a broken button
+      flashLabel(copyBtn, ok ? COPIED_LABEL : COPY_FAILED_LABEL, ok);
     });
   }
 }
