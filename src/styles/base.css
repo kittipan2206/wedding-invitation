@@ -62,10 +62,8 @@ body {
   height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
-  /* proximity (not mandatory): sections taller than the viewport — details,
-     rsvp — must stay freely scrollable mid-section (matches README spec) */
-  scroll-snap-type: y proximity;
-  scroll-behavior: smooth;
+  /* changed to mandatory to prevent skipping sections on mobile/desktop scrolling */
+  scroll-snap-type: y mandatory;
 }
 
 img,
@@ -107,15 +105,13 @@ canvas {
   position: fixed;
   inset: 0;
   z-index: -2;
-  background: linear-gradient(
-    135deg,
-    #fff8fa,
-    #fdf0ff,
-    #f0f8ff,
-    #f0fff8,
-    #fffaf0,
-    #fff8fa
-  );
+  background: linear-gradient(135deg,
+      #fff8fa,
+      #fdf0ff,
+      #f0f8ff,
+      #f0fff8,
+      #fffaf0,
+      #fff8fa);
   background-size: 400% 400%;
   animation: gradientShift 20s ease infinite;
 }
@@ -142,15 +138,19 @@ canvas {
   0% {
     background-position: 0% 50%;
   }
+
   25% {
     background-position: 100% 0%;
   }
+
   50% {
     background-position: 100% 100%;
   }
+
   75% {
     background-position: 0% 100%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -165,6 +165,7 @@ canvas {
 #gallery,
 footer {
   scroll-snap-align: start;
+  scroll-snap-stop: always;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -200,14 +201,12 @@ footer {
 hr.divider {
   border: none;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-lavender),
-    var(--color-pink),
-    var(--color-mint),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      var(--color-lavender),
+      var(--color-pink),
+      var(--color-mint),
+      transparent);
   max-width: 320px;
   margin: 0 auto 48px;
   opacity: 0.65;
