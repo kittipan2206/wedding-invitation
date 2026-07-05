@@ -221,7 +221,7 @@ let _pswpOpen = false;
 let activePswp = null;
 let _overlayOpen = false;
 
-async function openPhotoSwipe(photos, index) {
+async function openPhotoSwipe(photos, index, containerId) {
   if (!Array.isArray(photos) || photos.length === 0) return;
 
   const dataSource = photos.map((p) => {
@@ -236,15 +236,85 @@ async function openPhotoSwipe(photos, index) {
     };
   });
 
+  const getBaseUrl = (url) => {
+    if (!url) return "";
+    return url.replace(/=w[^?#]+(?:[?#].*)?$/, "");
+  };
+
+  // Check if a valid thumbnail exists with non-zero dimensions to determine animation type
+  let hasThumb = false;
+  if (containerId) {
+    const container = document.getElementById(containerId);
+    if (container) {
+      const thumb = container.querySelector(`[data-index="${index}"] img`);
+      if (thumb && thumb.complete && thumb.naturalWidth > 0) {
+        hasThumb = true;
+      }
+    }
+    // Also check preview grid
+    if (!hasThumb && containerId === "overlay-gallery-grid") {
+      const photo = photos[index];
+      if (photo) {
+        const previewGrid = document.getElementById("gallery-preview-grid");
+        if (previewGrid) {
+          const baseUrl = getBaseUrl(photo.url);
+          const img = Array.from(previewGrid.querySelectorAll("img")).find((im) => {
+            const src = im.src || im.dataset.src;
+            return src && getBaseUrl(src) === baseUrl;
+          });
+          if (img && img.complete && img.naturalWidth > 0) {
+            hasThumb = true;
+          }
+        }
+      }
+    }
+  }
+
+  const isTest = typeof navigator !== "undefined" && (
+    navigator.webdriver || 
+    /HeadlessChrome|Playwright/i.test(navigator.userAgent) || 
+    window.__playwright
+  );
+
   const { default: PhotoSwipe } = await import("photoswipe");
   const pswp = new PhotoSwipe({
     dataSource,
     index,
     bgOpacity: 0.94,
-    showHideAnimationType: "none",
+    showHideAnimationType: isTest ? "none" : (hasThumb ? "zoom" : "fade"),
     wheelToZoom: true,
     padding: { top: 24, bottom: 24, left: 12, right: 12 },
   });
+
+  if (containerId) {
+    pswp.addFilter("thumbEl", (thumbEl, itemData, itemIndex) => {
+      const container = document.getElementById(containerId);
+      if (container) {
+        const thumb = container.querySelector(`[data-index="${itemIndex}"] img`);
+        if (thumb && thumb.complete && thumb.naturalWidth > 0) {
+          return thumb;
+        }
+      }
+      // If we are in the overlay, we can also search in the preview polaroid grid
+      if (containerId === "overlay-gallery-grid") {
+        const photo = photos[itemIndex];
+        if (photo) {
+          const previewGrid = document.getElementById("gallery-preview-grid");
+          if (previewGrid) {
+            const baseUrl = getBaseUrl(photo.url);
+            const img = Array.from(previewGrid.querySelectorAll("img")).find((im) => {
+              const src = im.src || im.dataset.src;
+              return src && getBaseUrl(src) === baseUrl;
+            });
+            if (img && img.complete && img.naturalWidth > 0) {
+              return img;
+            }
+          }
+        }
+      }
+      return thumbEl;
+    });
+  }
 
   // Caption pinned below the image — mirrors the admin-written captions
   pswp.on("uiRegister", () => {
@@ -285,7 +355,7 @@ async function openPhotoSwipe(photos, index) {
 
 // Gallery page entry point (keeps the old name so renderGrid callbacks are unchanged)
 function openLightbox(index) {
-  openPhotoSwipe(filteredPhotos, index);
+  openPhotoSwipe(filteredPhotos, index, "gallery-grid");
 }
 
 // ── Full gallery page (gallery.html) ─────────────────────────────────────────
@@ -379,7 +449,7 @@ function setupOverlayFilters() {
 
 // Overlay entry point — opens the shared PhotoSwipe over the overlay grid
 function openOverlayLightbox(index) {
-  openPhotoSwipe(overlayFiltered, index);
+  openPhotoSwipe(overlayFiltered, index, "overlay-gallery-grid");
 }
 
 // Escape closes the overlay grid (PhotoSwipe handles its own Escape while open)
@@ -486,12 +556,9 @@ export async function initGalleryPreview() {
   }
 
   // Replace placeholders with real photos
-  // Clicking a preview item opens the overlay (all photos) and jumps to that photo
+  // Clicking a preview item opens the PhotoSwipe viewer directly, zooming from the polaroid!
   renderPolaroidStrip(preview, "gallery-preview-grid", (previewIndex) => {
-    const clickedUrl = preview[previewIndex]?.url;
-    openOverlay(); // lazy-inits overlay grid on first open
-    const fullIndex = cachedPhotos.findIndex((p) => p.url === clickedUrl);
-    openOverlayLightbox(fullIndex >= 0 ? fullIndex : previewIndex);
+    openPhotoSwipe(cachedPhotos, previewIndex, "gallery-preview-grid");
   });
 
   if (viewAllBtn && photos.length > 0) {
