@@ -18,7 +18,7 @@
 - **No bundler magic**: keep imports relative. No path aliases.
 - **CSS**: hand-written, no Tailwind here.
 - **HTML files**: multiple entry pages (`index.html`, `card.html`, `gallery.html`, `admin.html`, `display.html`) — see `vite.config.js`.
-- **Build quirk**: `postbuild` renames `dist/index.html` → `dist/_template.html` (Apps Script template).
+- **Build quirk**: `postbuild` copies `dist/index.html` → `dist/_template.html` (template for `api/og.js`). On Vercel (`$VERCEL` set) it also deletes `dist/index.html` — a static index would be served instead of the `/ → /api/og` rewrite (unfilled `{{og_*}}` tags, no embedded config). Cloudflare Pages keeps it.
 
 ## Commands
 
