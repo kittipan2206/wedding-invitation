@@ -50,12 +50,33 @@
   (sessionStorage — closing the browser and returning replays the experience)
 - The couple's names are printed on the envelope front
 - With `?to=NAME`, the envelope front is addressed "ถึง NAME"
-- While idle, the envelope floats gently and tilts toward the pointer (desktop)
+- The envelope is rendered in real 3D (WebGL) when the device supports it:
+  one ivory cotton-paper stock with rounded die-cut corners and a seamed
+  pocket, soft shadows between the layers, an irregular wax puddle with a
+  stamped disc and raised heart, and the couple's names pressed in
+  rose-gold foil; it rests on a linen-toned surface
+- While idle, the envelope floats gently and tilts toward the pointer
+  (desktop) — it faces the pointer: pointer up-right tips it up and to the
+  right — or follows a finger drag (touch); light sweeps across the foil
+  names and the wax as it tilts. Android also tilts with the phone's
+  gyroscope; iOS never shows a motion-permission prompt
+- Dragging the envelope does not open it — only a tap does
+- The 3D envelope loads in the background while the page loader is showing;
+  if WebGL is unavailable or the 3D module hasn't loaded within 4 seconds,
+  the same envelope is shown as the classic CSS version (identical story)
+- Returning visitors (same session) and `?goto=` links never download the
+  3D module
 - Tapping plays one continuous sequence: the wax seal cracks with a small
   particle burst (and a haptic pulse on supported devices), the flap swings
   open revealing a patterned liner, a letter card rises out of the pocket,
   then the SAME card expands (hero transition) into the readable personal
-  letter — no cut, one continuous object
+  letter — no cut, one continuous object (in 3D the card flies out and
+  lands exactly where the letter paper sits, with no visible jump)
+- The tap is audible: a brittle wax crack, then soft paper sounds as the
+  flap opens and the card slides out (recorded CC0 foley in `public/sfx/`,
+  decoded ahead of time; a missing file is silent, never a fake tone)
+- The same tap starts the background music quietly; it swells in as the
+  letter opens — unless the guest muted the music on a previous visit
 - The envelope can also be opened with Enter or Space when focused (keyboard)
 - A "ข้ามไปที่การ์ด" skip button appears after a moment; skipping goes straight
   to the invitation without the letter interstitial
@@ -68,17 +89,30 @@
 
 - The expanded letter shows a short personal note before the invitation
 - The wedding date appears top-right like a real letterhead
-- With `?to=NAME` the salutation "ถึง คุณNAME" types itself character by
-  character with a blinking ink caret (no doubled "คุณ" when the name already
-  includes it); otherwise "ถึงคนสำคัญของเรา"
+- The letter is a smooth ivory sheet with square-cut corners and the
+  couple's names ("นนท์ & เมย์") pressed in rose-gold foil at the top centre;
+  it casts a soft shadow
+- With `?to=NAME` the salutation "ถึง คุณNAME" is handwritten onto the
+  paper stroke by stroke in a Thai script hand (no doubled "คุณ" when the
+  name already includes it); otherwise "ถึงคนสำคัญของเรา"
 - The letter mentions the event date and is signed with the couple's names
-- The signature sweeps in left-to-right like a pen stroke (not typed), then a
-  small heart stamp presses down beside it
+- The signature is handwritten the same way, then a small heart stamp
+  presses down beside it
+- While reading, the sheet leans toward the pointer (desktop) or a finger
+  drag (touch; Android also follows the gyroscope) with a light sheen and
+  shadow that move with it; no iOS motion-permission prompt
 - Tapping anywhere on the paper completes all text instantly — the reveal
   never holds the guest hostage
 - With reduced-motion preference all text is simply shown at once
-- The "เปิดการ์ดเชิญ" button (or tapping outside / Enter / Escape) melts the
-  letter into the invitation page
+- The "เปิดการ์ดเชิญ" button (or tapping outside / Enter / Escape) dissolves
+  the letter into the invitation page: the paper melts away outward from
+  the point that was tapped (from the button for keyboard), its edge
+  bleeding pastel watercolour (pink → lilac → blue), in about 1.2 seconds
+- Pigment shed by the dissolving edge turns into petals that fly up and
+  assemble into the couple's names in the hero, then settle into the real
+  text and drift away
+- Without WebGL the letter melts into the page as a simple fade;
+  with reduced-motion preference there is no dissolve and no petal flight
 - Returning visitors (same session), the skip button, and `?goto=` links
   never see the letter
 - A music control button is visible on the envelope screen
@@ -89,6 +123,9 @@
 ### Hero Section
 
 - Couple names are displayed prominently
+- Tapping the names scatters them into petals that swirl and reassemble
+  into the names (repeatable; ignored while already animating; disabled
+  under reduced-motion preference)
 - An arch-framed couple photo appears above the names when a photo is available
   (config `hero_photo_url`, else the first visible pre-wedding photo); without
   a photo the floral illustration shows instead
@@ -211,6 +248,10 @@
 - Clicking again pauses it
 - The button visually indicates playing vs paused state
 - On iOS/Safari, music does not auto-play without a user gesture — the button prompts the user instead of crashing
+- Play and pause fade smoothly on every device, including iPhone (where the
+  plain audio volume cannot be changed)
+- Pausing the music is remembered (localStorage): on later visits the
+  envelope tap no longer starts it; pressing play clears that choice
 
 ### Travel Info Section
 
@@ -350,7 +391,15 @@ flips to a keepsake album with no redeploy:
 
 ### Network Resilience
 
-- Pages load using cached/default data if the server is slow (> 5s) or unreachable
+- Pages load using cached/default data if the server is slow or unreachable:
+  a first visit waits at most 2.5 s for the config, then renders the
+  built-in defaults and swaps in the real config the moment it arrives
+- In production the page arrives with the live config already embedded by
+  the server (`api/og.js`), so the first visit doesn't wait on GAS at all;
+  the config is requested once per load, never twice in parallel
+- Built-in default data can never switch the main page into post-event
+  memory mode — only real (server or cached) config can prove the wedding
+  is over, so an outage never hides RSVP from invited guests
 - Error states are shown with a retry option where appropriate
 - No page crashes or shows a blank screen due to a network failure
 

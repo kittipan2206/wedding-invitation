@@ -51,17 +51,8 @@
   color: var(--color-muted);
 }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(90deg, #d4849a, #9e88c8, #7aaed4);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 /* Ampersand special styling */
 .ampersand {
   font-style: italic;
-  color: var(--color-lavender);
-  filter: brightness(0.78);
+  color: var(--color-rose);
 }

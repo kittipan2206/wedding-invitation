@@ -3,6 +3,7 @@ import {
   cleanDisplayString,
   fixWeekday,
   validateConfig,
+  CONFIG_DEFAULTS,
 } from "../../src/js/config.js";
 
 afterEach(() => {
@@ -103,3 +104,17 @@ describe("validateConfig", () => {
     expect(input.rsvp_deadline_display).toBe("x.");
   });
 });
+
+// Defaults are the guest-facing fallback — they must be self-consistent
+describe("CONFIG_DEFAULTS", () => {
+  it("has a weekday that matches its own date", () => {
+    expect(
+      fixWeekday(CONFIG_DEFAULTS.event_date_display, CONFIG_DEFAULTS.event_date_iso),
+    ).toBe(CONFIG_DEFAULTS.event_date_display);
+  });
+
+  it("closes RSVP before the wedding day", () => {
+    expect(CONFIG_DEFAULTS.rsvp_deadline_iso < CONFIG_DEFAULTS.event_date_iso).toBe(true);
+  });
+});
+

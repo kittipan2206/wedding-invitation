@@ -7,150 +7,73 @@
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
-  padding: 100px 24px;
+  padding: 80px 24px;
 }
 
 .details-heading {
   font-family: var(--font-serif);
-  font-size: clamp(36px, 7vw, 56px);
+  font-size: clamp(34px, 7vw, 52px);
   font-weight: 300;
   font-style: italic;
-  margin-bottom: 80px;
+  margin-bottom: 48px;
   color: var(--color-text);
-  letter-spacing: -0.02em;
 }
 
-/* ── Staggered Editorial Layout ── */
-.details-cards {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 24px;
-  margin-bottom: 80px;
-}
-
-.detail-card {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border-radius: 32px;
-  padding: 48px 36px;
-  border: var(--border-glass);
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.03);
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.6s var(--transition-ease);
-  overflow: hidden;
-  position: relative;
-}
-
-.detail-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
+/* ── Invitation insert: one paper panel, rows split by hairlines ── */
+.details-cards,
+.travel-items {
   width: 100%;
-  height: 4px;
-  background: currentColor;
-  opacity: 0.15;
+  max-width: 560px;
+  margin: 0 auto;
+  /* cotton letterpress stock (paper.js → --paper-cotton) */
+  background: var(--paper-cotton, none) 0 0 / var(--paper-tile, 256px)
+    var(--color-ivory);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  box-shadow: var(--shadow-paper);
+  padding: 8px clamp(24px, 6vw, 48px);
+  /* inner keyline — letterpress double rule */
+  outline: 1px solid rgba(46, 42, 40, 0.07);
+  outline-offset: -8px;
 }
 
-/* Desktop Grid Placement (Balanced Editorial Layout) */
-@media (min-width: 992px) {
-  .detail-card:nth-child(1) {
-    grid-column: 1 / 7;
-  }
-  .detail-card:nth-child(2) {
-    grid-column: 7 / 13;
-  }
-  .detail-card:nth-child(3) {
-    grid-column: 1 / 8;
-  }
-  .detail-card:nth-child(4) {
-    grid-column: 8 / 13;
-  }
+.detail-card,
+.travel-item {
+  padding: 28px 0;
+  text-align: center;
 }
 
-@media (min-width: 768px) and (max-width: 991px) {
-  .detail-card {
-    grid-column: span 6;
-  }
+.detail-card + .detail-card,
+.travel-item + .travel-item {
+  border-top: 1px solid var(--hairline);
 }
 
-@media (max-width: 767px) {
-  .details-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-bottom: 56px;
-  }
-  .detail-card {
-    padding: 28px 24px;
-  }
-  .detail-card-icon {
-    margin-bottom: 18px;
-    width: 44px;
-    height: 44px;
-  }
-  .detail-card h3 {
-    margin-bottom: 10px;
-  }
-}
-
-.detail-card:hover {
-  transform: translateY(-10px) scale(1.01);
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 30px 60px rgba(201, 184, 232, 0.25);
-  z-index: 5;
-}
-
-.detail-card-icon {
-  width: 52px;
-  height: 52px;
-  margin-bottom: 32px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-}
-
-.detail-card:nth-child(1) {
-  color: #f1a7b9;
-}
-.detail-card:nth-child(2) {
-  color: #b2a1e0;
-}
-.detail-card:nth-child(3) {
-  color: #8edec6;
-}
-.detail-card:nth-child(4) {
-  color: #efc18d;
+.detail-card-icon,
+.travel-item-icon {
+  display: none;
 }
 
 .detail-card h3 {
-  font-family: var(--font-serif);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-  margin-bottom: 16px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--color-rose);
+  margin-bottom: 8px;
 }
 
 .detail-card p {
-  font-size: 18px;
-  line-height: 1.6;
+  font-family: var(--font-serif);
+  font-size: clamp(19px, 4.6vw, 22px);
+  line-height: 1.55;
+  font-variant-numeric: lining-nums;
   color: var(--color-text);
-  font-weight: 400;
 }
 
-/* ── Map actions refined ── */
+/* ── Map actions ── */
 .map-actions {
   display: flex;
-  gap: 20px;
+  gap: 12px;
   margin-top: 40px;
   justify-content: center;
 }
@@ -162,132 +85,36 @@
 }
 
 .map-btn {
-  padding: 18px 32px;
-  border-radius: 20px;
+  min-height: 48px;
+  padding: 12px 24px;
+  border-radius: 10px;
   font-family: var(--font-sans);
   font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-weight: 500;
+  letter-spacing: 0;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  transition: all 0.4s var(--transition-ease);
+  justify-content: center;
+  gap: 10px;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
   /* .ics button is a <button> — match anchor affordance */
   cursor: pointer;
 }
 
-.map-btn--navigate {
-  background: linear-gradient(135deg, #c9b8e8, #b8d8f8);
-  color: #2e2a28;
-  box-shadow: 0 10px 30px rgba(201, 184, 232, 0.4);
-  /* Shimmer sweep clips inside the pill */
-  position: relative;
-  overflow: hidden;
-}
-
-/* Slow shimmer sweep across the primary button — one pass every ~5s */
-.map-btn--navigate::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: -70%;
-  width: 45%;
-  background: linear-gradient(
-    105deg,
-    transparent,
-    rgba(255, 255, 255, 0.5),
-    transparent
-  );
-  transform: skewX(-18deg);
-  animation: btn-shimmer 4.8s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes btn-shimmer {
-  0%,
-  72% {
-    left: -70%;
-  }
-  92%,
-  100% {
-    left: 130%;
-  }
-}
-
-/* Frosted glass + pastel gradient border — reads as one set with the primary */
-.map-btn--calendar {
-  color: var(--color-text);
-  border: 1px solid transparent;
-  background:
-    linear-gradient(var(--glass-bg), var(--glass-bg)) padding-box,
-    linear-gradient(
-        135deg,
-        rgba(201, 184, 232, 0.75),
-        rgba(184, 216, 248, 0.75)
-      )
-      border-box;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 6px 22px rgba(201, 184, 232, 0.18);
-}
-
-.map-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 15px 40px rgba(201, 184, 232, 0.5);
-}
-
-/* Pressed: sink back with a quicker snap */
-.map-btn:active {
-  transform: translateY(-1px) scale(0.96);
-  transition-duration: 0.12s;
-}
-
-/* Icon micro-motion on hover */
 .map-btn svg {
   flex-shrink: 0;
+  width: 16px;
+  height: 16px;
 }
 
-.map-btn--navigate:hover svg {
-  animation: map-pin-hop 0.6s var(--transition-ease);
-}
-
-.map-btn--calendar:hover svg {
-  animation: cal-wiggle 0.6s var(--transition-ease);
-}
-
-@keyframes map-pin-hop {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-4px) scale(1.06);
-  }
-  70% {
-    transform: translateY(1px);
-  }
-}
-
-@keyframes cal-wiggle {
-  0%,
-  100% {
-    transform: rotate(0);
-  }
-  30% {
-    transform: rotate(-8deg);
-  }
-  60% {
-    transform: rotate(6deg);
-  }
-}
-
-/* Post-click confirmation flash (smart-calendar.js toggles .is-done) */
+/* Post-click confirmation (smart-calendar.js toggles .is-done) */
 .map-btn.is-done {
-  background: linear-gradient(135deg, #cdeee0, var(--color-mint));
-  border-color: transparent;
-  color: #2b5a48;
-  box-shadow: 0 6px 22px rgba(184, 232, 216, 0.45);
+  background: rgba(184, 232, 216, 0.3);
+  border-color: #6f9c8a;
+  color: #2f5a4a;
 }
 
 /* ── Alt row: demoted calendar option + Apple Maps + copy address ── */
@@ -311,12 +138,12 @@
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.03em;
+  letter-spacing: 0;
   color: var(--color-muted);
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 4px;
-  text-decoration-color: rgba(201, 184, 232, 0.65);
+  text-decoration-color: var(--hairline);
   transition: color var(--transition-fast);
 }
 
@@ -339,85 +166,26 @@
   text-decoration-color: currentColor;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .map-btn--navigate::after {
-    animation: none;
-    display: none;
-  }
-
-  .map-btn--navigate:hover svg,
-  .map-btn--calendar:hover svg {
-    animation: none;
-  }
-}
-
-/* ── Travel info ── */
+/* ── Travel info — same insert treatment as the details panel ── */
 .travel-info {
-  margin-top: 100px;
-  text-align: left;
+  margin-top: 64px;
 }
 
 .travel-info-heading {
   font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-  margin-bottom: 48px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--color-rose);
+  margin-bottom: 20px;
   text-align: center;
-  position: relative;
-}
-
-.travel-info-heading::after {
-  content: "";
-  display: block;
-  width: 40px;
-  height: 1px;
-  background: var(--color-lavender);
-  margin: 12px auto 0;
-  opacity: 0.5;
-}
-
-.travel-items {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-}
-
-.travel-item {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 32px;
-  background: rgba(255, 255, 255, 0.45);
-  border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  transition: all 0.3s ease;
-}
-
-.travel-item:hover {
-  background: rgba(255, 255, 255, 0.7);
-  transform: scale(1.02);
-}
-
-.travel-item-icon {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  border-radius: 16px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-lavender);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
 }
 
 .travel-item-text strong {
   display: block;
-  font-size: 16px;
-  font-weight: 600;
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 500;
   color: var(--color-text);
   margin-bottom: 4px;
 }
@@ -425,25 +193,20 @@
 .travel-item-text span {
   font-size: 14px;
   color: var(--color-muted);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* ── Dress code colors ── */
+/* ── Dress code colours: small ink-rimmed dots ── */
 .dress-palette {
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .dress-swatch {
-  width: 32px;
-  height: 32px;
-  border-radius: 12px;
-  border: 3px solid white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.4s var(--transition-ease);
-}
-
-.dress-swatch:hover {
-  transform: translateY(-4px) rotate(8deg);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(46, 42, 40, 0.12);
 }

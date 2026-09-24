@@ -8,7 +8,9 @@
   position: fixed;
   inset: 0;
   z-index: 999;
-  background: rgba(253, 252, 251, 0.98);
+  /* Linen table under the envelope — opaque (no page ghosting through).
+     envelope3d.js BG_GLSL replicates this exactly for the dissolve. */
+  background: radial-gradient(ellipse at center, #ece7e1 0%, #d9d1c9 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,11 +46,12 @@
 .env-back {
   position: absolute;
   inset: 0;
-  background: #ffffff;
-  border: 1.5px solid #c9b8e8;
-  border-radius: 8px;
+  background: #ebe4dd;
+  border-radius: 5px;
   /* Static shadow on a non-animating element — cheap, never repaints per frame */
-  box-shadow: 0 18px 44px rgba(201, 184, 232, 0.3);
+  box-shadow:
+    0 1px 2px rgba(60, 40, 50, 0.08),
+    0 16px 40px rgba(60, 40, 50, 0.14);
   z-index: 1;
 }
 
@@ -59,9 +62,9 @@
   left: 16px;
   right: 16px;
   height: 172px;
-  background: #fffdfd;
-  border: 1px solid rgba(201, 184, 232, 0.4);
-  border-radius: 6px;
+  background: #fffdfb;
+  border: 1px solid rgba(80, 60, 70, 0.1);
+  border-radius: 4px;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -94,25 +97,67 @@
   width: min(88vw, 420px);
   height: -webkit-fit-content;
   height: fit-content;
-  padding: clamp(32px, 7vw, 48px) clamp(24px, 6vw, 40px);
-  background: #fffdfb;
-  border: 1px solid rgba(201, 184, 232, 0.35);
-  border-radius: 20px;
-  box-shadow: 0 18px 60px rgba(201, 184, 232, 0.28);
+  /* top room for the foil monogram paper.js presses at MONOGRAM_Y */
+  padding: 58px clamp(26px, 6vw, 42px) clamp(34px, 7vw, 50px);
   text-align: left;
-  overflow: hidden;
+  /* The sheet itself is drawn by ::after (smooth card from
+     paper.js — the same canvas the WebGL card lands as) and its shadow by
+     ::before, so the box stays transparent */
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  /* leans toward the pointer / finger (envelope.js sets the vars) */
+  transform: perspective(1100px) rotateX(var(--tilt-x, 0deg))
+    rotateY(var(--tilt-y, 0deg));
+  transform-style: flat;
 }
 
-/* Soft pastel wash along the top edge, like pressed petals */
+/* soft shadow of the card, shifting with the tilt */
 .env-letter--open::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, #f9c8d4, #c9b8e8, #b8d8f8);
-  opacity: 0.7;
+  inset: -90px; /* paper.js LETTER_MARGIN */
+  background: var(--letter-shadow, none) center / 100% 100% no-repeat;
+  transform: translate(var(--shadow-dx, 0px), var(--shadow-dy, 0px));
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* the sheet: fallback flat ivory until the generated paper is ready */
+.env-letter--open::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--letter-face, linear-gradient(#fffdf9, #fffdf9)) center /
+    100% 100% no-repeat;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* light gliding over the paper as it tilts, clipped to the card */
+.letter-sheen {
+  display: none;
+}
+.env-letter--open .letter-sheen {
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 70% 55% at var(--sheen-x, 35%) var(--sheen-y, 20%),
+    rgba(255, 255, 255, 0.28),
+    rgba(255, 255, 255, 0) 70%
+  );
+  -webkit-mask: var(--letter-face, none) center / 100% 100% no-repeat;
+  mask: var(--letter-face, none) center / 100% 100% no-repeat;
+}
+
+/* dissolve: WebGL takes over the sheet + shadow; only text stays in DOM */
+#envelope-overlay.env-dissolving .env-letter--open::before,
+#envelope-overlay.env-dissolving .env-letter--open::after,
+#envelope-overlay.env-dissolving .letter-sheen {
+  opacity: 0;
 }
 
 .env-letter--open .env-letter-content {
@@ -129,7 +174,7 @@
 .env-letter-rule {
   width: 36px;
   height: 1px;
-  background: rgba(212, 83, 126, 0.45);
+  background: rgba(156, 72, 98, 0.4);
 }
 
 .env-letter-sub {
@@ -148,8 +193,8 @@
   inset: 0;
   z-index: 3;
   clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
-  background: linear-gradient(180deg, #fdf9fc 0%, #f6eefa 100%);
-  border-radius: 8px;
+  background: linear-gradient(180deg, #f8f3ee 0%, #f4efe9 100%);
+  border-radius: 5px;
 }
 
 /* ── Address on envelope front ── */
@@ -166,7 +211,6 @@
 .env-to {
   font-family: var(--font-sans);
   font-size: 12px;
-  letter-spacing: 0.04em;
   color: var(--color-muted);
   margin-bottom: 2px;
   white-space: nowrap;
@@ -179,8 +223,7 @@
   font-style: italic;
   font-size: 19px;
   font-weight: 500;
-  color: var(--color-text);
-  opacity: 0.85;
+  color: #b27f72; /* rose-gold foil, flat in the CSS fallback */
 }
 
 .env-to[style*="block"] + .env-couple {
@@ -206,13 +249,15 @@
   position: absolute;
   inset: 0;
   clip-path: polygon(0 0, 100% 0, 50% 58%);
-  border-radius: 8px 8px 0 0;
+  border-radius: 5px 5px 0 0;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
+/* same paper stock as the pocket — depth comes from shading, not colour */
 .env-flap-front {
-  background: linear-gradient(168deg, #f3eefe 0%, #e8d8f8 55%, #dac8f0 100%);
+  background: linear-gradient(180deg, #f1ebe5 0%, #f7f2ec 100%);
+  filter: drop-shadow(0 1px 1px rgba(60, 40, 50, 0.12));
 }
 
 /* Inside of the flap — the liner is what makes a real envelope feel premium.
@@ -223,12 +268,12 @@
    the "detached floating triangle" bug). */
 .env-flap-liner {
   transform: rotateY(180deg);
-  background-color: #faf3f8;
+  background-color: #ddd3e6;
   background-image: radial-gradient(
-    rgba(212, 83, 126, 0.16) 1.2px,
-    transparent 1.3px
+    rgba(255, 253, 250, 0.7) 1.1px,
+    transparent 1.2px
   );
-  background-size: 13px 13px;
+  background-size: 12px 12px;
 }
 
 /* Depth cue: the liner starts in shadow and brightens as the flap opens */
@@ -240,10 +285,9 @@
   pointer-events: none;
 }
 
-/* ── Floral dots on flap front ── */
+/* ── Floral dots on flap front: retired (real stock is plain) ── */
 .flap-dot {
-  position: absolute;
-  border-radius: 50%;
+  display: none;
 }
 
 .flap-dot-c {
@@ -281,11 +325,11 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #e07a9d, #d4537e 62%, #c44469);
+  background: radial-gradient(circle at 38% 32%, #b8627c, #9c4862 60%, #7e3850);
   box-shadow:
-    0 2px 10px rgba(196, 68, 105, 0.35),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.28);
+    0 2px 4px rgba(60, 20, 35, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.18);
   z-index: 6;
   display: flex;
   align-items: center;
@@ -311,9 +355,9 @@
 /* ── Label below envelope ── */
 .envelope-label {
   font-family: var(--font-sans);
-  font-size: 13px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  font-size: 14px;
+  /* Thai: never letter-spaced (it detaches vowels and tone marks) */
+  letter-spacing: 0;
   color: var(--color-muted);
   text-align: center;
   opacity: 0;
@@ -333,7 +377,7 @@
   -webkit-backdrop-filter: blur(8px);
   font-family: var(--font-sans);
   font-size: 12px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   color: var(--color-muted);
   cursor: pointer;
   opacity: 0;
@@ -384,4 +428,34 @@
 #music-btn.is-playing,
 #env-music-btn.is-playing {
   animation: musicPulse 2s ease-in-out infinite;
+}
+
+/* ── 3D mode (envelope3d.js): WebGL draws the envelope; the DOM stage stays
+   only as the invisible tap/keyboard target ── */
+#envelope-overlay.env3d .env-stage {
+  visibility: hidden;
+}
+
+/* Dissolve: WebGL repaints the overlay + blank paper and melts them away;
+   the DOM letter keeps only its text floating above */
+#envelope-overlay.env-dissolving {
+  background: transparent;
+}
+
+
+/* ── Handwritten lines (handwriting.js writes them with a pen) ── */
+.env-letter--open .letter-to,
+.env-letter--open .letter-sign {
+  font-family: "Charm", "Trirong", serif;
+  font-style: normal;
+  color: #3a2a33; /* iron-gall ink, a touch of plum */
+  letter-spacing: 0;
+}
+.env-letter--open .letter-to {
+  font-size: clamp(24px, 6vw, 30px);
+  line-height: 1.5;
+}
+.env-letter--open .letter-sign {
+  font-size: 21px;
+  clip-path: none; /* the pen reveals it now */
 }

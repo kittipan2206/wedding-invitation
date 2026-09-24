@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { CONFIG_DEFAULTS, injectConfig, fetchConfig } from "../../src/js/config.js";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { CONFIG_DEFAULTS, CONFIG_WAIT_MS, injectConfig, fetchConfig } from "../../src/js/config.js";
 
 // ─── injectConfig ────────────────────────────────────────────────────────────
 
@@ -64,9 +64,12 @@ describe("injectConfig — detail cards", () => {
   });
 
   it("sets event date display text, auto-correcting a mismatched weekday", () => {
-    // default event_date_iso 2026-03-15 is a Sunday — validateConfig fixes the weekday
-    injectConfig({ event_date_display: "วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569" });
-    expect(document.getElementById("dc-date").textContent).toBe("วันอาทิตย์ที่ 15 มีนาคม พ.ศ. 2569");
+    // 2027-02-28 is a Sunday — the live sheet says เสาร์; validateConfig fixes it
+    injectConfig({
+      event_date_iso: "2027-02-28",
+      event_date_display: "วันเสาร์ที่ 28 กุมภาพันธ์ พ.ศ. 2570",
+    });
+    expect(document.getElementById("dc-date").textContent).toBe("วันอาทิตย์ที่ 28 กุมภาพันธ์ พ.ศ. 2570");
   });
 
   it("shows ceremony and lunch times in dc-time", () => {
@@ -218,5 +221,46 @@ describe("fetchConfig — normalizes Google Sheets ISO strings", () => {
     });
     const result = await fetchConfig();
     expect(result.groom_name).toBe("นนท์");
+  });
+});
+
+// ─── First-visit speed ───────────────────────────────────────────────────────
+
+describe("fetchConfig — first visit never hangs on GAS", () => {
+  // a GAS request that hangs until the test releases it
+  let release;
+  const hangingFetch = () =>
+    vi.fn(() => new Promise((r) => (release = () => r({ ok: false }))));
+  beforeEach(() => {
+    localStorage.clear();
+    delete window.__SSR_CONFIG;
+  });
+  afterEach(async () => {
+    release?.();
+    release = null;
+    await Promise.resolve();
+  });
+
+  it("uses the config the server embedded in the HTML without waiting", async () => {
+    window.__SSR_CONFIG = { groom_name: "บอล", event_date_iso: "2099-01-01T00:00:00.000Z" };
+    global.fetch = hangingFetch(); // GAS never answers
+    const result = await fetchConfig();
+    expect(result.groom_name).toBe("บอล");
+    expect(result.event_date_iso).toBe("2099-01-01"); // normalized like GAS data
+  });
+
+  it("gives up after CONFIG_WAIT_MS on a cold visit and renders defaults", async () => {
+    vi.useFakeTimers();
+    global.fetch = hangingFetch();
+    const pending = fetchConfig();
+    await vi.advanceTimersByTimeAsync(CONFIG_WAIT_MS + 10);
+    await expect(pending).resolves.toBeNull();
+    vi.useRealTimers();
+  });
+
+  it("sends a single config request on a cold visit", async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ groom_name: "บอล" }) });
+    await fetchConfig();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 });

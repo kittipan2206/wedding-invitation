@@ -29,7 +29,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(253, 252, 251, 0.98);
+  background: var(--color-paper);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 24px 24px 0 0;
@@ -53,8 +53,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: none;
-  background: rgba(201, 184, 232, 0.2);
+  background: transparent;
+  border: 1px solid var(--hairline);
   color: var(--color-muted);
   display: flex;
   align-items: center;
@@ -63,7 +63,7 @@
 }
 
 .share-close:hover {
-  background: rgba(201, 184, 232, 0.35);
+  background: rgba(46, 42, 40, 0.05);
 }
 
 .share-panel-title {
@@ -83,8 +83,8 @@
 }
 
 .share-link-box {
-  background: rgba(201, 184, 232, 0.12);
-  border: 1.5px solid rgba(201, 184, 232, 0.4);
+  background: transparent;
+  border: 1px dashed rgba(46, 42, 40, 0.22);
   border-radius: 12px;
   padding: 12px 16px;
   margin-bottom: 20px;
@@ -107,8 +107,9 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 12px 18px;
-  border-radius: 50px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 10px;
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 500;
@@ -121,31 +122,5 @@
   white-space: nowrap;
 }
 
-.share-action-btn:hover {
-  transform: translateY(-2px);
-  opacity: 0.88;
-}
 
-.share-action-btn--native {
-  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(249, 200, 212, 0.4);
-}
 
-.share-action-btn--copy {
-  background: linear-gradient(135deg, #c9b8e8, #b8d8f8);
-  color: #3d3550;
-  box-shadow: 0 4px 16px rgba(201, 184, 232, 0.35);
-}
-
-.share-action-btn--line {
-  background: #06c755;
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(6, 199, 85, 0.25);
-}
-
-.share-action-btn--fb {
-  background: #1877f2;
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(24, 119, 242, 0.25);
-}

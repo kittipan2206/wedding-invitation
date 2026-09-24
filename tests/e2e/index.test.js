@@ -38,6 +38,21 @@ test.describe("Homepage — page load", () => {
     await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
     await expect(page.locator(".hero-names")).toBeVisible();
   });
+
+  test("defaults never flip the page into memory mode when server is unreachable", async ({
+    page,
+  }) => {
+    // Clock long past any default date — only real config may prove the
+    // wedding is over; defaults must keep RSVP open
+    await page.clock.setFixedTime(new Date("2099-12-31T12:00:00+07:00"));
+    await page.route("**/script.google.com/**", (route) =>
+      route.abort("failed"),
+    );
+    await page.goto("/");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    await expect(page.locator("body")).not.toHaveClass(/post-event/);
+    await expect(page.locator("#rsvp")).not.toHaveCSS("display", "none");
+  });
 });
 
 test.describe("Homepage — URL parameters", () => {
@@ -430,3 +445,57 @@ test.describe("Details — smart calendar adapts to platform", () => {
     await expect(page.locator("#copy-address-btn")).toBeVisible();
   });
 });
+
+test.describe("Homepage — 3D envelope & petal names", () => {
+  test("3D envelope opens into the letter and dissolves into the page", async ({
+    page,
+  }) => {
+    await mockGAS(page);
+    // E2E runs the classic envelope by default — opt this test into 3D
+    await page.addInitScript(() => {
+      window.__ENVELOPE_MODE = "3d";
+    });
+    await page.goto("/");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    const hasWebGL2 = await page.evaluate(
+      () => !!document.createElement("canvas").getContext("webgl2"),
+    );
+    test.skip(!hasWebGL2, "runner has no WebGL2");
+    await expect(page.locator(".env3d-canvas")).toBeAttached();
+    await page.click(".envelope-body");
+    await expect(page.locator(".env-letter--open")).toBeVisible({
+      timeout: 10_000,
+    });
+    // first tap completes the text reveal, the next one continues
+    await page.click(".env-letter--open");
+    await page.click(".letter-continue");
+    await expect(page.locator("#envelope-overlay")).toBeHidden({
+      timeout: 5_000,
+    });
+    // scene disposed with the overlay
+    await expect(page.locator(".env3d-canvas")).toHaveCount(0);
+    await expect(page.locator(".hero-names")).toHaveCSS("opacity", "1", {
+      timeout: 6_000,
+    });
+  });
+
+  test("tapping the names scatters them into petals that reassemble", async ({
+    page,
+  }) => {
+    await mockGAS(page);
+    await page.addInitScript(() => {
+      sessionStorage.setItem("envelope_opened", "1");
+    });
+    await page.goto("/");
+    await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
+    await page.locator(".hero-name--first").click();
+    await expect(page.locator(".petal-names-canvas")).toBeVisible();
+    await expect(page.locator(".hero-names")).toHaveCSS("opacity", "0");
+    // petals settle back into the real text
+    await expect(page.locator(".petal-names-canvas")).toBeHidden({
+      timeout: 6_000,
+    });
+    await expect(page.locator(".hero-names")).toHaveCSS("opacity", "1");
+  });
+});
+

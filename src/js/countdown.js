@@ -3,6 +3,8 @@
 //  - on the day      → "วันนี้แล้ว!" + ceremony time + navigate button
 //  - after the day   → thank-you message (memory mode handles the rest)
 
+import { CONFIG_DEFAULTS } from "./config.js";
+
 export function getCountdownPhase(isoDate, now = new Date()) {
   const dayStart = new Date(`${isoDate}T00:00:00+07:00`);
   const dayEnd = new Date(`${isoDate}T23:59:59+07:00`);
@@ -18,8 +20,8 @@ export function headingCopy(days) {
 
 export function initCountdown() {
   const cfg = window.__weddingConfig;
-  const isoDate = cfg?.event_date_iso || "2026-03-15";
-  const time = cfg?.event_time_ceremony || "11:00";
+  const isoDate = cfg?.event_date_iso || CONFIG_DEFAULTS.event_date_iso;
+  const time = cfg?.event_time_ceremony || CONFIG_DEFAULTS.event_time_ceremony;
   const wedding = new Date(`${isoDate}T${time}:00+07:00`);
   const pad = (n) => String(n).padStart(2, "0");
 

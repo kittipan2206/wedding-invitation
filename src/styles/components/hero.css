@@ -16,34 +16,15 @@
   margin: 0 auto;
 }
 
-/* ── Corner ornaments (frame) ── */
-.hero-corner {
+/* ── Card edge: a single hairline frame, like the border of a printed card ── */
+#hero::before {
+  content: "";
   position: absolute;
-  width: clamp(48px, 9vw, 72px);
-  height: clamp(48px, 9vw, 72px);
+  inset: clamp(14px, 3vw, 28px);
+  border: 1px solid var(--hairline);
   pointer-events: none;
   opacity: 0;
   animation: fadeIn 1.4s ease 0.6s forwards;
-}
-
-.hero-corner--tl {
-  top: clamp(20px, 4vw, 40px);
-  left: clamp(20px, 4vw, 40px);
-}
-
-.hero-corner--tr {
-  top: clamp(20px, 4vw, 40px);
-  right: clamp(20px, 4vw, 40px);
-}
-
-.hero-corner--bl {
-  bottom: clamp(20px, 4vw, 40px);
-  left: clamp(20px, 4vw, 40px);
-}
-
-.hero-corner--br {
-  bottom: clamp(20px, 4vw, 40px);
-  right: clamp(20px, 4vw, 40px);
 }
 
 .hero-badge {
@@ -64,13 +45,7 @@
   display: inline-block;
   width: 26px;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-lavender),
-    transparent
-  );
-  opacity: 0.7;
+  background: var(--hairline);
 }
 
 /* ── Couple portrait (arch frame) ── */
@@ -85,9 +60,9 @@
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: 999px 999px 16px 16px;
-  border: 5px solid rgba(255, 255, 255, 0.95);
-  outline: 1px solid rgba(201, 184, 232, 0.45);
-  box-shadow: 0 14px 40px rgba(201, 184, 232, 0.35);
+  border: 5px solid var(--color-ivory);
+  outline: 1px solid var(--hairline);
+  box-shadow: var(--shadow-paper);
   animation: fadeInUp 0.9s var(--transition-ease) both;
 }
 
@@ -112,8 +87,7 @@
 }
 
 .guest-name {
-  color: var(--color-lavender);
-  filter: brightness(0.78);
+  color: var(--color-rose);
 }
 
 .hero-names {
@@ -156,14 +130,7 @@
 .ampersand-rule {
   flex: 1;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(201, 184, 232, 0.55) 40%,
-    rgba(201, 184, 232, 0.7) 50%,
-    rgba(201, 184, 232, 0.55) 60%,
-    transparent
-  );
+  background: var(--hairline);
 }
 
 .hero-names .ampersand {
@@ -173,8 +140,7 @@
   font-weight: 400;
   font-size: clamp(40px, 7vw, 64px);
   line-height: 1;
-  color: var(--color-lavender);
-  filter: brightness(0.72);
+  color: var(--color-rose);
   letter-spacing: 0;
   flex-shrink: 0;
   transform: translateY(-2px);
@@ -192,15 +158,9 @@
 
 .hero-date-rule {
   display: block;
-  width: clamp(60px, 12vw, 96px);
+  width: clamp(40px, 8vw, 64px);
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-lavender),
-    transparent
-  );
-  opacity: 0.65;
+  background: var(--hairline);
 }
 
 .hero-date {
@@ -209,8 +169,9 @@
   font-size: clamp(17px, 3vw, 24px);
   font-weight: 400;
   color: var(--color-text);
-  letter-spacing: 0.06em;
-  opacity: 0.82;
+  /* Thai — no tracking */
+  letter-spacing: 0;
+  opacity: 0.86;
   min-height: 1.4em;
 }
 
@@ -219,7 +180,7 @@
   content: "|";
   display: inline-block;
   margin-left: 2px;
-  color: var(--color-lavender);
+  color: var(--color-muted);
   opacity: 1;
   animation: tw-blink 0.7s step-start infinite;
 }
@@ -260,68 +221,24 @@
 .scroll-line {
   width: 1px;
   height: 40px;
-  background: linear-gradient(to bottom, var(--color-lavender), transparent);
+  background: linear-gradient(to bottom, rgba(46, 42, 40, 0.3), transparent);
   animation: scrollPulse 2s ease-in-out infinite;
 }
 
-/* ── Floral decorations ── */
-.floral-top,
-.floral-bottom {
-  position: absolute;
-  pointer-events: none;
-  opacity: 0.75;
-  animation: floralBreath 9s ease-in-out infinite;
-}
-
+/* ── Hairline sprig above the names ── */
 .floral-top {
-  top: clamp(60px, 9vw, 90px);
+  position: absolute;
+  top: clamp(64px, 11vh, 110px);
   left: 50%;
+  color: var(--color-muted);
+  opacity: 0.7;
+  pointer-events: none;
   transform: translateX(calc(-50% + var(--px, 0px))) translateY(var(--py, 0px));
-  will-change: transform;
   transition: transform 0.05s linear;
-}
-
-.floral-bottom {
-  bottom: clamp(78px, 10vw, 100px);
-  left: 50%;
-  transform: translateX(calc(-50% + var(--px, 0px))) scaleY(-1)
-    translateY(var(--py, 0px));
-  will-change: transform;
-  transition: transform 0.05s linear;
-  animation-delay: -4s;
-  width: clamp(160px, 22vw, 220px);
-}
-
-.floral-bottom svg {
-  width: 100%;
-  height: auto;
-}
-
-@keyframes floralBreath {
-  0%,
-  100% {
-    opacity: 0.72;
-  }
-  50% {
-    opacity: 0.92;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .floral-top,
-  .floral-bottom {
-    animation: none;
-  }
 }
 
 /* ── Mobile tweaks ── */
 @media (max-width: 480px) {
-  .floral-top {
-    top: clamp(40px, 8vw, 70px);
-  }
-  .floral-bottom {
-    bottom: clamp(90px, 16vw, 120px);
-  }
   .ampersand-wrap {
     max-width: 220px;
   }

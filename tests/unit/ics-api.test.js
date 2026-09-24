@@ -47,8 +47,8 @@ describe("api/ics handler", () => {
 
   it("falls back to config defaults when params are missing or invalid", () => {
     const res = run({ date: "28/02/2027", start: "late morning" });
-    // CONFIG_DEFAULTS: 2026-03-15 11:00 Bangkok → 04:00 UTC
-    expect(res.body).toContain("DTSTART:20260315T040000Z");
+    // CONFIG_DEFAULTS: 2027-02-28 09:00 Bangkok → 02:00 UTC
+    expect(res.body).toContain("DTSTART:20270228T020000Z");
     expect(res.body).toContain("SUMMARY:งานแต่งงาน นนท์ & เมย์");
   });
 

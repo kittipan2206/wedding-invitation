@@ -14,10 +14,13 @@
     <meta name="twitter:description" content="{{og_description}}" />
     <meta name="twitter:image" content="{{og_image}}" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <!-- config backend: GAS redirects script.google.com → googleusercontent -->
+    <link rel="preconnect" href="https://script.google.com" />
+    <link rel="preconnect" href="https://script.googleusercontent.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Trirong:ital,wght@0,300;0,400;0,500;1,300;1,400&family=IBM+Plex+Sans+Thai+Looped:wght@300;400;500&family=Charm:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <!-- Critical inline CSS: loader renders before external CSS loads (prevents FOUC) -->
@@ -26,12 +29,7 @@
         position: fixed;
         inset: 0;
         z-index: 3000;
-        background: linear-gradient(
-          135deg,
-          #fff8fa 0%,
-          #fdf0ff 50%,
-          #f0f8ff 100%
-        );
+        background: #fcf9f4;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -49,18 +47,19 @@
       }
 
       .loader-title {
-        font-family: "Cormorant Garamond", Georgia, serif;
+        font-family: "Cormorant Garamond", "Trirong", Georgia, serif;
         font-size: clamp(26px, 5vw, 40px);
         font-weight: 400;
         font-style: italic;
         color: #2e2a28;
-        letter-spacing: 0.01em;
+        letter-spacing: 0;
       }
 
       .loader-sub {
+        font-family: "DM Sans", "IBM Plex Sans Thai Looped", sans-serif;
         font-size: 13px;
         color: #8a7f7a;
-        letter-spacing: 0.08em;
+        letter-spacing: 0;
       }
 
       .loader-petals {
@@ -70,20 +69,18 @@
       }
 
       .loader-petal {
-        width: 8px;
-        height: 8px;
+        width: 5px;
+        height: 5px;
         border-radius: 50%;
-        background: #f9c8d4;
+        background: #9a5c74;
         animation: loaderBounce 1.1s ease-in-out infinite;
       }
 
       .loader-petal:nth-child(2) {
-        background: #c9b8e8;
         animation-delay: 0.18s;
       }
 
       .loader-petal:nth-child(3) {
-        background: #b8d8f8;
         animation-delay: 0.36s;
       }
 
@@ -96,8 +93,8 @@
         }
 
         40% {
-          transform: translateY(-10px);
-          opacity: 1;
+          transform: translateY(-4px);
+          opacity: 0.9;
         }
       }
     </style>
@@ -223,211 +220,23 @@
     <div class="snap-wrap">
       <!-- HERO -->
       <section id="hero">
-        <!-- Corner ornaments (A: frame) -->
-        <svg
-          class="hero-corner hero-corner--tl"
-          width="72"
-          height="72"
-          viewBox="0 0 72 72"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M2 30 V2 H30"
-            stroke="#C9B8E8"
-            stroke-width="1.2"
-            stroke-linecap="round"
-            opacity="0.55"
-          />
-          <path
-            d="M2 14 Q10 14 14 10 Q14 2 14 2"
-            stroke="#C9B8E8"
-            stroke-width="0.9"
-            fill="none"
-            opacity="0.55"
-          />
-          <circle cx="2" cy="30" r="2" fill="#F9C8D4" opacity="0.7" />
-          <circle cx="30" cy="2" r="2" fill="#B8D8F8" opacity="0.7" />
-          <path
-            d="M20 18 Q26 14 26 8"
-            stroke="#B8E8D8"
-            stroke-width="0.8"
-            fill="none"
-            opacity="0.5"
-          />
-          <circle cx="26" cy="8" r="1.5" fill="#B8E8D8" opacity="0.7" />
-        </svg>
-        <svg
-          class="hero-corner hero-corner--tr"
-          width="72"
-          height="72"
-          viewBox="0 0 72 72"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M70 30 V2 H42"
-            stroke="#C9B8E8"
-            stroke-width="1.2"
-            stroke-linecap="round"
-            opacity="0.55"
-          />
-          <path
-            d="M70 14 Q62 14 58 10 Q58 2 58 2"
-            stroke="#C9B8E8"
-            stroke-width="0.9"
-            fill="none"
-            opacity="0.55"
-          />
-          <circle cx="70" cy="30" r="2" fill="#F9C8D4" opacity="0.7" />
-          <circle cx="42" cy="2" r="2" fill="#B8D8F8" opacity="0.7" />
-          <path
-            d="M52 18 Q46 14 46 8"
-            stroke="#B8E8D8"
-            stroke-width="0.8"
-            fill="none"
-            opacity="0.5"
-          />
-          <circle cx="46" cy="8" r="1.5" fill="#B8E8D8" opacity="0.7" />
-        </svg>
-        <svg
-          class="hero-corner hero-corner--bl"
-          width="72"
-          height="72"
-          viewBox="0 0 72 72"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M2 42 V70 H30"
-            stroke="#C9B8E8"
-            stroke-width="1.2"
-            stroke-linecap="round"
-            opacity="0.55"
-          />
-          <path
-            d="M2 58 Q10 58 14 62 Q14 70 14 70"
-            stroke="#C9B8E8"
-            stroke-width="0.9"
-            fill="none"
-            opacity="0.55"
-          />
-          <circle cx="2" cy="42" r="2" fill="#F8D8B8" opacity="0.7" />
-          <circle cx="30" cy="70" r="2" fill="#B8E8D8" opacity="0.7" />
-          <path
-            d="M20 54 Q26 58 26 64"
-            stroke="#F9C8D4"
-            stroke-width="0.8"
-            fill="none"
-            opacity="0.5"
-          />
-          <circle cx="26" cy="64" r="1.5" fill="#F9C8D4" opacity="0.7" />
-        </svg>
-        <svg
-          class="hero-corner hero-corner--br"
-          width="72"
-          height="72"
-          viewBox="0 0 72 72"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M70 42 V70 H42"
-            stroke="#C9B8E8"
-            stroke-width="1.2"
-            stroke-linecap="round"
-            opacity="0.55"
-          />
-          <path
-            d="M70 58 Q62 58 58 62 Q58 70 58 70"
-            stroke="#C9B8E8"
-            stroke-width="0.9"
-            fill="none"
-            opacity="0.55"
-          />
-          <circle cx="70" cy="42" r="2" fill="#F8D8B8" opacity="0.7" />
-          <circle cx="42" cy="70" r="2" fill="#B8E8D8" opacity="0.7" />
-          <path
-            d="M52 54 Q46 58 46 64"
-            stroke="#F9C8D4"
-            stroke-width="0.8"
-            fill="none"
-            opacity="0.5"
-          />
-          <circle cx="46" cy="64" r="1.5" fill="#F9C8D4" opacity="0.7" />
-        </svg>
 
         <div class="floral-top" aria-hidden="true">
-          <svg
-            width="380"
-            height="160"
-            viewBox="0 0 340 140"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M170 140 Q165 90 140 60"
-              stroke="#B8E8D8"
-              stroke-width="1.5"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <path
-              d="M170 140 Q175 85 200 55"
-              stroke="#C9B8E8"
-              stroke-width="1.5"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <path
-              d="M170 140 Q170 80 170 40"
-              stroke="#F9C8D4"
-              stroke-width="1.2"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <path
-              d="M152 95 Q130 75 118 85 Q128 100 152 95Z"
-              fill="#B8E8D8"
-              opacity="0.7"
-            />
-            <path
-              d="M145 75 Q120 55 115 68 Q132 82 145 75Z"
-              fill="#B8D8F8"
-              opacity="0.6"
-            />
-            <path
-              d="M188 90 Q210 70 222 82 Q210 97 188 90Z"
-              fill="#C9B8E8"
-              opacity="0.7"
-            />
-            <path
-              d="M195 68 Q218 50 224 63 Q208 76 195 68Z"
-              fill="#F8D8B8"
-              opacity="0.6"
-            />
-            <circle cx="140" cy="55" r="3.5" fill="#F9C8D4" opacity="0.85" />
-            <circle cx="140" cy="55" r="7" fill="#F9C8D4" opacity="0.3" />
-            <circle cx="200" cy="50" r="3.5" fill="#C9B8E8" opacity="0.85" />
-            <circle cx="200" cy="50" r="7" fill="#C9B8E8" opacity="0.3" />
-            <circle cx="170" cy="36" r="4" fill="#F8D8B8" opacity="0.85" />
-            <circle cx="170" cy="36" r="8" fill="#F8D8B8" opacity="0.3" />
-            <path
-              d="M155 52 Q142 35 148 28"
-              stroke="#F9C8D4"
-              stroke-width="1"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <path
-              d="M185 48 Q198 32 193 25"
-              stroke="#C9B8E8"
-              stroke-width="1"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <circle cx="148" cy="26" r="3" fill="#F9C8D4" opacity="0.7" />
-            <circle cx="193" cy="23" r="3" fill="#C9B8E8" opacity="0.7" />
+          <!-- Single hairline sprig, drawn in ink -->
+          <svg width="132" height="40" viewBox="0 0 132 40" fill="none" stroke="currentColor" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M66 34C54 27 36 22 10 24" />
+            <path d="M66 34C78 27 96 22 122 24" />
+            <path d="M52 29c-3-6-9-8-14-7 3 5 8 7 14 7Z" />
+            <path d="M40 25c-2-5-7-8-12-7 2 5 7 7 12 7Z" />
+            <path d="M27 24c-2-4-6-6-10-6 2 4 5 6 10 6Z" />
+            <path d="M46 27c1 5 5 8 10 8-1-5-5-8-10-8Z" />
+            <path d="M33 24c1 4 4 7 8 7-1-4-4-7-8-7Z" />
+            <path d="M80 29c3-6 9-8 14-7-3 5-8 7-14 7Z" />
+            <path d="M92 25c2-5 7-8 12-7-2 5-7 7-12 7Z" />
+            <path d="M105 24c2-4 6-6 10-6-2 4-5 6-10 6Z" />
+            <path d="M86 27c-1 5-5 8-10 8 1-5 5-8 10-8Z" />
+            <path d="M99 24c-1 4-4 7-8 7 1-4 4-7 8-7Z" />
+            <circle cx="66" cy="31" r="2.2" />
           </svg>
         </div>
 
@@ -439,7 +248,7 @@
         <p class="guest-greeting" style="display: none">
           เรียน <span class="guest-name"></span>
         </p>
-        <p class="hero-badge">
+        <p class="hero-badge" lang="en">
           <span class="hero-badge-line"></span>Wedding Invitation<span
             class="hero-badge-line"
           ></span>
@@ -460,44 +269,6 @@
             data-typewriter="วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569"
           ></p>
           <span class="hero-date-rule"></span>
-        </div>
-
-        <div class="floral-bottom" aria-hidden="true">
-          <svg
-            width="300"
-            height="120"
-            viewBox="0 0 260 100"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M130 10 Q125 45 108 65"
-              stroke="#B8E8D8"
-              stroke-width="1.4"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <path
-              d="M130 10 Q135 42 152 62"
-              stroke="#C9B8E8"
-              stroke-width="1.4"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <path
-              d="M108 65 Q88 50 82 60 Q94 72 108 65Z"
-              fill="#B8E8D8"
-              opacity="0.65"
-            />
-            <path
-              d="M152 62 Q172 48 178 58 Q166 70 152 62Z"
-              fill="#C9B8E8"
-              opacity="0.65"
-            />
-            <circle cx="108" cy="66" r="3" fill="#F9C8D4" opacity="0.8" />
-            <circle cx="152" cy="63" r="3" fill="#F8D8B8" opacity="0.8" />
-            <circle cx="130" cy="8" r="3.5" fill="#B8D8F8" opacity="0.8" />
-          </svg>
         </div>
 
         <div class="hero-scroll-hint" aria-hidden="true">
@@ -578,10 +349,10 @@
         </div>
         <!-- Shown after the wedding day has passed -->
         <div id="countdown-ended" style="display: none">
-          <div class="countdown-ended-heart">♡</div>
+          <div class="countdown-ended-heart" aria-hidden="true"><svg class="inline-heart" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5l-1.3-1.2C6 15.1 3 12.3 3 8.9 3 6.1 5.2 4 7.9 4c1.6 0 3.1.7 4.1 1.9C13 4.7 14.5 4 16.1 4 18.8 4 21 6.1 21 8.9c0 3.4-3 6.2-7.7 10.5L12 20.5z" fill="currentColor"/></svg></div>
           <p class="countdown-ended-thanks">ขอบคุณทุกท่านที่มาร่วมงาน</p>
           <p class="countdown-ended-names"></p>
-          <p class="countdown-ended-sub">รู้สึกอบอุ่นและมีความสุข ♡</p>
+          <p class="countdown-ended-sub">รู้สึกอบอุ่นและมีความสุข</p>
         </div>
       </section>
 
@@ -610,88 +381,18 @@
         <h2 class="details-heading reveal reveal-delay-1">วันและสถานที่</h2>
         <div class="details-cards">
           <div class="detail-card reveal reveal-delay-1">
-            <div class="detail-card-icon">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <rect
-                  x="2"
-                  y="4"
-                  width="18"
-                  height="16"
-                  rx="3"
-                  stroke="#4A4340"
-                  stroke-width="1.5"
-                />
-                <path d="M2 9h18" stroke="#4A4340" stroke-width="1.5" />
-                <path
-                  d="M7 3v2M15 3v2"
-                  stroke="#4A4340"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                />
-                <circle cx="11" cy="14" r="1.5" fill="#4A4340" />
-              </svg>
-            </div>
             <h3>วันที่</h3>
             <p id="dc-date">วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569</p>
           </div>
           <div class="detail-card reveal reveal-delay-2">
-            <div class="detail-card-icon">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <circle
-                  cx="11"
-                  cy="11"
-                  r="8.5"
-                  stroke="#4A4340"
-                  stroke-width="1.5"
-                />
-                <path
-                  d="M11 7v4.5l3 2"
-                  stroke="#4A4340"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </div>
             <h3>เวลา</h3>
             <p id="dc-time">เริ่มพิธี 11:00 น.<br />รับประทานอาหาร 12:00 น.</p>
           </div>
           <div class="detail-card reveal reveal-delay-3">
-            <div class="detail-card-icon">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <path
-                  d="M11 2C7.686 2 5 4.686 5 8c0 4.5 6 11 6 11s6-6.5 6-11c0-3.314-2.686-6-6-6Z"
-                  stroke="#4A4340"
-                  stroke-width="1.5"
-                />
-                <circle
-                  cx="11"
-                  cy="8"
-                  r="2"
-                  stroke="#4A4340"
-                  stroke-width="1.5"
-                />
-              </svg>
-            </div>
             <h3>สถานที่</h3>
             <p id="dc-venue">ตำบลแป-ระ อำเภอท่าแพ<br />จังหวัดสตูล</p>
           </div>
           <div class="detail-card reveal reveal-delay-4">
-            <div class="detail-card-icon">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <path
-                  d="M8 2l-4 4 3 1-3 13h14l-3-13 3-1-4-4"
-                  stroke="#4A4340"
-                  stroke-width="1.5"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M8 2c0 1.657 1.343 3 3 3s3-1.343 3-3"
-                  stroke="#4A4340"
-                  stroke-width="1.5"
-                />
-              </svg>
-            </div>
             <h3>การแต่งกาย</h3>
             <p id="dc-dress">Pastel Formal</p>
             <div class="dress-palette">
@@ -855,22 +556,6 @@
           <h3 class="travel-info-heading">ข้อมูลการเดินทาง</h3>
           <div class="travel-items">
             <div class="travel-item">
-              <div class="travel-item-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19 4c-1 0-1.5.5-3.5 1.5L8 3 5.9 5.1l7 2.8-2.5 3.5-3-.5-1.5 1.5 3.5 2 2 3.5 1.5-1.5-.5-3 3.5-2.5 2.8 7z"
-                  />
-                </svg>
-              </div>
               <div class="travel-item-text">
                 <strong>สนามบินหาดใหญ่ (HDY)</strong>
                 <span data-config="travel_airport"
@@ -879,21 +564,6 @@
               </div>
             </div>
             <div class="travel-item">
-              <div class="travel-item-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
-              </div>
               <div class="travel-item-text">
                 <strong>ที่พักแนะนำ</strong>
                 <span data-config="travel_hotel"
@@ -902,23 +572,6 @@
               </div>
             </div>
             <div class="travel-item">
-              <div class="travel-item-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <rect x="1" y="3" width="15" height="13" rx="2" />
-                  <path d="M16 8h4l3 3v5h-7V8z" />
-                  <circle cx="5.5" cy="18.5" r="2.5" />
-                  <circle cx="18.5" cy="18.5" r="2.5" />
-                </svg>
-              </div>
               <div class="travel-item-text">
                 <strong>ที่จอดรถ</strong>
                 <span data-config="travel_car"
@@ -977,7 +630,7 @@
           <p class="rsvp-closed-sub" id="rsvp-closed-date"></p>
           <p class="rsvp-closed-contact">
             หากต้องการแจ้งเข้าร่วมเพิ่มเติม
-            ติดต่อเจ้าบ่าวเจ้าสาวโดยตรงได้เลยนะคะ ♡
+            ติดต่อเจ้าบ่าวเจ้าสาวโดยตรงได้เลยนะคะ
           </p>
         </div>
         <div class="rsvp-form reveal reveal-delay-3">
@@ -1090,7 +743,7 @@
               </p>
             </div>
             <button type="submit" class="btn-submit">
-              ส่งคำตอบถึงบ่าวสาว ♡
+              ส่งคำตอบถึงบ่าวสาว
             </button>
           </form>
           <div class="thank-you" id="thank-you" style="display: none">
@@ -1236,7 +889,7 @@
           </svg>
           <div class="floral-divider-line"></div>
         </div>
-        <span class="section-label reveal">Guestbook</span>
+        <span class="section-label reveal" lang="en">Guestbook</span>
         <h2 class="guestbook-heading reveal reveal-delay-1">ฝากคำอวยพร</h2>
         <p id="guestbook-sub" class="guestbook-sub reveal reveal-delay-2">
           ฝากคำอวยพรให้นนท์ &amp; เมย์
@@ -1244,7 +897,7 @@
         <div class="heart-altar reveal reveal-delay-2">
           <p class="heart-invite">ส่งความรักให้นนท์ &amp; เมย์</p>
           <span class="heart-count-wrap" style="display: none"
-            >❤&thinsp;<span id="heart-count">0</span>&thinsp;หัวใจ</span
+            ><svg class="inline-heart" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5l-1.3-1.2C6 15.1 3 12.3 3 8.9 3 6.1 5.2 4 7.9 4c1.6 0 3.1.7 4.1 1.9C13 4.7 14.5 4 16.1 4 18.8 4 21 6.1 21 8.9c0 3.4-3 6.2-7.7 10.5L12 20.5z" fill="currentColor"/></svg>&thinsp;<span id="heart-count">0</span>&thinsp;หัวใจ</span
           >
           <button
             type="button"
@@ -1266,7 +919,7 @@
               />
             </svg>
           </button>
-          <p class="heart-hint" id="heart-hint">แตะเพื่อส่งหัวใจ ♡</p>
+          <p class="heart-hint" id="heart-hint">แตะเพื่อส่งหัวใจ</p>
           <div
             class="session-counter-wrap"
             id="session-counter-wrap"
@@ -1313,7 +966,7 @@
               />
             </svg>
           </div>
-          <h3>ขอบคุณนะ ♡</h3>
+          <h3>ขอบคุณนะ</h3>
           <p id="guestbook-thanks-msg">
             คำอวยพรของท่านส่งถึงนนท์ &amp; เมย์แล้ว ♡
           </p>
@@ -1384,7 +1037,7 @@
                 />
                 <p class="field-error" id="gb-err-name">กรุณากรอกชื่อของท่าน</p>
               </div>
-              <button type="submit" class="btn-submit">ส่งคำอวยพร ♡</button>
+              <button type="submit" class="btn-submit">ส่งคำอวยพร</button>
             </form>
           </div>
         </div>
@@ -1510,13 +1163,6 @@
           </svg>
           เปิดซองอีกครั้ง
         </button>
-        <div class="footer-petals" aria-hidden="true">
-          <div class="petal"></div>
-          <div class="petal"></div>
-          <div class="petal"></div>
-          <div class="petal"></div>
-          <div class="petal"></div>
-        </div>
       </footer>
     </div>
     <!-- /.snap-wrap -->
@@ -1645,13 +1291,12 @@
         height: 48px;
         border-radius: 50%;
         border: none;
-        background: rgba(255, 255, 255, 0.82);
-        backdrop-filter: blur(12px);
+        background: rgba(253, 250, 244, 0.92);
         color: #8a7f7a;
         cursor: pointer;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 20px rgba(201, 184, 232, 0.35);
+        box-shadow: 0 0 0 1px rgba(46, 42, 40, 0.12), 0 4px 14px rgba(46, 42, 40, 0.06);
         transition: box-shadow 0.3s;
       "
     ></button>

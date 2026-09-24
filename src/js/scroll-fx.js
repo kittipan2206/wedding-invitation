@@ -4,8 +4,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 // Scroll-linked depth on the hero. As you scroll away from the first screen the
-// couple photo drifts up and zooms slightly slower than the page, while the
-// bottom florals drift the opposite way — a layered parallax that adds depth.
+// couple photo drifts up and zooms slightly slower than the page — a layered
+// parallax that adds depth.
 //
 // The site scrolls inside the scroll-snap container (.snap-wrap), not the
 // window, so ScrollTrigger is pointed at that element as its scroller. The
@@ -21,7 +21,6 @@ export function initScrollFX() {
   ScrollTrigger.defaults({ scroller });
 
   const photo = document.querySelector(".hero-photo");
-  const floralBottom = hero.querySelector(".floral-bottom");
 
   gsap
     .timeline({
@@ -32,8 +31,7 @@ export function initScrollFX() {
         scrub: 0.5,
       },
     })
-    .to(photo, { y: -64, scale: 1.06, ease: "none" }, 0)
-    .to(floralBottom, { y: 44, ease: "none" }, 0);
+    .to(photo, { y: -64, scale: 1.06, ease: "none" }, 0);
 
   // ── Section parallax: decorative elements drift on their own layers ──
   // IMPORTANT: never target `.reveal` elements — their entrance uses a CSS
@@ -67,11 +65,8 @@ export function initScrollFX() {
     .toArray(".countdown-grid .countdown-unit")
     .forEach((el, i) => drift(el, 10 + (i % 2) * 8));
 
-  // Detail cards: the wrapper drifts as one sheet, the icons a touch more
+  // Details insert drifts as one sheet
   drift(document.querySelector(".details-cards"), 16);
-  gsap.utils
-    .toArray(".detail-card-icon")
-    .forEach((el, i) => drift(el, 6 + (i % 3) * 4));
 
   // Guestbook feed rises slightly faster than the page
   drift(document.getElementById("guestbook-feed"), 14);
@@ -110,26 +105,6 @@ export function initScrollFX() {
       childList: true,
     });
   }
-
-  // Divider ornaments slowly pinwheel as they pass
-  gsap.utils.toArray(".floral-divider-ornament").forEach((el) => {
-    const section = el.closest("section");
-    if (!section) return;
-    gsap.fromTo(
-      el,
-      { rotation: -40 },
-      {
-        rotation: 40,
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 0.8,
-        },
-      },
-    );
-  });
 
   // Recompute positions once async content settles — the hero photo loads
   // lazily and the envelope overlay may cover the viewport at init time.

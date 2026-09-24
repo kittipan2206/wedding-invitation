@@ -14,14 +14,8 @@ footer {
 .footer-divider {
   width: 80px;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-pink),
-    transparent
-  );
+  background: var(--hairline);
   margin: 0 auto 36px;
-  opacity: 0.6;
 }
 
 .footer-text {
@@ -34,11 +28,9 @@ footer {
 }
 
 .footer-names {
-  font-weight: 500;
-  color: transparent;
-  background: linear-gradient(90deg, #d4849a, #9e88c8, #7aaed4);
-  -webkit-background-clip: text;
-  background-clip: text;
+  font-weight: 400;
+  color: var(--color-rose);
+  letter-spacing: 0;
 }
 
 .footer-sub {
@@ -53,28 +45,18 @@ footer {
 .footer-share-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 24px;
-  padding: 8px 16px;
-  border-radius: 50px;
-  border: 1px solid rgba(201, 184, 232, 0.45);
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: var(--color-muted);
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 28px;
+  padding: 10px 20px;
+  border-radius: 10px;
   font-family: var(--font-sans);
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  font-size: 14px;
   cursor: pointer;
-  opacity: 0.8;
   transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-}
-
-.footer-share-btn:hover {
-  opacity: 0.75;
-  transform: translateY(-1px);
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 /* ── Replay envelope link — quiet affordance under the share button ── */
@@ -88,8 +70,9 @@ footer {
   border: none;
   cursor: pointer;
   font-family: var(--font-sans);
-  font-size: 12.5px;
-  letter-spacing: 0.04em;
+  min-height: 44px;
+  font-size: 13px;
+  letter-spacing: 0;
   color: var(--color-muted);
   opacity: 0.8;
   transition: opacity 0.25s ease;
@@ -99,38 +82,3 @@ footer {
   opacity: 1;
 }
 
-.footer-petals {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 32px;
-}
-
-.petal {
-  width: 8px;
-  height: 12px;
-  border-radius: 50% 50% 50% 0 / 60% 60% 40% 40%;
-  opacity: 0.45;
-  animation: petalFloat 4s ease-in-out infinite;
-}
-
-.petal:nth-child(1) {
-  background: var(--color-pink);
-  animation-delay: 0s;
-}
-.petal:nth-child(2) {
-  background: var(--color-lavender);
-  animation-delay: 0.4s;
-}
-.petal:nth-child(3) {
-  background: var(--color-mint);
-  animation-delay: 0.8s;
-}
-.petal:nth-child(4) {
-  background: var(--color-peach);
-  animation-delay: 1.2s;
-}
-.petal:nth-child(5) {
-  background: var(--color-sky);
-  animation-delay: 1.6s;
-}

@@ -1,0 +1,9 @@
+Envelope foley — all CC0 1.0 (public domain), from freesound.org.
+Trimmed, high-passed, lightly denoised, faded and loudness-matched (ffmpeg).
+
+wax-crack.mp3   "Chocolate Crumble and Snapping / Cutting" by Finnssound
+                https://freesound.org/people/Finnssound/sounds/660866/  (at 5.80 s)
+flap-open.mp3   "Envelope opened.WAV" by Nickh69
+                https://freesound.org/people/Nickh69/sounds/472850/  (at 1.80 s)
+card-slide.mp3  "Greeting Card Foley" by SpliceSound
+                https://freesound.org/people/SpliceSound/sounds/140393/  (at 15.16 s)

@@ -43,8 +43,8 @@
   font-size: 15px;
   font-weight: 400;
   font-style: italic;
-  color: #c0839a;
-  letter-spacing: 0.015em;
+  color: var(--color-rose);
+  letter-spacing: 0;
   text-align: center;
   line-height: 1.5;
   margin-bottom: 4px;
@@ -85,8 +85,8 @@
 /* Heart path — smooth outline → fill transition */
 .heart-path {
   fill: none;
-  stroke: rgba(212, 83, 126, 0.6);
-  stroke-width: 1.3;
+  stroke: var(--color-rose);
+  stroke-width: 0.9;
   stroke-linecap: round;
   stroke-linejoin: round;
   transition:
@@ -97,8 +97,8 @@
 
 /* Filled state after first tap */
 .heart-tap-btn.heart-filled .heart-path {
-  fill: #d4537e;
-  stroke: #d4537e;
+  fill: var(--color-rose);
+  stroke: var(--color-rose);
   stroke-width: 0;
 }
 
@@ -129,8 +129,8 @@
 .heart-hint {
   font-size: 12px;
   color: var(--color-muted);
-  letter-spacing: 0.015em;
-  opacity: 0.65;
+  letter-spacing: 0;
+  opacity: 0.75;
   overflow: hidden;
 }
 
@@ -160,9 +160,8 @@
 .session-count {
   font-family: var(--font-sans);
   font-size: 15px;
-  font-weight: 700;
-  color: #d4537e;
-  letter-spacing: 0.01em;
+  font-weight: 500;
+  color: var(--color-rose);
   display: inline-block; /* required for GSAP scale transform */
 }
 
@@ -170,7 +169,12 @@
 .heart-count-wrap {
   font-size: 13px;
   color: var(--color-muted);
-  letter-spacing: 0.01em;
+}
+
+.inline-heart {
+  display: inline-block;
+  vertical-align: -1px;
+  color: var(--color-rose);
 }
 
 /* Floating elements — base only; GSAP drives opacity/transform/scale */
@@ -188,9 +192,9 @@
 .heart-milestone-float {
   font-family: var(--font-sans);
   font-size: 32px;
-  font-weight: 700;
-  color: #d4537e;
-  text-shadow: 0 1px 6px rgba(212, 83, 126, 0.28);
+  font-weight: 400;
+  font-family: var(--font-serif);
+  color: var(--color-rose);
   line-height: 1;
 }
 
@@ -201,40 +205,32 @@
   justify-content: center;
   gap: 10px;
   width: 100%;
-  padding: 20px;
+  min-height: 56px;
+  padding: 16px 20px;
   margin-bottom: 20px;
-  border: 1.6px dashed rgba(201, 184, 232, 0.75);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.35);
+  border: 1px dashed rgba(46, 42, 40, 0.28);
+  border-radius: 4px;
+  /* cotton letterpress stock (paper.js → --paper-cotton) */
+  background: var(--paper-cotton, none) 0 0 / var(--paper-tile, 256px)
+    var(--color-ivory);
   cursor: pointer;
   font-family: var(--font-sans);
-  font-size: 14.5px;
-  letter-spacing: 0.03em;
+  font-size: 15px;
+  letter-spacing: 0;
   color: var(--color-muted);
   transition:
-    background 0.3s ease,
-    transform 0.3s var(--transition-ease);
-  animation: gbSlotPulse 2.8s ease-in-out infinite;
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .gb-slot svg {
-  color: #d4537e;
+  color: var(--color-rose);
   flex-shrink: 0;
 }
 
 .gb-slot:hover {
-  background: rgba(255, 255, 255, 0.7);
-  transform: translateY(-2px);
-}
-
-@keyframes gbSlotPulse {
-  0%,
-  100% {
-    border-color: rgba(201, 184, 232, 0.75);
-  }
-  50% {
-    border-color: rgba(212, 83, 126, 0.6);
-  }
+  border-color: var(--color-plum);
+  color: var(--color-text);
 }
 
 /* ── Composer overlay: the slot expands into this letter paper ── */
@@ -267,9 +263,11 @@
   inset: 10vh 0 auto 0;
   margin: 0 auto;
   width: min(90vw, 440px);
-  background: #fffdfb;
-  border: 1px solid rgba(201, 184, 232, 0.35);
-  border-radius: 20px;
+  /* cotton letterpress stock (paper.js → --paper-cotton) */
+  background: var(--paper-cotton, none) 0 0 / var(--paper-tile, 256px)
+    var(--color-ivory);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
   padding: clamp(26px, 6vw, 40px) clamp(22px, 5vw, 36px) clamp(22px, 5vw, 32px);
   box-shadow: 0 18px 60px rgba(75, 21, 40, 0.18);
   text-align: left;
@@ -277,17 +275,6 @@
   will-change: transform;
 }
 
-/* Pastel wash along the top edge, same as the personal letter */
-.gb-composer-paper::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, #f9c8d4, #c9b8e8, #b8d8f8);
-  opacity: 0.7;
-}
 
 .gb-paper-to {
   font-family: var(--font-serif);
@@ -301,7 +288,7 @@
   display: block;
   width: 40px;
   height: 1px;
-  background: rgba(212, 83, 126, 0.45);
+  background: var(--hairline);
   margin-bottom: 18px;
 }
 
@@ -312,8 +299,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: none;
-  background: rgba(201, 184, 232, 0.15);
+  border: 1px solid var(--hairline);
+  background: transparent;
   color: var(--color-muted);
   cursor: pointer;
   display: flex;
@@ -325,7 +312,7 @@
 }
 
 .gb-composer-close:hover {
-  background: rgba(201, 184, 232, 0.3);
+  background: rgba(46, 42, 40, 0.05);
   color: var(--color-text);
 }
 
@@ -368,10 +355,12 @@
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  background: #fffdfd;
-  border-radius: 14px;
-  border: 1px solid rgba(201, 184, 232, 0.4);
-  box-shadow: 0 4px 16px rgba(201, 184, 232, 0.12);
+  /* cotton letterpress stock (paper.js → --paper-cotton) */
+  background: var(--paper-cotton, none) 0 0 / var(--paper-tile, 256px)
+    var(--color-ivory);
+  border-radius: 4px;
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-paper);
   padding: 20px;
   padding-right: 48px;
   position: relative;
@@ -387,21 +376,9 @@
 }
 
 .gb-entry:hover {
-  transform: translateX(4px) rotate(var(--tilt));
-  box-shadow: 0 8px 24px rgba(201, 184, 232, 0.2);
+  transform: rotate(0deg);
 }
 
-/* Pastel wash along the top edge, like the personal letter */
-.gb-entry::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #f9c8d4, #c9b8e8, #b8d8f8);
-  opacity: 0.65;
-}
 
 /* Wax heart stamp, top-right corner */
 .gb-entry::after {
@@ -414,13 +391,13 @@
   border-radius: 50%;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='white' opacity='.95' d='M12 20.5l-1.3-1.2C6 15.1 3 12.3 3 8.9 3 6.1 5.2 4 7.9 4c1.6 0 3.1.7 4.1 1.9C13 4.7 14.5 4 16.1 4 18.8 4 21 6.1 21 8.9c0 3.4-3 6.2-7.7 10.5L12 20.5z'/%3E%3C/svg%3E"),
-    radial-gradient(circle at 35% 30%, #e07a9d, #d4537e 62%, #c44469);
+    radial-gradient(circle at 35% 30%, #b07489, var(--color-rose) 62%, #85495f);
   background-size:
     11px 11px,
     cover;
   background-position: center, center;
   background-repeat: no-repeat;
-  box-shadow: 0 1px 4px rgba(196, 68, 105, 0.3);
+  box-shadow: 0 1px 2px rgba(46, 42, 40, 0.2);
   transform: rotate(-8deg);
 }
 
@@ -428,15 +405,16 @@
   width: 44px;
   height: 44px;
   min-width: 44px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #f9c8d4, #c9b8e8);
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+  background: rgba(249, 200, 212, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(201, 184, 232, 0.3);
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-rose);
 }
 
 .gb-entry-body {
@@ -446,14 +424,15 @@
 
 .gb-entry-name {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-text);
   margin-bottom: 4px;
 }
 
 .gb-entry-msg {
-  font-size: 15px;
-  color: var(--color-muted);
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-text);
   line-height: 1.65;
   word-break: break-word;
 }
@@ -462,24 +441,16 @@
 .gb-show-more {
   display: block;
   width: 100%;
+  min-height: 48px;
   margin: 0 0 32px;
-  padding: 14px 20px;
-  background: white;
-  border: 1.5px solid rgba(201, 184, 232, 0.4);
-  border-radius: 16px;
-  color: var(--color-muted);
-  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-}
-
-.gb-show-more:hover {
-  background: #fdf2f6;
-  border-color: var(--color-lavender);
-  color: var(--color-text);
-  transform: translateY(-1px);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 /* ── Thank-you state ── */
@@ -494,32 +465,23 @@
   text-align: center;
   position: relative;
   overflow: hidden;
-  background: #fffdfd;
-  border: 1px solid rgba(201, 184, 232, 0.4);
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(201, 184, 232, 0.12);
+  /* cotton letterpress stock (paper.js → --paper-cotton) */
+  background: var(--paper-cotton, none) 0 0 / var(--paper-tile, 256px)
+    var(--color-ivory);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  box-shadow: var(--shadow-paper);
 }
 
-.guestbook-thanks::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #f9c8d4, #c9b8e8, #b8d8f8);
-  opacity: 0.65;
-}
 
 .guestbook-thanks-icon {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
+  background: var(--color-rose);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(201, 184, 232, 0.4);
 }
 
 .guestbook-thanks h3 {
