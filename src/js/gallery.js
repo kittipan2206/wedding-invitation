@@ -546,7 +546,7 @@ export async function initGalleryPreview() {
     if (postEvent) {
       note.style.display = "none";
     } else {
-      note.textContent = "รูปจากวันงานจะเพิ่มเข้ามาหลังวันงาน ♡";
+      note.textContent = "รูปจากวันงานจะเพิ่มเข้ามาหลังวันงาน";
     }
   }
 

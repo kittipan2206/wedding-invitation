@@ -19,6 +19,25 @@ import { applyMemoryMode } from "./js/memory-mode.js";
 import { initHearts } from "./js/hearts.js";
 import { initIcsButton } from "./js/ics.js";
 import { initSmartCalendar } from "./js/smart-calendar.js";
+import { initPetalNames, assembleNames } from "./js/petal-names.js";
+import { applyPaperVars } from "./js/paper.js";
+
+const THREE_D_BUDGET_MS = 4000; // past this, the classic CSS envelope plays
+
+function want3D() {
+  // E2E runners drive the classic envelope; a dedicated test opts into 3D
+  if (window.__ENVELOPE_MODE) return window.__ENVELOPE_MODE === "3d";
+  if (navigator.webdriver) return false;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+    return false;
+  try {
+    const gl = document.createElement("canvas").getContext("webgl2");
+    gl?.getExtension("WEBGL_lose_context")?.loseContext();
+    return !!gl;
+  } catch {
+    return false;
+  }
+}
 
 function afterEnvelope() {
   initPetals();
@@ -28,18 +47,30 @@ function afterEnvelope() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const t0 = performance.now();
+  applyPaperVars(); // cotton stock for the page's paper surfaces
+  const params = new URLSearchParams(window.location.search);
+  // If ?goto=<sectionId> is in the URL, OR the envelope was already opened
+  // this session, skip the envelope animation entirely. Session-scoped on
+  // purpose: the envelope IS the invitation experience — a guest who comes
+  // back days later should get it again.
+  const gotoSection = params.get("goto");
+  const alreadyOpened = sessionStorage.getItem("envelope_opened") === "1";
+  const playEnvelope = !gotoSection && !alreadyOpened;
+  // Download the 3D envelope while the loader waits on config — free time
+  const scene3d = playEnvelope && want3D() ? import("./js/envelope3d.js") : null;
+
   // Fetch remote config first — injects dynamic content, sets window.__weddingConfig
   // Falls back to defaults silently if GAS is unreachable
   const cfg = await fetchConfig();
   injectConfig(cfg);
 
-  // Hide loader once fonts are ready
-  document.fonts.ready.then(() => {
-    const loader = document.getElementById("page-loader");
-    if (loader) loader.classList.add("loader--hidden");
-  });
+  const hideLoader = () =>
+    document.fonts.ready.then(() => {
+      const loader = document.getElementById("page-loader");
+      if (loader) loader.classList.add("loader--hidden");
+    });
 
-  const params = new URLSearchParams(window.location.search);
   const guestName = params.get("to");
   if (guestName) {
     const greet = document.querySelector(".guest-greeting");
@@ -58,8 +89,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.title = `${guestName} — นนท์ & เมย์ Wedding Invitation`;
   }
 
-  // After the wedding day, the site flips to a keepsake-album layout
-  applyMemoryMode(window.__weddingConfig);
+  // After the wedding day, the site flips to a keepsake-album layout — only
+  // on real (network/cached) config: hardcoded defaults can't prove the
+  // wedding has passed, and a wrong flip hides RSVP from invited guests
+  if (cfg) applyMemoryMode(window.__weddingConfig);
 
   initCountdown();
   initReveal();
@@ -76,6 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initHearts();
   initIcsButton();
   initSmartCalendar();
+  initPetalNames();
 
   // Footer "เปิดซองอีกครั้ง" — clears the session flag and reloads from the
   // top (keeps ?to= personalization, drops ?goto= so the envelope plays)
@@ -88,14 +122,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = u.toString();
   });
 
-  // If ?goto=<sectionId> is in the URL, OR the envelope was already opened
-  // this session, skip the envelope animation entirely. Session-scoped on
-  // purpose: the envelope IS the invitation experience — a guest who comes
-  // back days later should get it again.
-  const gotoSection = params.get("goto");
-  const alreadyOpened = sessionStorage.getItem("envelope_opened") === "1";
-
-  if (gotoSection || alreadyOpened) {
+  if (!playEnvelope) {
+    hideLoader();
     const overlay = document.getElementById("envelope-overlay");
     if (overlay) overlay.style.display = "none";
     afterEnvelope();
@@ -113,11 +141,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
   } else {
-    initEnvelope(() => {
-      // The personal letter is part of the envelope sequence itself —
-      // by the time this fires the guest has read and closed it
-      sessionStorage.setItem("envelope_opened", "1");
-      afterEnvelope();
-    });
+    // Keep the loader up until the 3D scene is ready (or its budget runs
+    // out) so the guest never sees the CSS envelope swap into 3D
+    let scene = null;
+    if (scene3d) {
+      const overlay = document.getElementById("envelope-overlay");
+      const pending = scene3d
+        .then((m) => m.createEnvelopeScene(overlay))
+        .catch(() => null);
+      const left = Math.max(0, THREE_D_BUDGET_MS - (performance.now() - t0));
+      scene = await Promise.race([
+        pending,
+        new Promise((r) => setTimeout(() => r(null), left)),
+      ]);
+      // lost the race — a late scene must not paint over the CSS envelope
+      if (!scene) pending.then((late) => late?.dispose());
+    }
+    hideLoader();
+    initEnvelope(
+      () => {
+        // The personal letter is part of the envelope sequence itself —
+        // by the time this fires the guest has read and closed it
+        sessionStorage.setItem("envelope_opened", "1");
+        afterEnvelope();
+      },
+      { scene, onClosing: (o) => assembleNames(o) },
+    );
   }
 });

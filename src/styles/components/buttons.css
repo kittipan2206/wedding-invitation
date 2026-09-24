@@ -1,0 +1,50 @@
+/* ══ Button system ══
+   primary  = solid plum, ivory text
+   secondary = hairline outline on paper
+   Both ≥44px tall, modest radius, no glow. */
+.btn-submit,
+.map-btn--navigate,
+.letter-continue,
+.share-action-btn--native {
+  background: var(--color-plum);
+  color: var(--color-ivory);
+  border: 1px solid var(--color-plum);
+  box-shadow: none;
+}
+
+.btn-submit:hover,
+.map-btn--navigate:hover,
+.letter-continue:hover,
+.share-action-btn--native:hover {
+  background: #3b2e3a;
+  border-color: #3b2e3a;
+}
+
+.map-btn--calendar,
+.gb-show-more,
+.gallery-view-all-btn,
+.footer-share-btn,
+.share-action-btn--copy,
+.share-action-btn--line,
+.share-action-btn--fb {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid rgba(46, 42, 40, 0.28);
+  box-shadow: none;
+}
+
+.map-btn--calendar:hover,
+.gb-show-more:hover,
+.gallery-view-all-btn:hover,
+.footer-share-btn:hover,
+.share-action-btn--copy:hover,
+.share-action-btn--line:hover,
+.share-action-btn--fb:hover {
+  border-color: var(--color-plum);
+  background: rgba(74, 58, 72, 0.04);
+}
+
+:where(.btn-submit, .letter-continue, .map-btn, .gb-show-more, .footer-share-btn, .share-action-btn, .gallery-view-all-btn):focus-visible {
+  outline: 2px solid rgba(74, 58, 72, 0.45);
+  outline-offset: 2px;
+}

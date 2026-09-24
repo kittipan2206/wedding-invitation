@@ -16,25 +16,24 @@
 }
 
 .scroll-nav-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: rgba(201, 184, 232, 0.4);
-  border: 1.5px solid rgba(201, 184, 232, 0.6);
+  background: transparent;
+  border: 1px solid rgba(46, 42, 40, 0.3);
   cursor: pointer;
   transition: transform 0.3s ease, background 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
 }
 
 .scroll-nav-dot:hover {
-  background: rgba(201, 184, 232, 0.75);
-  transform: scale(1.3);
+  background: rgba(46, 42, 40, 0.2);
 }
 
 .scroll-nav-dot.active {
-  background: #C9B8E8;
-  border-color: #C9B8E8;
-  height: 20px;
-  border-radius: 4px;
+  background: var(--color-plum);
+  border-color: var(--color-plum);
+  height: 18px;
+  border-radius: 3px;
   transform: none;
 }
 

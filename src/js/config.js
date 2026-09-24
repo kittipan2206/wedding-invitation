@@ -1,20 +1,25 @@
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 
+// Fallback when GAS is unreachable on a first visit (no cache). Keep in sync
+// with the live sheet — stale values here once flipped guests into memory
+// mode before the wedding (main.js now also refuses memory mode on defaults).
 export const CONFIG_DEFAULTS = {
   groom_name: "นนท์",
   bride_name: "เมย์",
-  event_date_display: "วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569",
-  event_date_iso: "2026-03-15",
-  event_time_ceremony: "11:00",
-  event_time_lunch: "12:00",
-  venue_name: "ตำบลแป-ระ อำเภอท่าแพ จังหวัดสตูล",
-  dress_code: "Pastel Formal",
-  rsvp_deadline_display: "28 กุมภาพันธ์ 2569",
-  music_url: "/music.mp3",
-  travel_airport: "ระยะทางประมาณ 1 ชั่วโมงครึ่ง จากสนามบิน",
-  travel_hotel: "โรงแรมในตัวเมืองสตูล ห่างจากงาน ~20 นาที",
-  travel_car: "มีที่จอดรถสำหรับแขกเพียงพอ ไม่มีค่าใช้จ่าย",
+  event_date_display: "วันอาทิตย์ที่ 28 กุมภาพันธ์ พ.ศ. 2570",
+  event_date_iso: "2027-02-28",
+  event_time_ceremony: "09:00",
+  event_time_lunch: "13:00",
+  venue_name: "ตำบลแป-ระ, อำเภอท่าแพ, จังหวัดสตูล",
+  venue_maps_url: "https://maps.app.goo.gl/7PQxdmqd1pa38qa4A",
+  dress_code: "สีพาสเทล",
+  rsvp_deadline_display: "25 กุมภาพันธ์ 2570",
+  rsvp_deadline_iso: "2027-02-25",
+  music_url: "/music/เล่นเปียโน.mp3",
+  travel_airport: "ระยะทางประมาณ 1-2 ชั่วโมงจากสนามบิน",
+  travel_hotel: "โรงแรมในตัวเมือง ห่างจากงานประมาณ 20 นาที",
+  travel_car: "มีที่จอดรถสำหรับแขก ไม่มีค่าใช้จ่าย",
   og_image: "https://non-may.vercel.app/og-image.png",
 };
 
@@ -130,39 +135,62 @@ function writeCache(data) {
   }
 }
 
-async function fetchFromGAS() {
-  const res = await fetch(`${SHEET_URL}?type=config`, { redirect: "follow" });
-  if (!res.ok) return null;
-  const data = await res.json();
-  if (!data || typeof data !== "object" || Array.isArray(data)) return null;
-  return normalizeConfigValues(data);
+// Cold first visit: how long the page may wait on GAS before rendering the
+// built-in defaults (GAS regularly takes 2–12 s). The real config still
+// swaps in the moment it arrives.
+export const CONFIG_WAIT_MS = 2500;
+
+// Concurrent callers share one request (the cold-visit wait and the SWR
+// refresh used to fire two in parallel)
+let inflight = null;
+function fetchFromGAS() {
+  inflight ??= fetch(`${SHEET_URL}?type=config`, { redirect: "follow" })
+    .then((res) => (res.ok ? res.json() : null))
+    .then((data) =>
+      data && typeof data === "object" && !Array.isArray(data)
+        ? normalizeConfigValues(data)
+        : null,
+    )
+    .catch(() => null)
+    .finally(() => (inflight = null));
+  return inflight;
+}
+
+// Config the server already fetched while rendering this HTML (api/og.js)
+function readServerConfig() {
+  const d = typeof window !== "undefined" && window.__SSR_CONFIG;
+  return d && typeof d === "object" ? normalizeConfigValues(d) : null;
 }
 
 export async function fetchConfig() {
-  const cached = readCache();
+  const server = readServerConfig();
+  if (server) writeCache(server);
+  const known = readCache() || server;
 
-  // Revalidate in background (SWR) — always fetch fresh copy quietly
-  fetchFromGAS()
-    .then((fresh) => {
-      if (fresh) {
-        writeCache(fresh);
-        // If data changed vs what we rendered, re-inject automatically
-        if (cached && JSON.stringify(fresh) !== JSON.stringify(cached)) {
-          injectConfig(fresh);
-        }
-      }
-    })
-    .catch(() => {});
+  // Revalidate in background (SWR) — always fetch a fresh copy quietly
+  const fresh = fetchFromGAS().then((data) => {
+    if (data) writeCache(data);
+    return data;
+  });
 
-  // Return cache instantly if available, otherwise wait for network
-  if (cached) return cached;
-  try {
-    const fresh = await fetchFromGAS();
-    if (fresh) writeCache(fresh);
-    return fresh;
-  } catch {
-    return null;
+  if (known) {
+    // If data changed vs what we rendered, re-inject automatically
+    fresh.then((data) => {
+      if (data && JSON.stringify(data) !== JSON.stringify(known))
+        injectConfig(data);
+    });
+    return known;
   }
+
+  // Cold visit: wait for GAS, but never longer than CONFIG_WAIT_MS
+  const winner = await Promise.race([
+    fresh,
+    new Promise((r) => setTimeout(() => r(undefined), CONFIG_WAIT_MS)),
+  ]);
+  if (winner !== undefined) return winner;
+  // rendering defaults for now; the late answer swaps in when it lands
+  fresh.then((data) => data && injectConfig(data));
+  return null;
 }
 
 export function injectConfig(cfg) {

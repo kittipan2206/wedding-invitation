@@ -27,6 +27,7 @@
     "esbuild": "^0.28.2",
     "gsap": "^3.15.0",
     "photoswipe": "^5.4.4",
-    "qr-code-styling": "^1.9.2"
+    "qr-code-styling": "^1.9.2",
+    "three": "^0.186.0"
   }
 }

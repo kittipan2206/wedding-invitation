@@ -1,26 +1,25 @@
 import fs from "fs";
 import path from "path";
+import { CONFIG_DEFAULTS } from "../src/js/config.js";
 
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 
-const DEFAULTS = {
-  groom_name: "นนท์",
-  bride_name: "เมย์",
-  event_date_display: "วันเสาร์ที่ 15 มีนาคม พ.ศ. 2569",
-  venue_name: "ตำบลแป-ระ อำเภอท่าแพ จังหวัดสตูล",
-  rsvp_deadline_display: "28 กุมภาพันธ์",
-  og_image: "https://non-may.vercel.app/og-image.png",
-};
+// Single source of truth with the client (a stale copy here once still
+// said 15 มีนาคม 2569 in link previews)
+const DEFAULTS = CONFIG_DEFAULTS;
 
 // In-memory cache — best-effort for warm instances
 let _cache = null;
 let _cachedAt = 0;
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
+// → { cfg, live } — live = the raw sheet data (null when GAS was unreachable
+// and nothing is cached), which is embedded in the page for the client
+let _live = null;
 async function getConfig() {
   const now = Date.now();
-  if (_cache && now - _cachedAt < TTL_MS) return _cache;
+  if (_cache && now - _cachedAt < TTL_MS) return { cfg: _cache, live: _live };
   try {
     const res = await fetch(`${GAS_URL}?type=config`, {
       redirect: "follow",
@@ -30,14 +29,23 @@ async function getConfig() {
       const data = await res.json();
       if (data && typeof data === "object" && !Array.isArray(data)) {
         _cache = { ...DEFAULTS, ...data };
+        _live = data;
         _cachedAt = now;
-        return _cache;
+        return { cfg: _cache, live: _live };
       }
     }
   } catch {
     // GAS unreachable — use cached or defaults
   }
-  return _cache ?? { ...DEFAULTS };
+  return { cfg: _cache ?? { ...DEFAULTS }, live: _live };
+}
+
+// JSON for an inline <script>: "<" escaped so sheet text can never close
+// the tag (the sheet is admin-edited, but it's still user input)
+export function ssrConfigScript(live) {
+  if (!live) return "";
+  const json = JSON.stringify(live).replace(/</g, "\\u003c");
+  return `<script>window.__SSR_CONFIG=${json}</script>`;
 }
 
 function escAttr(str) {
@@ -81,7 +89,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const cfg = await getConfig();
+  const { cfg, live } = await getConfig();
 
   // After the wedding day, shared links read as a memory album, not an invite
   // (GAS may return event_date_iso as a full ISO datetime — take the date part)
@@ -124,10 +132,14 @@ export default async function handler(req, res) {
   html = html
     .replaceAll("{{og_title}}", title)
     .replaceAll("{{og_description}}", description)
-    .replaceAll("{{og_image}}", ogImage);
+    .replaceAll("{{og_image}}", ogImage)
+    // the page starts from this config instantly instead of re-asking GAS
+    .replace("</head>", `${ssrConfigScript(live)}</head>`);
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
-  // CDN-level cache: 5 min fresh, then serve stale while revalidating in background
-  res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=60");
+  // CDN-level cache: 5 min fresh, then keep serving the cached page instantly
+  // while it refreshes in the background (a 60 s window used to make the
+  // unlucky visitor wait on GAS for the HTML itself)
+  res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=86400");
   res.send(html);
 }
