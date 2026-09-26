@@ -250,8 +250,11 @@ export function injectConfig(cfg) {
   if (dcDress) dcDress.textContent = c.dress_code;
 
   // Map navigate button href
-  const mapNavBtn = document.getElementById("map-navigate-btn");
-  if (mapNavBtn && c.venue_maps_url) mapNavBtn.href = c.venue_maps_url;
+  // navigate button + the illustrated map card
+  if (c.venue_maps_url)
+    document
+      .querySelectorAll("#map-navigate-btn, #map-card")
+      .forEach((a) => (a.href = c.venue_maps_url));
 
   // Map iframe src
   const mapIframe = document.getElementById("map-iframe");

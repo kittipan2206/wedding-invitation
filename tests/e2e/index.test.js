@@ -544,4 +544,27 @@ test.describe("Stationery touches", () => {
       timeout: 10_000,
     });
   });
+
+  test("choosing attendance stamps the reply paper", async ({ page }) => {
+    await mockGAS(page);
+    await page.goto("/?goto=rsvp");
+    await expect(page.locator("#rsvp-form")).toBeVisible({ timeout: 10_000 });
+    await page.click('label[for="attend-yes"]');
+    await expect(page.locator("#rsvp-stamp")).toHaveClass(/rsvp-stamp--pressed/);
+    await expect(page.locator("#rsvp-stamp")).toContainText("ยินดี");
+    await page.click('label[for="attend-no"]');
+    await expect(page.locator("#rsvp-stamp")).toContainText("เสียดายจัง");
+  });
+
+  test("the illustrated map opens the venue in Google Maps", async ({
+    page,
+  }) => {
+    await mockGAS(page);
+    await page.goto("/?goto=details");
+    const card = page.locator("#map-card");
+    await expect(card).toBeVisible({ timeout: 10_000 });
+    const nav = await page.locator("#map-navigate-btn").getAttribute("href");
+    await expect(card).toHaveAttribute("href", nav);
+    await expect(card).toContainText("ไม่ตามมาตราส่วน");
+  });
 });

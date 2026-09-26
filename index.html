@@ -109,6 +109,19 @@
   </head>
 
   <body>
+    <!-- shared art for the embossed section dividers -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <g id="emboss-sprig">
+          <path d="M29 13.2C22 15.6 14.5 15 6 11.2" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          <path d="M24.5 14.6c-1.4-3.6.6-6 3.9-6.4-.1 3.2-1.4 5.6-3.9 6.4z" />
+          <path d="M18.4 15.2c-1.8-3.2-.2-5.9 3-6.7.3 3.2-.7 5.6-3 6.7z" />
+          <path d="M12.6 14.2c-2.2-2.8-1-5.7 2.1-6.9.6 3.1 0 5.6-2.1 6.9z" />
+          <path d="M22 15.4c2.8 2.6 5.8 2.5 7.8.6-2.5-2-5.2-2.3-7.8-.6z" />
+          <path d="M15.6 15.6c2.6 2.8 5.6 3 7.8 1.2-2.4-2.2-5.1-2.7-7.8-1.2z" />
+        </g>
+      </defs>
+    </svg>
     <!-- Page loader (inline CSS above ensures it covers page before external CSS loads) -->
     <div id="page-loader">
       <div class="loader-petals">
@@ -288,18 +301,13 @@
           <div class="floral-divider-line"></div>
           <svg
             class="floral-divider-ornament"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.2"
+            viewBox="0 0 72 24"
+            fill="currentColor"
           >
-            <path
-              d="M12 22C12 22 12 12 12 2M12 12C12 12 2 12 2 12M12 12C12 12 22 12 22 12M12 12C12 12 19 5 19 5M12 12C12 12 5 5 5 5"
-              stroke-linecap="round"
-            />
-            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <!-- blind-embossed sprigs + heart (sprite at the top of <body>) -->
+            <use href="#emboss-sprig" />
+            <use href="#emboss-sprig" transform="matrix(-1 0 0 1 72 0)" />
+            <path d="M36 17.6l-.9-.8c-3.2-2.9-5.3-4.8-5.3-7.1 0-1.9 1.5-3.3 3.3-3.3 1.1 0 2.1.5 2.9 1.3.8-.8 1.8-1.3 2.9-1.3 1.8 0 3.3 1.4 3.3 3.3 0 2.3-2.1 4.2-5.3 7.1z" />
           </svg>
           <div class="floral-divider-line"></div>
         </div>
@@ -367,18 +375,13 @@
           <div class="floral-divider-line"></div>
           <svg
             class="floral-divider-ornament"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.2"
+            viewBox="0 0 72 24"
+            fill="currentColor"
           >
-            <path
-              d="M12 22C12 22 12 12 12 2M12 12C12 12 2 12 2 12M12 12C12 12 22 12 22 12M12 12C12 12 19 5 19 5M12 12C12 12 5 5 5 5"
-              stroke-linecap="round"
-            />
-            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <!-- blind-embossed sprigs + heart (sprite at the top of <body>) -->
+            <use href="#emboss-sprig" />
+            <use href="#emboss-sprig" transform="matrix(-1 0 0 1 72 0)" />
+            <path d="M36 17.6l-.9-.8c-3.2-2.9-5.3-4.8-5.3-7.1 0-1.9 1.5-3.3 3.3-3.3 1.1 0 2.1.5 2.9 1.3.8-.8 1.8-1.3 2.9-1.3 1.8 0 3.3 1.4 3.3 3.3 0 2.3-2.1 4.2-5.3 7.1z" />
           </svg>
           <div class="floral-divider-line"></div>
         </div>
@@ -430,14 +433,89 @@
           </div>
         </div>
 
-        <!-- <div style="height:20px"></div> -->
-
-        <!-- <div class="map-embed reveal">
-        <iframe id="map-iframe"
-          src="https://maps.google.com/maps?q=ตำบลแป-ระ+อำเภอท่าแพ+จังหวัดสตูล&output=embed&hl=th&z=13"
-          title="แผนที่สถานที่จัดงาน" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-      </div> -->
+        <!-- Hand-inked stationery map (not to scale); the route draws itself
+             when the card is revealed. Tap = Google Maps (config.js sets href) -->
+        <a
+          id="map-card"
+          class="map-card reveal"
+          href="https://maps.app.goo.gl/7PQxdmqd1pa38qa4A"
+          target="_blank"
+          rel="noopener"
+          aria-label="แผนที่ไปสถานที่จัดงาน — แตะเพื่อเปิดใน Google Maps"
+        >
+          <svg viewBox="0 0 320 200" role="img" aria-hidden="true">
+            <defs>
+              <mask id="map-route-reveal">
+                <path
+                  class="map-route-mask"
+                  pathLength="1"
+                  d="M128 160C140 140 150 128 168 120S200 104 206 86S226 62 238 56"
+                />
+              </mask>
+            </defs>
+            <!-- sea + coast -->
+            <path
+              class="map-sea"
+              d="M0 0H58C52 22 66 40 58 62C50 86 70 104 62 128C56 146 74 164 88 176C100 186 96 196 104 200H0Z"
+            />
+            <path
+              class="map-coast"
+              d="M58 0C52 22 66 40 58 62C50 86 70 104 62 128C56 146 74 164 88 176C100 186 96 196 104 200"
+            />
+            <g class="map-waves">
+              <path d="M6 36q4-4 8 0t8 0" />
+              <path d="M6 92q4-4 8 0t8 0" />
+              <path d="M6 150q4-4 8 0t8 0" />
+              <path d="M30 184q4-4 8 0t8 0" />
+            </g>
+            <text class="map-sea-label" transform="translate(40 122) rotate(-90)">
+              ทะเลอันดามัน
+            </text>
+            <!-- hills + trees -->
+            <g class="map-ink">
+              <path d="M250 152l12-18 12 18M268 156l10-14 10 14M158 72l9-13 9 13" />
+              <path d="M190 150v7M204 160v7M146 98v7M226 170v7" />
+              <circle cx="190" cy="146" r="4" />
+              <circle cx="204" cy="156" r="4" />
+              <circle cx="146" cy="94" r="4" />
+              <circle cx="226" cy="166" r="4" />
+            </g>
+            <!-- town -->
+            <g class="map-ink">
+              <path d="M114 170v-7l5-5 5 5v7zM126 170v-9l6-6 6 6v9zM140 170v-6l4-4 4 4v6z" />
+            </g>
+            <text class="map-label" x="130" y="188">ตัวเมืองสตูล</text>
+            <!-- the way to Hat Yai (airport) -->
+            <path class="map-dotted" d="M210 90C236 96 268 94 300 98" />
+            <text class="map-label map-label--muted" x="314" y="112" text-anchor="end">
+              ไปหาดใหญ่ / สนามบิน →
+            </text>
+            <!-- route, inked in through the mask -->
+            <path
+              class="map-route"
+              mask="url(#map-route-reveal)"
+              d="M128 160C140 140 150 128 168 120S200 104 206 86S226 62 238 56"
+            />
+            <!-- compass -->
+            <g class="map-ink map-compass">
+              <path d="M292 190v-16m-4 5 4-5 4 5" />
+            </g>
+            <text class="map-label map-label--muted" x="300" y="186">N</text>
+            <!-- wax-seal pin on the venue -->
+            <g class="map-pin">
+              <ellipse cx="240" cy="60" rx="8" ry="2.5" class="map-pin-shadow" />
+              <circle cx="240" cy="46" r="11" class="map-pin-wax" />
+              <path
+                class="map-pin-heart"
+                d="M240 52.5l-.9-.8c-3.1-2.8-5.1-4.6-5.1-6.9 0-1.8 1.4-3.2 3.2-3.2 1 0 2 .5 2.8 1.2.7-.7 1.8-1.2 2.8-1.2 1.8 0 3.2 1.4 3.2 3.2 0 2.3-2 4.1-5.1 6.9z"
+              />
+            </g>
+            <text class="map-label map-label--venue" x="240" y="26">
+              สถานที่จัดงาน ♡
+            </text>
+          </svg>
+          <span class="map-card-note">แผนที่ประกอบ ไม่ตามมาตราส่วน · แตะเพื่อเปิดใน Google Maps</span>
+        </a>
         <div class="map-actions reveal">
           <a
             id="map-navigate-btn"
@@ -594,18 +672,13 @@
           <div class="floral-divider-line"></div>
           <svg
             class="floral-divider-ornament"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.2"
+            viewBox="0 0 72 24"
+            fill="currentColor"
           >
-            <path
-              d="M12 22C12 22 12 12 12 2M12 12C12 12 2 12 2 12M12 12C12 12 22 12 22 12M12 12C12 12 19 5 19 5M12 12C12 12 5 5 5 5"
-              stroke-linecap="round"
-            />
-            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <!-- blind-embossed sprigs + heart (sprite at the top of <body>) -->
+            <use href="#emboss-sprig" />
+            <use href="#emboss-sprig" transform="matrix(-1 0 0 1 72 0)" />
+            <path d="M36 17.6l-.9-.8c-3.2-2.9-5.3-4.8-5.3-7.1 0-1.9 1.5-3.3 3.3-3.3 1.1 0 2.1.5 2.9 1.3.8-.8 1.8-1.3 2.9-1.3 1.8 0 3.3 1.4 3.3 3.3 0 2.3-2.1 4.2-5.3 7.1z" />
           </svg>
           <div class="floral-divider-line"></div>
         </div>
@@ -639,6 +712,35 @@
           </p>
         </div>
         <div class="rsvp-form reveal reveal-delay-3">
+          <!-- Rubber stamp pressed when attendance is chosen (rsvp.js) -->
+          <div class="rsvp-stamp" id="rsvp-stamp" aria-hidden="true">
+            <svg viewBox="0 0 120 64">
+              <defs>
+                <!-- patchy ink: noise punches small holes in the print -->
+                <filter id="stamp-ink" x="0" y="0" width="100%" height="100%">
+                  <feTurbulence
+                    type="fractalNoise"
+                    baseFrequency="0.85"
+                    numOctaves="2"
+                    seed="7"
+                    result="noise"
+                  />
+                  <feColorMatrix
+                    in="noise"
+                    type="matrix"
+                    values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.4 2.25"
+                    result="ink"
+                  />
+                  <feComposite in="SourceGraphic" in2="ink" operator="in" />
+                </filter>
+              </defs>
+              <g filter="url(#stamp-ink)">
+                <rect x="3" y="3" width="114" height="58" rx="8" class="rsvp-stamp-frame" />
+                <rect x="8.5" y="8.5" width="103" height="47" rx="5" class="rsvp-stamp-frame rsvp-stamp-frame--inner" />
+                <text class="rsvp-stamp-text" x="60" y="40">ยินดี ♡</text>
+              </g>
+            </svg>
+          </div>
           <div class="rsvp-letterhead" aria-hidden="true">
             <p class="rsvp-letterhead-to" id="rsvp-letter-to">
               ถึง นนท์ &amp; เมย์
@@ -882,18 +984,13 @@
           <div class="floral-divider-line"></div>
           <svg
             class="floral-divider-ornament"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.2"
+            viewBox="0 0 72 24"
+            fill="currentColor"
           >
-            <path
-              d="M12 22C12 22 12 12 12 2M12 12C12 12 2 12 2 12M12 12C12 12 22 12 22 12M12 12C12 12 19 5 19 5M12 12C12 12 5 5 5 5"
-              stroke-linecap="round"
-            />
-            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <!-- blind-embossed sprigs + heart (sprite at the top of <body>) -->
+            <use href="#emboss-sprig" />
+            <use href="#emboss-sprig" transform="matrix(-1 0 0 1 72 0)" />
+            <path d="M36 17.6l-.9-.8c-3.2-2.9-5.3-4.8-5.3-7.1 0-1.9 1.5-3.3 3.3-3.3 1.1 0 2.1.5 2.9 1.3.8-.8 1.8-1.3 2.9-1.3 1.8 0 3.3 1.4 3.3 3.3 0 2.3-2.1 4.2-5.3 7.1z" />
           </svg>
           <div class="floral-divider-line"></div>
         </div>
@@ -1057,18 +1154,13 @@
           <div class="floral-divider-line"></div>
           <svg
             class="floral-divider-ornament"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.2"
+            viewBox="0 0 72 24"
+            fill="currentColor"
           >
-            <path
-              d="M12 22C12 22 12 12 12 2M12 12C12 12 2 12 2 12M12 12C12 12 22 12 22 12M12 12C12 12 19 5 19 5M12 12C12 12 5 5 5 5"
-              stroke-linecap="round"
-            />
-            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <!-- blind-embossed sprigs + heart (sprite at the top of <body>) -->
+            <use href="#emboss-sprig" />
+            <use href="#emboss-sprig" transform="matrix(-1 0 0 1 72 0)" />
+            <path d="M36 17.6l-.9-.8c-3.2-2.9-5.3-4.8-5.3-7.1 0-1.9 1.5-3.3 3.3-3.3 1.1 0 2.1.5 2.9 1.3.8-.8 1.8-1.3 2.9-1.3 1.8 0 3.3 1.4 3.3 3.3 0 2.3-2.1 4.2-5.3 7.1z" />
           </svg>
           <div class="floral-divider-line"></div>
         </div>

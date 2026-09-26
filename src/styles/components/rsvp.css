@@ -355,3 +355,71 @@
   max-width: 360px;
   line-height: 1.8;
 }
+
+/* ── Rubber stamp (rsvp.js stampAttendance) ── */
+.rsvp-stamp {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: clamp(84px, 24vw, 108px);
+  color: #9c4862;
+  opacity: 0;
+  transform: rotate(-10deg);
+  pointer-events: none;
+  mix-blend-mode: multiply; /* ink sits in the paper, not on it */
+  z-index: 2;
+}
+
+.rsvp-stamp[data-tone="no"] {
+  color: #8a7f7a;
+}
+
+.rsvp-stamp svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.rsvp-stamp-frame {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+}
+
+.rsvp-stamp-frame--inner {
+  stroke-width: 1.1;
+}
+
+.rsvp-stamp-text {
+  font-family: var(--font-sans);
+  font-size: 19px;
+  font-weight: 600;
+  text-anchor: middle;
+  fill: currentColor;
+}
+
+.rsvp-stamp--pressed {
+  opacity: 0.86;
+  animation: stamp-press 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+@keyframes stamp-press {
+  0% {
+    opacity: 0;
+    transform: scale(1.7) rotate(-18deg);
+  }
+  55% {
+    opacity: 0.9;
+    transform: scale(0.94) rotate(-9deg);
+  }
+  100% {
+    opacity: 0.86;
+    transform: scale(1) rotate(-10deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rsvp-stamp--pressed {
+    animation: none;
+  }
+}

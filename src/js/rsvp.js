@@ -38,6 +38,24 @@ export function fillThankYou({ name, attending }, cfg) {
   }
 }
 
+// A rubber stamp pressed onto the reply paper when attendance is chosen
+const STAMPS = {
+  ยินดีเข้าร่วม: { text: "ยินดี ♡", tone: "yes" },
+  ไม่สะดวกเข้าร่วม: { text: "เสียดายจัง", tone: "no" },
+};
+export function stampAttendance(value) {
+  const el = document.getElementById("rsvp-stamp");
+  const stamp = STAMPS[value];
+  if (!el || !stamp) return;
+  el.querySelector(".rsvp-stamp-text").textContent = stamp.text;
+  el.dataset.tone = stamp.tone;
+  // restart the press even when re-choosing
+  el.classList.remove("rsvp-stamp--pressed");
+  void el.offsetWidth;
+  el.classList.add("rsvp-stamp--pressed");
+  navigator.vibrate?.(8);
+}
+
 export function initRsvp() {
   const form = document.getElementById("rsvp-form");
   if (!form) return;
@@ -136,7 +154,10 @@ export function initRsvp() {
   document
     .querySelectorAll('input[name="attendance"]')
     .forEach((r) =>
-      r.addEventListener("change", () => showError("err-attend", false)),
+      r.addEventListener("change", () => {
+        showError("err-attend", false);
+        stampAttendance(r.value);
+      }),
     );
 
   // Char counter

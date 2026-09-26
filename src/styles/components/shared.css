@@ -17,22 +17,50 @@
   letter-spacing: -0.01em;
 }
 
-/* ── Section rule: a single short hairline (ornament hidden) ── */
+/* ── Section divider: a botanical ornament blind-embossed into the paper —
+   paper-coloured, seen only through its light (top-left) and shadow
+   (bottom-right) edges. It presses in as the section is revealed. ── */
 .floral-divider {
   display: flex;
+  align-items: center;
   justify-content: center;
-  width: 48px;
+  gap: 12px;
+  width: 190px;
   margin: 0 auto 28px;
 }
 
 .floral-divider-line {
   flex: 1;
   height: 1px;
-  background: var(--hairline);
+  background: rgba(46, 42, 40, 0.1);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .floral-divider-ornament {
-  display: none;
+  flex: none;
+  width: 90px;
+  height: 30px;
+  color: #ebe3d9;
+  filter: drop-shadow(-0.7px -0.8px 0 rgba(255, 255, 255, 0.95))
+    drop-shadow(0.8px 1px 0.6px rgba(90, 65, 65, 0.36));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .floral-divider.reveal .floral-divider-ornament {
+    /* the die hovering above the paper… */
+    transform: scale(1.3);
+    filter: drop-shadow(-2px -2px 3px rgba(255, 255, 255, 0.6))
+      drop-shadow(3px 5px 6px rgba(90, 65, 65, 0.22));
+    transition:
+      transform 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) 0.2s,
+      filter 0.55s ease 0.2s;
+  }
+  /* …presses in */
+  .floral-divider.reveal.visible .floral-divider-ornament {
+    transform: none;
+    filter: drop-shadow(-0.7px -0.8px 0 rgba(255, 255, 255, 0.95))
+      drop-shadow(0.8px 1px 0.6px rgba(90, 65, 65, 0.36));
+  }
 }
 
 /* ── Generic icon circle ── */
