@@ -160,7 +160,11 @@
 - Time card shows ceremony time and lunch time
 - Venue card shows the location name
 - Dress code card shows the required attire
-- An embedded map shows the venue location
+- An illustrated map card (drawn like a hand-inked stationery map, not to
+  scale — it says so) shows the sea, the town ("ตัวเมืองสตูล"), the way to
+  Hat Yai airport and a wax-seal pin on the venue; the route inks itself in
+  when the card comes into view (reduced-motion: already drawn). Tapping the
+  card opens the venue in Google Maps, same as "นำทางเลย"
 - A "Navigate" button opens Google Maps with the venue coordinates
 - A single smart "บันทึกปฏิทิน" button adapts to the guest's device:
   - Apple devices (iPhone/iPad, incl. iPadOS reporting as Mac) open the
@@ -187,6 +191,10 @@
   wash as the personal letter and is headed "ถึง {groom} & {bride}"
 - Guests can confirm attendance by filling out the RSVP form
 - Required fields: name, attendance selection
+- Choosing attendance presses a rubber stamp onto the corner of the reply
+  paper — rose ink "ยินดี ♡" for attending, faded ink "เสียดายจัง" for not —
+  with patchy real-stamp ink; changing the choice re-stamps
+  (reduced-motion: it simply appears)
 - Optional fields: number of guests, contact info, message (max 300 characters)
 - A character counter updates as the guest types in the message field
 - On submit, the reply is "mailed": the form paper shrinks away, a small
@@ -448,6 +456,9 @@ flips to a keepsake album with no redeploy:
 
 ### Visual Polish (motion & loading)
 
+- **Blind-embossed dividers**: each section opens with a small botanical
+  ornament pressed into the paper (same colour as the paper, visible only
+  by its light and shadow edges); it presses in as it comes into view
 - **Ink headings**: section headings soak into the paper like ink when they
   come into view — blurry, spreading blots that settle into crisp text
   (reduced-motion: plain fade)

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { initRsvp } from "../../src/js/rsvp.js";
+import { initRsvp, stampAttendance } from "../../src/js/rsvp.js";
 
 // Mock burstConfetti (imported inside rsvp.js)
 vi.mock("../../src/js/confetti.js", () => ({ burstConfetti: vi.fn() }));
@@ -210,5 +210,38 @@ describe("RSVP — send failure", () => {
       expect(localStorage.getItem("rsvp_submitted_v1")).toContain("สมชาย"),
     );
     expect(document.getElementById("rsvp-send-err").style.display).toBe("none");
+  });
+});
+
+// ─── Rubber stamp ───────────────────────────────────────────────────────────
+
+describe("RSVP — attendance stamp", () => {
+  const stampDOM = () => {
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      `<div id="rsvp-stamp"><svg><text class="rsvp-stamp-text"></text></svg></div>`,
+    );
+    return document.getElementById("rsvp-stamp");
+  };
+
+  it("stamps the reply with the guest's choice", () => {
+    setupRsvpDOM();
+    const stamp = stampDOM();
+    initRsvp();
+    const yes = document.getElementById("attend-yes");
+    yes.checked = true;
+    yes.dispatchEvent(new Event("change"));
+    expect(stamp.textContent).toBe("ยินดี ♡");
+    expect(stamp.dataset.tone).toBe("yes");
+    expect(stamp.classList.contains("rsvp-stamp--pressed")).toBe(true);
+  });
+
+  it("re-stamps when the choice changes", () => {
+    setupRsvpDOM();
+    const stamp = stampDOM();
+    stampAttendance("ยินดีเข้าร่วม");
+    stampAttendance("ไม่สะดวกเข้าร่วม");
+    expect(stamp.textContent).toBe("เสียดายจัง");
+    expect(stamp.dataset.tone).toBe("no");
   });
 });
