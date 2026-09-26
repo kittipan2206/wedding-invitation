@@ -11,6 +11,9 @@
 }
 
 .countdown-heading {
+  /* upright numerals like the cards (Cormorant's old-style "154" sank
+     below the Thai baseline) */
+  font-variant-numeric: lining-nums;
   font-family: var(--font-serif);
   font-size: clamp(28px, 5vw, 40px);
   font-weight: 400;
@@ -137,8 +140,8 @@
   --flap-pad: 6px clamp(8px, 2.4vw, 16px) 4px;
   position: relative;
   width: 100%;
-  max-width: 124px;
-  perspective: 360px;
+  max-width: 150px;
+  perspective: 640px; /* gentle: the leaf barely widens as it turns */
   padding: var(--flap-pad);
   background: var(--paper-cotton, none) 0 0 / var(--paper-tile, 256px)
     var(--color-ivory);
@@ -163,8 +166,11 @@
   pointer-events: none;
 }
 
+/* on a card the number is capped so three digits ("154") always fit the
+   card's width — the 84px desktop size overflowed it */
 .flap .countdown-number {
   padding-bottom: 0;
+  font-size: clamp(30px, 8vw, 60px);
 }
 
 .flap .countdown-number::after {
