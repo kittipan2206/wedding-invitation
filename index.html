@@ -8,12 +8,19 @@
     <meta property="og:title" content="{{og_title}}" />
     <meta property="og:description" content="{{og_description}}" />
     <meta property="og:image" content="{{og_image}}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="นนท์ &amp; เมย์ — Wedding Invitation" />
+    <meta property="og:site_name" content="นนท์ &amp; เมย์" />
+    <meta property="og:locale" content="th_TH" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="{{og_title}}" />
     <meta name="twitter:description" content="{{og_description}}" />
     <meta name="twitter:image" content="{{og_image}}" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <!-- config backend: GAS redirects script.google.com → googleusercontent -->
     <link rel="preconnect" href="https://script.google.com" />
     <link rel="preconnect" href="https://script.googleusercontent.com" />
@@ -745,6 +752,9 @@
             <button type="submit" class="btn-submit">
               ส่งคำตอบถึงบ่าวสาว
             </button>
+            <p class="field-error" id="rsvp-send-err" role="alert">
+              ส่งไม่สำเร็จ — กรุณาตรวจสอบอินเทอร์เน็ตแล้วกดส่งอีกครั้ง
+            </p>
           </form>
           <div class="thank-you" id="thank-you" style="display: none">
             <svg

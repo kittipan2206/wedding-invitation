@@ -1,6 +1,10 @@
 import fs from "fs";
 import path from "path";
-import { CONFIG_DEFAULTS } from "../src/js/config.js";
+import {
+  CONFIG_DEFAULTS,
+  normalizeConfigValues,
+  validateConfig,
+} from "../src/js/config.js";
 
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
@@ -28,7 +32,9 @@ async function getConfig() {
     if (res.ok) {
       const data = await res.json();
       if (data && typeof data === "object" && !Array.isArray(data)) {
-        _cache = { ...DEFAULTS, ...data };
+        // same cleanup the page applies — the sheet says "วันเสาร์" for a
+        // Sunday and link previews used to repeat it
+        _cache = validateConfig({ ...DEFAULTS, ...normalizeConfigValues(data) });
         _live = data;
         _cachedAt = now;
         return { cfg: _cache, live: _live };
@@ -69,28 +75,10 @@ function shortHash(str) {
   return (h >>> 0).toString(36);
 }
 
-export default async function handler(req, res) {
-  // Locate the template HTML:
-  // - Production (Vercel): dist/_template.html (renamed by postbuild so it's not served statically)
-  // - Local dev (vercel dev): source index.html
-  let htmlPath = path.join(process.cwd(), "dist", "_template.html");
-  if (!fs.existsSync(htmlPath)) {
-    htmlPath = path.join(process.cwd(), "dist", "index.html");
-  }
-  if (!fs.existsSync(htmlPath)) {
-    htmlPath = path.join(process.cwd(), "index.html");
-  }
-
-  let html;
-  try {
-    html = fs.readFileSync(htmlPath, "utf-8");
-  } catch {
-    res.status(500).end("index.html not found");
-    return;
-  }
-
-  const { cfg, live } = await getConfig();
-
+// Fills the {{og_*}} placeholders. Also run at build time with the defaults
+// (vite.config.js) so hosts without this function — Cloudflare Pages serves
+// the static index.html — still give crawlers a real title and image.
+export function renderPage(html, cfg, live = null) {
   // After the wedding day, shared links read as a memory album, not an invite
   // (GAS may return event_date_iso as a full ISO datetime — take the date part)
   const datePart = String(cfg.event_date_iso || "").slice(0, 10);
@@ -129,12 +117,36 @@ export default async function handler(req, res) {
   const sep = baseImage.includes("?") ? "&" : "?";
   const ogImage = escAttr(`${baseImage}${sep}v=${ver}`);
 
-  html = html
+  return html
     .replaceAll("{{og_title}}", title)
     .replaceAll("{{og_description}}", description)
     .replaceAll("{{og_image}}", ogImage)
     // the page starts from this config instantly instead of re-asking GAS
     .replace("</head>", `${ssrConfigScript(live)}</head>`);
+}
+
+export default async function handler(req, res) {
+  // Locate the template HTML:
+  // - Production (Vercel): dist/_template.html (renamed by postbuild so it's not served statically)
+  // - Local dev (vercel dev): source index.html
+  let htmlPath = path.join(process.cwd(), "dist", "_template.html");
+  if (!fs.existsSync(htmlPath)) {
+    htmlPath = path.join(process.cwd(), "dist", "index.html");
+  }
+  if (!fs.existsSync(htmlPath)) {
+    htmlPath = path.join(process.cwd(), "index.html");
+  }
+
+  let html;
+  try {
+    html = fs.readFileSync(htmlPath, "utf-8");
+  } catch {
+    res.status(500).end("index.html not found");
+    return;
+  }
+
+  const { cfg, live } = await getConfig();
+  html = renderPage(html, cfg, live);
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   // CDN-level cache: 5 min fresh, then keep serving the cached page instantly

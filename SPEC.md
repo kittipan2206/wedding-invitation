@@ -194,7 +194,11 @@
 - After the RSVP deadline, the form is hidden entirely; a "closed" card shows the deadline date and a hint to contact the couple directly
 - Thai characters and special characters in all fields are handled correctly
 - The submit button is disabled after the first click to prevent double submission
-- If the server does not respond, the user sees an error message (not a hang)
+- If sending fails (no connection, or no answer within 20 seconds), the guest
+  sees "ส่งไม่สำเร็จ" with a hint to check the connection, the button comes
+  back with everything they typed still filled in, and nothing is remembered
+  as submitted — they just tap send again (never a thank-you for a reply the
+  couple didn't receive)
 
 ### Guestbook Section
 
@@ -427,6 +431,15 @@ flips to a keepsake album with no redeploy:
   (names, date, venue, deadline, pre/post-event). When any of these change the
   hash changes, so Facebook/LINE/Twitter treat it as a new image and drop their
   cached preview instead of serving the old one
+- The preview text gets the same clean-up as the page (wrong weekday fixed,
+  trailing punctuation dropped), and the image declares its 1200×630 size so
+  Facebook shows it on the very first share
+- Links to `/card.html` and `/gallery.html` show the same preview image
+- A host that serves the static page without `api/og.js` (Cloudflare Pages)
+  still shows a real title, description and image, built from the default
+  config at build time — never raw `{{og_*}}` placeholders
+- Every page uses the wax-seal favicon; saving to the iPhone home screen
+  shows it on ivory paper (`apple-touch-icon.png`)
 
 ### Mobile / Responsive
 

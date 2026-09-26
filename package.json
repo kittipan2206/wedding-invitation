@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "cp dist/index.html dist/_template.html && if [ -n \"$VERCEL\" ]; then rm dist/index.html; fi",
+    "postbuild": "if [ -n \"$VERCEL\" ]; then rm dist/index.html; fi",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
