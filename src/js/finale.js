@@ -151,25 +151,45 @@ export function initFinale() {
   scroller.addEventListener("scroll", () => scene?.redraw(), { passive: true });
 
   gsap.registerPlugin(ScrollTrigger);
-  const proxy = { p: 0 };
-  gsap.to(proxy, {
-    p: 1,
-    ease: "none",
-    scrollTrigger: {
-      trigger: section,
-      scroller,
-      start: "top top",
-      end: "bottom bottom",
-      scrub: 0.6,
-    },
-    onUpdate: () => {
-      const p = proxy.p;
-      // paper sounds on the way in only
-      if (progress < 0.55 && p >= 0.55) playSlide();
-      if (progress < 0.72 && p >= 0.72) playFlap();
-      if (p < 0.86) section.classList.remove("finale--sealed");
-      progress = p;
-      scene?.setProgress(p);
+  // Scroll picks the STOP, time plays the step. Mandatory snap moves a whole
+  // screen in ~0.4 s — scrubbing straight to it squeezed the fold into a
+  // blink. Each step instead plays at its own pace (~2.5 s per half), and a
+  // change of heart mid-step turns it around smoothly from where it is.
+  const STOPS = [0, 0.5, 1];
+  const SECONDS_PER_HALF = 2.5;
+  const anim = { p: 0 };
+  let stop = 0;
+  const onFrame = () => {
+    const p = anim.p;
+    // paper sounds on the way in only
+    if (progress < 0.55 && p >= 0.55) playSlide();
+    if (progress < 0.72 && p >= 0.72) playFlap();
+    if (p < 0.86) section.classList.remove("finale--sealed");
+    progress = p;
+    scene?.setProgress(p);
+  };
+  ScrollTrigger.create({
+    trigger: section,
+    scroller,
+    start: "top top",
+    end: "bottom bottom",
+    onUpdate: (self) => {
+      // head for the stop the scroll is moving toward (a nudge of 8% past
+      // the current stop commits to the next one; snap finishes the scroll)
+      const r = self.progress;
+      let next = stop;
+      while (next < STOPS.length - 1 && r > STOPS[next] + 0.08) next++;
+      while (next > 0 && r < STOPS[next] - 0.08) next--;
+      if (next === stop) return;
+      stop = next;
+      const to = STOPS[stop];
+      gsap.to(anim, {
+        p: to,
+        duration: (Math.abs(to - anim.p) / 0.5) * SECONDS_PER_HALF,
+        ease: "power1.inOut",
+        overwrite: true,
+        onUpdate: onFrame,
+      });
     },
   });
 }
