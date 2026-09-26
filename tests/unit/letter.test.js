@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { letterContent } from "../../src/js/letter.js";
+import { clipName, letterContent } from "../../src/js/letter.js";
 
 describe("letterContent", () => {
   const cfg = {
@@ -34,5 +34,22 @@ describe("letterContent", () => {
     const { to, sign } = letterContent(null, null);
     expect(to).toBe("ถึงคนสำคัญของเรา");
     expect(sign).toContain("นนท์");
+  });
+});
+
+describe("clipName — ?to= values made safe to show", () => {
+  it("keeps normal names as-is (trimmed)", () => {
+    expect(clipName("  คุณสมชาย และครอบครัว ")).toBe("คุณสมชาย และครอบครัว");
+  });
+
+  it("cuts over-long names at 40 graphemes, never splitting a tone mark", () => {
+    const out = clipName("ต้น".repeat(30)); // 60 graphemes: ต้ + น
+    expect(out.endsWith("…")).toBe(true);
+    expect(Array.from(new Intl.Segmenter("th", { granularity: "grapheme" }).segment(out))).toHaveLength(40);
+    expect(out.at(-2)).not.toBe("ต"); // "ต้" stays whole — ends on a full grapheme
+  });
+
+  it("drops control characters", () => {
+    expect(clipName("ต้น\n\u0007")).toBe("ต้น");
   });
 });

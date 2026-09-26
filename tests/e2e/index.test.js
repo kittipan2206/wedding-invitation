@@ -109,6 +109,10 @@ test.describe("Homepage — envelope", () => {
     await page.goto("/?to=สมชาย");
     await expect(page.locator("#page-loader")).toBeHidden({ timeout: 15_000 });
     await expect(page.locator("#envelope-overlay")).toBeVisible();
+    // the envelope is addressed by hand, same wording as the letter
+    await expect(page.locator("#envelope-overlay .env-to")).toHaveText(
+      "ถึง คุณสมชาย",
+    );
     await page.click(".envelope-body");
     // The risen card expands (hero transition) into the personal letter
     await expect(page.locator(".env-letter--open")).toBeVisible({

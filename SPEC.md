@@ -49,7 +49,9 @@
 - A sealed envelope with a wax seal is shown on each new browser session
   (sessionStorage — closing the browser and returning replays the experience)
 - The couple's names are printed on the envelope front
-- With `?to=NAME`, the envelope front is addressed "ถึง NAME"
+- With `?to=NAME`, the envelope front is addressed "ถึง คุณNAME" in the same
+  Thai handwriting as the letter (no doubled "คุณ" when the name already
+  includes it)
 - The envelope is rendered in real 3D (WebGL) when the device supports it:
   one ivory cotton-paper stock with rounded die-cut corners and a seamed
   pocket, soft shadows between the layers, an irregular wax puddle with a
@@ -425,8 +427,18 @@ flips to a keepsake album with no redeploy:
 - `og:title` and `og:description` are server-rendered from live config, so the
   date/venue/RSVP-deadline in the link preview text always reflect the latest
   admin edits (no redeploy needed)
-- The `og:image` is an **evergreen** graphic (couple names + wordmark only, no
+- The `og:image` is the same sealed envelope the guest sees on opening the
+  link — ivory paper, wax seal, rose-gold foil names on the linen surface —
+  rendered from the real 3D envelope, straight-on, filling most of the frame
+  so the names stay readable at chat-thumbnail size. It is **evergreen** (no
   date) — it never goes stale when shared details change
+- With `?to=NAME`, the preview image is that envelope addressed to the guest
+  ("ถึง คุณNAME", handwritten, same rule as the envelope) and the preview
+  title reads "ถึง คุณNAME — {groom} & {bride} ขอเรียนเชิญร่วมงานแต่งงาน"
+  (the date moves to the description). Any name works — no guest list needed;
+  long names shrink to fit, over-long ones are cut with "…"
+- After the wedding the preview still shows the sealed envelope (a memory-mode
+  image is planned once wedding photos exist)
 - The `og:image` URL carries a `?v=<hash>` derived from the shared details
   (names, date, venue, deadline, pre/post-event). When any of these change the
   hash changes, so Facebook/LINE/Twitter treat it as a new image and drop their
