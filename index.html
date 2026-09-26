@@ -26,10 +26,26 @@
     <link rel="preconnect" href="https://script.googleusercontent.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Web fonts, loaded without blocking first paint: the loader covers
+         the page meanwhile, and the JS that paints text into canvases (3D
+         envelope, letter paper) waits on window.__fontsCss (platform.js
+         fontsReady) so it never draws in a fallback face -->
     <link
+      id="fonts-css"
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Trirong:ital,wght@0,300;0,400;0,500;1,300;1,400&family=IBM+Plex+Sans+Thai+Looped:wght@300;400;500&family=Charm:wght@400;700&display=swap"
       rel="stylesheet"
+      media="print"
     />
+    <script>
+      window.__fontsCss = new Promise((done) => {
+        const l = document.getElementById("fonts-css");
+        const on = () => ((l.media = "all"), done());
+        l.addEventListener("load", on);
+        l.addEventListener("error", on);
+        setTimeout(on, 4000); // never hold the page hostage
+      });
+    </script>
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Trirong:ital,wght@0,300;0,400;0,500;1,300;1,400&family=IBM+Plex+Sans+Thai+Looped:wght@300;400;500&family=Charm:wght@400;700&display=swap" rel="stylesheet" /></noscript>
     <!-- Critical inline CSS: loader renders before external CSS loads (prevents FOUC) -->
     <style>
       #page-loader {

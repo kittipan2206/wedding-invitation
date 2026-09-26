@@ -20,13 +20,24 @@ function rng(seed) {
   };
 }
 
-function canvas(w, h) {
+function canvas(w, h, scale = SCALE) {
   const c = document.createElement("canvas");
-  c.width = Math.round(w * SCALE);
-  c.height = Math.round(h * SCALE);
-  const ctx = c.getContext("2d");
-  ctx.scale(SCALE, SCALE);
+  c.width = Math.round(w * scale);
+  c.height = Math.round(h * scale);
+  // painted once, then read back (PNG/JPEG encode, WebGL upload): a CPU
+  // canvas skips the GPU round-trip that made each encode a long task
+  const ctx = c.getContext("2d", { willReadFrequently: true });
+  ctx.scale(scale, scale);
   return { c, ctx };
+}
+
+// Run non-urgent work (texture builds, PNG encodes) once the page has
+// painted and gone quiet. Safari has no requestIdleCallback — a short
+// timeout stands in.
+export function whenIdle(fn, timeout = 2500) {
+  if (typeof requestIdleCallback === "function")
+    return requestIdleCallback(() => fn(), { timeout });
+  return setTimeout(fn, 600);
 }
 
 // Smooth wedding card stock — only a faint tooth up close. (Visible
@@ -42,28 +53,45 @@ export function paperTile(kind = "cotton") {
   const k = STOCK[kind];
   const { c, ctx } = canvas(TILE, TILE);
   const r = rng(k.seed);
-  ctx.fillStyle = k.base;
-  ctx.fillRect(0, 0, TILE, TILE);
-  // fine tooth (sub-pixel specks never cross the edge, so it tiles)
-  for (let i = 0; i < TILE * TILE * 0.08; i++) {
-    ctx.fillStyle = r() > 0.5
-      ? `rgba(255,255,255,${0.08 * k.tooth})`
-      : `rgba(110,90,80,${0.035 * k.tooth})`;
-    ctx.fillRect(r() * TILE, r() * TILE, 0.5, 0.5);
+  // fine tooth, written straight into pixels: ~5k sub-pixel specks drawn
+  // as vector rects cost ~0.6 s of rasterising on a mid phone; as a plain
+  // loop over ImageData it's a few ms. (Specks never cross the edge, so
+  // the tile still tiles.)
+  const n = c.width;
+  const img = ctx.createImageData(n, n);
+  const px = img.data;
+  const base = k.base.match(/\w\w/g).map((h) => parseInt(h, 16));
+  for (let i = 0; i < px.length; i += 4) {
+    px[i] = base[0];
+    px[i + 1] = base[1];
+    px[i + 2] = base[2];
+    px[i + 3] = 255;
   }
+  const LIGHT = [255, 255, 255, 0.08 * k.tooth];
+  const DARK = [110, 90, 80, 0.035 * k.tooth];
+  for (let i = 0; i < TILE * TILE * 0.08; i++) {
+    const [cr, cg, cb, a] = r() > 0.5 ? LIGHT : DARK;
+    const at = (Math.floor(r() * n) + Math.floor(r() * n) * n) * 4;
+    px[at] += (cr - px[at]) * a;
+    px[at + 1] += (cg - px[at + 1]) * a;
+    px[at + 2] += (cb - px[at + 2]) * a;
+  }
+  ctx.putImageData(img, 0, 0);
   tiles[kind] = c;
   return c;
 }
 
 export function applyPaperVars() {
   const c = paperTile("cotton");
+  // the tile is opaque — JPEG encodes several times faster than PNG (and
+  // smaller); q .92 keeps the faint tooth
   c.toBlob((b) => {
     if (!b) return;
     const url = URL.createObjectURL(b);
     const root = document.documentElement.style;
     root.setProperty("--paper-cotton", `url("${url}")`);
     root.setProperty("--paper-tile", `${TILE}px`);
-  });
+  }, "image/jpeg", 0.92);
 }
 
 // ── Personal letter ──────────────────────────────────────────────────────
@@ -122,15 +150,18 @@ export function letterPaper(w, h, monogram = "") {
   ctx.restore();
 
   const M = LETTER_MARGIN;
-  const { c: shadow, ctx: s } = canvas(w + 2 * M, h + 2 * M);
+  // the shadow is all blur — 1× is indistinguishable and a quarter of the
+  // pixels to paint and PNG-encode
+  const SH = 1;
+  const { c: shadow, ctx: s } = canvas(w + 2 * M, h + 2 * M, SH);
   // only the blurred shadow is painted: the shape sits far off-canvas
   // (shadowBlur, not ctx.filter — canvas filters need iOS 18+)
   const drop = (dy, blur, color) => {
     s.save();
     s.shadowColor = color;
-    s.shadowBlur = blur * SCALE;
-    s.shadowOffsetX = 10000 * SCALE;
-    s.shadowOffsetY = dy * SCALE;
+    s.shadowBlur = blur * SH;
+    s.shadowOffsetX = 10000 * SH;
+    s.shadowOffsetY = dy * SH;
     s.translate(M - 10000, M);
     s.fill(edge);
     s.restore();

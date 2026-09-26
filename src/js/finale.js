@@ -12,7 +12,7 @@ import { CONFIG_DEFAULTS } from "./config.js";
 import { initFooterEnvelope } from "./footer-env.js";
 import { INK_PEN } from "./letter.js";
 import { canvasURL, foilMonogram, letterPaper } from "./paper.js";
-import { want3D } from "./platform.js";
+import { fontsReady, want3D } from "./platform.js";
 import { playFlap, playSlide, preloadSfx } from "./sfx.js";
 
 const SERIF = `"Cormorant Garamond", "Trirong", serif`;
@@ -30,6 +30,7 @@ export async function drawFinaleLetter(sheetEl) {
   const note = sheetEl.querySelector(".finale-note")?.textContent.trim() || "";
   const date = document.getElementById("footer-date")?.textContent.trim() || "";
   const crest = sheetEl.querySelector(".monogram-crest-letters")?.textContent || "";
+  await fontsReady();
   await Promise.all(
     [`italic 400 30px ${SERIF}`, `italic 300 22px ${SERIF}`, `400 19px ${SCRIPT}`, `400 11px ${SANS}`].map(
       (f) => document.fonts.load(f, `${couple}${note}${crest}With love`),
@@ -116,7 +117,7 @@ export function initFinale() {
       try {
         preloadSfx();
         const { createEnvelopeScene } = await import("./envelope3d.js");
-        await document.fonts.ready;
+        await fontsReady();
         const drawn = await drawFinaleLetter(sheetEl);
         const url = await canvasURL(drawn);
         if (url) {

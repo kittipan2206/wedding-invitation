@@ -1,3 +1,4 @@
+import { fontsReady } from "./platform.js";
 import { setHeroPhoto } from "./hero-photo.js";
 import "photoswipe/style.css";
 
@@ -374,7 +375,7 @@ export async function initGallery() {
   setupFilters();
 
   // Wait for fonts before fetching so there's no reflow flash
-  const [photos] = await Promise.all([fetchPhotos(), document.fonts.ready]);
+  const [photos] = await Promise.all([fetchPhotos(), fontsReady()]);
   allPhotos = photos;
   filteredPhotos = [...allPhotos];
   renderGrid(filteredPhotos, "gallery-grid", openLightbox);

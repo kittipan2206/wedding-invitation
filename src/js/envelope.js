@@ -17,7 +17,8 @@ import { Flip } from "gsap/Flip";
 import { letterContent } from "./letter.js";
 import { playCrack, playFlap, playSlide, preloadSfx } from "./sfx.js";
 import { autoplayMusic } from "./music.js";
-import { letterPaper, canvasURL } from "./paper.js";
+import { letterPaper, canvasURL, whenIdle } from "./paper.js";
+import { fontsReady } from "./platform.js";
 import { writeTween, loadScriptFont } from "./handwriting.js";
 
 gsap.registerPlugin(Flip);
@@ -176,16 +177,24 @@ export function initEnvelope(onComplete, { scene = null, onClosing } = {}) {
       c?.groom_name && c?.bride_name ? `${c.groom_name} & ${c.bride_name}` : "";
     const paper = letterPaper(r.width, r.height, names);
     scene?.setLetterPaper(paper);
-    Promise.all([canvasURL(paper.face), canvasURL(paper.shadow)]).then(
-      ([face, shadow]) => {
-        if (face) letter.style.setProperty("--letter-face", `url("${face}")`);
-        if (shadow)
-          letter.style.setProperty("--letter-shadow", `url("${shadow}")`);
-      },
-    );
+    // two PNG encodes (the sheet needs alpha: it's also the mask) — one
+    // per idle slice rather than one long block
+    canvasURL(paper.face).then((face) => {
+      if (face) letter.style.setProperty("--letter-face", `url("${face}")`);
+      whenIdle(() =>
+        canvasURL(paper.shadow).then((shadow) => {
+          if (shadow)
+            letter.style.setProperty("--letter-shadow", `url("${shadow}")`);
+        }),
+      );
+    });
   }
-  // after webfonts settle — Thai line breaks decide the sheet's height
-  document.fonts.ready.then(() => applyLetterPaper(measureOpenLetter()));
+  // after webfonts settle — Thai line breaks decide the sheet's height.
+  // Built in idle time (the texture + PNG encodes are the heaviest thing
+  // on load); open() builds it on the spot if the guest taps first.
+  fontsReady().then(() =>
+    whenIdle(() => applyLetterPaper(measureOpenLetter())),
+  );
 
   // ── Letter tilt: the sheet leans toward the pointer / finger (Android
   // also follows the gyroscope), with a moving sheen and shadow ──
@@ -465,6 +474,7 @@ export function initEnvelope(onComplete, { scene = null, onClosing } = {}) {
     if (opened) return;
     opened = true;
     teardownIdle();
+    applyLetterPaper(measureOpenLetter()); // no-op if idle time built it
 
     // Haptic tick on the seal crack (Android)
     if (navigator.vibrate) navigator.vibrate(10);
