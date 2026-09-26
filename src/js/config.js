@@ -26,7 +26,7 @@ export const CONFIG_DEFAULTS = {
 // Normalize values that Google Sheets auto-converted to ISO datetime strings.
 // e.g. "11:00" → "1899-12-30T11:00:00.000Z"  (time-only epoch)
 //      "2026-03-15" → "2026-03-15T00:00:00.000Z"  (date cell)
-function normalizeConfigValues(data) {
+export function normalizeConfigValues(data) {
   const isoRe =
     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
   const out = {};

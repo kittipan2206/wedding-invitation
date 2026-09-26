@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
-import { readdirSync } from "fs";
+import { copyFileSync, readFileSync, readdirSync, writeFileSync } from "fs";
 import { join } from "path";
+import { renderPage } from "./api/og.js";
+import { CONFIG_DEFAULTS, validateConfig } from "./src/js/config.js";
 
 function musicManifestPlugin() {
   return {
@@ -21,11 +23,27 @@ function musicManifestPlugin() {
   };
 }
 
+// dist/_template.html keeps the {{og_*}} placeholders for api/og.js; the
+// static dist/index.html gets them filled from the defaults, so a host that
+// can't run api/og.js (Cloudflare Pages) still shows a proper link preview
+function staticOgPlugin() {
+  return {
+    name: "static-og",
+    apply: "build",
+    closeBundle() {
+      const index = join(process.cwd(), "dist", "index.html");
+      copyFileSync(index, join(process.cwd(), "dist", "_template.html"));
+      const cfg = validateConfig(CONFIG_DEFAULTS);
+      writeFileSync(index, renderPage(readFileSync(index, "utf-8"), cfg));
+    },
+  };
+}
+
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 
 export default defineConfig({
-  plugins: [musicManifestPlugin()],
+  plugins: [musicManifestPlugin(), staticOgPlugin()],
   test: {
     environment: "jsdom",
     globals: true,

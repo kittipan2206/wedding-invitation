@@ -6,6 +6,7 @@ import { downloadIcs } from "./ics.js";
 const SHEET_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
 const STORAGE_KEY = "rsvp_submitted_v1";
+const SEND_TIMEOUT_MS = 20_000;
 
 // Personalized thank-you: greet the guest by name; attendees also get the
 // event date and both add-to-calendar buttons right where the decision
@@ -169,8 +170,10 @@ export function initRsvp() {
       'input[name="attendance"]:checked',
     );
 
+    const btnLabel = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.textContent = "กำลังส่ง…";
+    showError("rsvp-send-err", false);
 
     const payload = {
       ชื่อ: nameEl.value.trim(),
@@ -180,14 +183,25 @@ export function initRsvp() {
       ข้อความ: noteEl?.value.trim() || "",
     };
 
+    // Only a sent reply earns the thank-you: a swallowed failure used to
+    // show "thanks" + lock the form while the sheet never got the row.
+    // ponytail: no-cors can't see GAS-side script errors, only network
+    // failures/timeouts — read the response if GAS ever returns a status.
     try {
       await fetch(SHEET_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        // GAS often takes 2–12 s; a retry after this at worst duplicates a row
+        signal: AbortSignal.timeout?.(SEND_TIMEOUT_MS),
       });
-    } catch (_) {}
+    } catch {
+      submitBtn.disabled = false;
+      submitBtn.textContent = btnLabel;
+      showError("rsvp-send-err", true);
+      return;
+    }
 
     const name = nameEl.value.trim();
     const attending = attendVal.value === "ยินดีเข้าร่วม";

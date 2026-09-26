@@ -35,6 +35,7 @@ function setupRsvpDOM({ deadlineIso = "2099-12-31" } = {}) {
         <span id="rsvp-char-counter">0 / 300 ตัวอักษร</span>
 
         <button type="submit">ส่ง RSVP</button>
+        <p id="rsvp-send-err" style="display:none">ส่งไม่สำเร็จ</p>
       </form>
       <div id="thank-you" style="display:none">ขอบคุณ!</div>
     </div>`;
@@ -170,5 +171,44 @@ describe("RSVP — localStorage persistence", () => {
     // Form should not be hidden (display is "" or "block")
     expect(document.getElementById("rsvp-form").style.display).not.toBe("none");
     expect(document.getElementById("thank-you").style.display).toBe("none");
+  });
+});
+
+// ─── Send failure ────────────────────────────────────────────────────────────
+
+describe("RSVP — send failure", () => {
+  function fillAndSubmit() {
+    document.getElementById("guest-name").value = "สมชาย";
+    document.getElementById("guest-count").value = "1";
+    document.getElementById("attend-yes").checked = true;
+    document.querySelector("#rsvp-form button[type='submit']").click();
+  }
+
+  it("does not thank or remember the guest when the send fails", async () => {
+    global.fetch = vi.fn().mockRejectedValue(new TypeError("Failed to fetch"));
+    setupRsvpDOM();
+    initRsvp();
+    fillAndSubmit();
+    await vi.waitFor(() =>
+      expect(document.getElementById("rsvp-send-err").style.display).toBe(
+        "block",
+      ),
+    );
+    const btn = document.querySelector("#rsvp-form button[type='submit']");
+    expect(btn.disabled).toBe(false);
+    expect(btn.textContent).toBe("ส่ง RSVP");
+    expect(localStorage.getItem("rsvp_submitted_v1")).toBeNull();
+    expect(document.getElementById("guest-name").value).toBe("สมชาย");
+  });
+
+  it("remembers the guest once the send goes through", async () => {
+    global.fetch = vi.fn().mockResolvedValue(new Response(null));
+    setupRsvpDOM();
+    initRsvp();
+    fillAndSubmit();
+    await vi.waitFor(() =>
+      expect(localStorage.getItem("rsvp_submitted_v1")).toContain("สมชาย"),
+    );
+    expect(document.getElementById("rsvp-send-err").style.display).toBe("none");
   });
 });

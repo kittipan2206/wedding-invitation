@@ -1,4 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <circle cx="16" cy="16" r="14" fill="none" stroke="#C9B8E8" stroke-width="1.5"/>
-  <path d="M16 24S6 18 6 12a6 6 0 0 1 10 0 6 6 0 0 1 10 0c0 6-10 12-10 12Z" fill="#F9C8D4" opacity="0.8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="w" cx="38%" cy="32%" r="75%">
+      <stop offset="0" stop-color="#c46d87"/>
+      <stop offset=".6" stop-color="#9c4862"/>
+      <stop offset="1" stop-color="#7e3850"/>
+    </radialGradient>
+    <radialGradient id="d" cx="60%" cy="68%" r="70%">
+      <stop offset="0" stop-color="#a9506b"/>
+      <stop offset="1" stop-color="#8a3f58"/>
+    </radialGradient>
+  </defs>
+  <path d="M62.5 32.0 L62.5 35.2 L61.6 38.3 L60.2 41.2 L58.7 43.9 L57.2 46.5 L55.5 49.1 L53.5 51.4 L51.1 53.2 L48.5 54.8 L46.0 56.2 L43.5 57.8 L41.0 59.7 L38.3 61.6 L35.3 62.9 L32.0 63.2 L28.8 62.3 L25.9 60.5 L23.4 58.6 L20.9 57.0 L18.2 55.9 L15.3 54.9 L12.5 53.7 L9.9 51.9 L7.8 49.5 L6.2 46.9 L4.9 44.1 L3.6 41.2 L2.7 38.2 L2.2 35.1 L2.5 32.0 L3.5 29.0 L4.9 26.2 L6.0 23.6 L6.7 20.7 L7.1 17.6 L7.7 14.3 L9.0 11.3 L11.1 8.8 L14.0 7.3 L17.3 6.5 L20.4 5.9 L23.3 5.3 L26.1 4.4 L29.0 3.6 L32.0 3.2 L35.0 3.3 L38.0 3.8 L41.0 4.4 L44.0 5.1 L47.1 5.9 L50.1 7.1 L52.6 9.1 L54.3 11.9 L55.3 15.0 L56.0 18.2 L56.8 21.0 L58.1 23.5 L59.8 26.1 L61.5 28.9Z" fill="url(#w)"/>
+  <circle cx="32" cy="32" r="20.5" fill="url(#d)" stroke="#6f2f45" stroke-opacity=".55" stroke-width="1.6"/>
+  <circle cx="32" cy="32" r="20.5" fill="none" stroke="#e8a9bb" stroke-opacity=".35" stroke-width=".8" transform="translate(.6 .8)"/>
+  <path d="M32 44.5S19.5 36.6 19.5 28a6.6 6.6 0 0 1 12.5-3 6.6 6.6 0 0 1 12.5 3c0 8.6-12.5 16.5-12.5 16.5Z" fill="#f3c6d2"/>
+  <path d="M32 44.5S19.5 36.6 19.5 28a6.6 6.6 0 0 1 12.5-3" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.1" stroke-linecap="round"/>
+  <ellipse cx="15.5" cy="12.5" rx="5" ry="2.2" transform="rotate(-38 15.5 12.5)" fill="#fff" opacity=".22"/>
 </svg>

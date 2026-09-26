@@ -175,11 +175,15 @@ test.describe("RSVP — edge cases", () => {
     await page.click('label[for="attend-yes"]');
     await page.click('button[type="submit"]');
 
-    // Should show an error or re-enable the button — not hang forever
-    await expect(
-      page.locator(
-        "#thank-you, .toast--error, .rsvp-error, #rsvp-form button[type='submit']:not([disabled])",
-      ),
-    ).toBeVisible({ timeout: 15_000 });
+    // A failed send must never look like a sent reply
+    await expect(page.locator("#rsvp-send-err")).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.locator("#thank-you")).toBeHidden();
+    await expect(page.locator('#rsvp-form button[type="submit"]')).toBeEnabled();
+    await expect(page.locator("#guest-name")).toHaveValue("ทดสอบ");
+    expect(
+      await page.evaluate(() => localStorage.getItem("rsvp_submitted_v1")),
+    ).toBeNull();
   });
 });
