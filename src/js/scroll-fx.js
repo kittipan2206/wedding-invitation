@@ -71,37 +71,46 @@ export function initScrollFX() {
   // Guestbook feed rises slightly faster than the page
   drift(document.getElementById("guestbook-feed"), 14);
 
-  // Gallery tiles float at alternating depths. gallery.js replaces the
-  // grid's children once real photos arrive, so the drifts are (re)bound
-  // to whatever the current children are, via a MutationObserver.
+  // Gallery polaroids lie flat on the linen table and stand up one after
+  // another as the section scrolls in (the resting tilt matches the CSS
+  // nth-child tilt). gallery.js replaces the grid's children once real
+  // photos arrive, so the tweens are (re)bound to whatever the current
+  // children are, via a MutationObserver.
   const galleryGrid = document.getElementById("gallery-preview-grid");
   if (galleryGrid) {
     let galleryTweens = [];
-    const bindGalleryDrift = () => {
+    const bindGalleryRise = () => {
       galleryTweens.forEach((t) => {
         t.scrollTrigger?.kill();
         t.kill();
       });
-      galleryTweens = Array.from(galleryGrid.children).map((el, i) => {
-        const mag = 8 + (i % 3) * 6;
-        return gsap.fromTo(
+      galleryTweens = Array.from(galleryGrid.children).map((el, i) =>
+        gsap.fromTo(
           el,
-          { y: mag },
           {
-            y: -mag,
-            ease: "none",
+            rotationX: 64,
+            rotation: (i % 2 ? 7 : -9) + (i % 3) * 2,
+            y: 36,
+            transformPerspective: 700,
+            transformOrigin: "50% 100%",
+          },
+          {
+            rotationX: 0,
+            rotation: i % 2 ? 1.6 : -2,
+            y: 0,
+            ease: "power1.out",
             scrollTrigger: {
-              trigger: galleryGrid.closest("section"),
-              start: "top bottom",
-              end: "bottom top",
+              trigger: galleryGrid,
+              start: `top ${98 - i * 5}%`,
+              end: `top ${62 - i * 2}%`, // all upright by the time it snaps
               scrub: 0.6,
             },
           },
-        );
-      });
+        ),
+      );
     };
-    bindGalleryDrift();
-    new MutationObserver(bindGalleryDrift).observe(galleryGrid, {
+    bindGalleryRise();
+    new MutationObserver(bindGalleryRise).observe(galleryGrid, {
       childList: true,
     });
   }

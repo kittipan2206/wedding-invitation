@@ -208,6 +208,11 @@
   z-index: 4;
 }
 
+/* a handwritten "ถึง คุณ…" line: clear of the wax seal's rim */
+.env-address:has(.env-to[style*="block"]) {
+  top: 150px;
+}
+
 .env-to {
   /* handwritten address, same hand as the letter's salutation */
   font-family: "Charm", "Trirong", serif;

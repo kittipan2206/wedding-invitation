@@ -121,3 +121,15 @@ describe("initCountdown — uses defaults when no config", () => {
     expect(() => initCountdown()).not.toThrow();
   });
 });
+
+describe("split-flap cards", () => {
+  it("keeps #cd-* holding just the value, with or without a flip", async () => {
+    const { flip } = await import("../../src/js/countdown.js");
+    document.body.innerHTML = `<div class="flap"><div class="countdown-number" id="cd-secs">05</div></div>`;
+    const card = document.querySelector(".flap");
+    // jsdom has no Element.animate → no leaves are left behind
+    flip(card, "05", "04");
+    expect(card.querySelectorAll(".flap-leaf")).toHaveLength(0);
+    expect(document.getElementById("cd-secs").textContent).toBe("05");
+  });
+});

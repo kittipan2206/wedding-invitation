@@ -503,3 +503,45 @@ test.describe("Homepage — 3D envelope & petal names", () => {
   });
 });
 
+
+test.describe("Stationery touches", () => {
+  test("countdown numbers tick on split-flap cards", async ({ page }) => {
+    await mockGAS(page);
+    await page.goto("/?goto=countdown");
+    await expect(page.locator(".countdown-grid .flap #cd-secs")).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.locator(".countdown-grid .flap")).toHaveCount(4);
+    const first = await page.locator("#cd-secs").textContent();
+    await expect(page.locator("#cd-secs")).not.toHaveText(first, {
+      timeout: 3_000,
+    });
+    await expect(page.locator("#cd-secs")).toHaveText(/^\d\d$/);
+  });
+
+  test("the page closes by sealing the letter back in its envelope", async ({
+    page,
+  }) => {
+    await mockGAS(page);
+    await page.goto("/?goto=gallery&to=สมชาย");
+    await page.waitForTimeout(800);
+    await page.evaluate(() => {
+      const w = document.querySelector(".snap-wrap");
+      w.scrollTo({ top: w.scrollHeight });
+    });
+    await expect(page.locator("#footer-env .env-to")).toHaveText(
+      "ถึง คุณสมชาย",
+    );
+    // mock event date is 2099-08-01
+    await expect(page.locator("#footer-farewell")).toHaveText(
+      "แล้วพบกันวันที่ 1 ส.ค. ♡",
+      { timeout: 8_000 },
+    );
+    // the sealed envelope reopens the invitation from the top
+    await page.click("#footer-env");
+    await expect(page).not.toHaveURL(/goto=/);
+    await expect(page.locator("#envelope-overlay")).toBeVisible({
+      timeout: 10_000,
+    });
+  });
+});

@@ -124,7 +124,11 @@
 
 ### Hero Section
 
-- Couple names are displayed prominently
+- Couple names are displayed prominently, pressed in rose-gold foil that
+  catches a moving glint of light as the page scrolls (like tilting a real
+  card under a lamp); the section labels ("นับถอยหลังสู่วันพิเศษ" …) are the
+  same foil. Browsers without scroll-driven animations show still foil;
+  reduced-motion preference keeps it still
 - Tapping the names scatters them into petals that swirl and reassemble
   into the names (repeatable; ignored while already animating; disabled
   under reduced-motion preference)
@@ -142,6 +146,9 @@
 
 - A live countdown shows days, hours, minutes, and seconds until the wedding
 - The countdown updates every second
+- Each number sits on an ivory split-flap card: when it changes, the top
+  half folds down and the new bottom half drops into place, like an old
+  station departure board (reduced-motion: the number simply changes)
 - The heading reads "อีก N วัน เราจะได้เจอกัน" (or "อีกไม่กี่ชั่วโมงแล้ว!" under one day)
 - On the wedding day itself (Asia/Bangkok), the countdown is replaced by a
   "วันนี้แล้ว!" banner with the ceremony time and a navigate-to-venue button
@@ -237,7 +244,11 @@
 ### Photo Gallery (on main page)
 
 - A preview of up to 6 photos is shown as a horizontal polaroid strip with the
-  admin-written captions under each photo
+  admin-written captions under each photo, laid on the same linen surface as
+  the envelope
+- As the section scrolls in, the polaroids stand up one after another from
+  lying flat on the table (reduced-motion: they are simply there, slightly
+  tilted)
 - Clicking a photo opens a fullscreen photo viewer (PhotoSwipe)
 - The viewer supports pinch / double-tap / wheel zoom, drag-to-close, momentum
   swipe, arrow buttons, a photo counter, and the admin caption
@@ -267,6 +278,15 @@
 
 ### Footer
 
+- The page closes the way it opened: when the footer scrolls into view a
+  small envelope is waiting open, the letter slides back into it, the flap
+  folds shut and the wax seal stamps it closed; then a handwritten line
+  appears — "แล้วพบกันวันที่ {day} {month} ♡" before the wedding,
+  "แล้วพบกันวันนี้นะ ♡" on the day, "ขอบคุณที่มาร่วมงานของเรา ♡" after it.
+  With `?to=NAME` the envelope is addressed to the guest. It plays once per
+  page load; reduced-motion shows it already sealed
+- Tapping the sealed envelope (or Enter/Space) replays the opening envelope,
+  same as "เปิดซองอีกครั้ง"
 - Couple names and date are displayed
 - Social share buttons work (if present)
 
@@ -427,6 +447,10 @@ flips to a keepsake album with no redeploy:
 - No page crashes or shows a blank screen due to a network failure
 
 ### Visual Polish (motion & loading)
+
+- **Ink headings**: section headings soak into the paper like ink when they
+  come into view — blurry, spreading blots that settle into crisp text
+  (reduced-motion: plain fade)
 
 - **RSVP success confetti**: submitting the RSVP fires a celebratory confetti
   burst (center pop + two side cannons + heart accents) in the wedding palette.

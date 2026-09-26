@@ -259,13 +259,13 @@
           ></span>
         </p>
         <h1 class="hero-names">
-          <span class="hero-name hero-name--first">นนท์</span>
+          <span class="hero-name hero-name--first foil">นนท์</span>
           <span class="ampersand-wrap" aria-hidden="true">
             <span class="ampersand-rule"></span>
             <span class="ampersand">&amp;</span>
             <span class="ampersand-rule"></span>
           </span>
-          <span class="hero-name hero-name--second">เมย์</span>
+          <span class="hero-name hero-name--second foil">เมย์</span>
         </h1>
         <div class="hero-date-frame">
           <span class="hero-date-rule"></span>
@@ -303,23 +303,23 @@
           </svg>
           <div class="floral-divider-line"></div>
         </div>
-        <span class="section-label reveal">นับถอยหลังสู่วันพิเศษ</span>
-        <h2 class="countdown-heading reveal reveal-delay-1">ยังมีเวลาอีก…</h2>
+        <span class="section-label foil reveal">นับถอยหลังสู่วันพิเศษ</span>
+        <h2 class="countdown-heading ink reveal reveal-delay-1">ยังมีเวลาอีก…</h2>
         <div class="countdown-grid reveal reveal-delay-2">
           <div class="countdown-unit">
-            <div class="countdown-number" id="cd-days">00</div>
+            <div class="flap"><div class="countdown-number" id="cd-days">00</div></div>
             <span class="countdown-label">วัน</span>
           </div>
           <div class="countdown-unit">
-            <div class="countdown-number" id="cd-hours">00</div>
+            <div class="flap"><div class="countdown-number" id="cd-hours">00</div></div>
             <span class="countdown-label">ชั่วโมง</span>
           </div>
           <div class="countdown-unit">
-            <div class="countdown-number" id="cd-mins">00</div>
+            <div class="flap"><div class="countdown-number" id="cd-mins">00</div></div>
             <span class="countdown-label">นาที</span>
           </div>
           <div class="countdown-unit">
-            <div class="countdown-number" id="cd-secs">00</div>
+            <div class="flap"><div class="countdown-number" id="cd-secs">00</div></div>
             <span class="countdown-label">วินาที</span>
           </div>
         </div>
@@ -382,8 +382,8 @@
           </svg>
           <div class="floral-divider-line"></div>
         </div>
-        <span class="section-label reveal">รายละเอียดงาน</span>
-        <h2 class="details-heading reveal reveal-delay-1">วันและสถานที่</h2>
+        <span class="section-label foil reveal">รายละเอียดงาน</span>
+        <h2 class="details-heading ink reveal reveal-delay-1">วันและสถานที่</h2>
         <div class="details-cards">
           <div class="detail-card reveal reveal-delay-1">
             <h3>วันที่</h3>
@@ -609,8 +609,8 @@
           </svg>
           <div class="floral-divider-line"></div>
         </div>
-        <span class="section-label reveal">ตอบรับการเข้าร่วม</span>
-        <h2 class="rsvp-heading reveal reveal-delay-1">RSVP</h2>
+        <span class="section-label foil reveal">ตอบรับการเข้าร่วม</span>
+        <h2 class="rsvp-heading ink reveal reveal-delay-1">RSVP</h2>
         <p class="rsvp-sub reveal reveal-delay-2" id="rsvp-deadline-text">
           กรุณาตอบรับภายในวันที่ 28 กุมภาพันธ์ 2569
         </p>
@@ -897,8 +897,8 @@
           </svg>
           <div class="floral-divider-line"></div>
         </div>
-        <span class="section-label reveal" lang="en">Guestbook</span>
-        <h2 class="guestbook-heading reveal reveal-delay-1">ฝากคำอวยพร</h2>
+        <span class="section-label foil reveal" lang="en">Guestbook</span>
+        <h2 class="guestbook-heading ink reveal reveal-delay-1">ฝากคำอวยพร</h2>
         <p id="guestbook-sub" class="guestbook-sub reveal reveal-delay-2">
           ฝากคำอวยพรให้นนท์ &amp; เมย์
         </p>
@@ -1072,8 +1072,8 @@
           </svg>
           <div class="floral-divider-line"></div>
         </div>
-        <span class="section-label reveal">ภาพความทรงจำ</span>
-        <h2 class="gallery-heading reveal reveal-delay-1">ช่วงเวลาพิเศษ</h2>
+        <span class="section-label foil reveal">ภาพความทรงจำ</span>
+        <h2 class="gallery-heading ink reveal reveal-delay-1">ช่วงเวลาพิเศษ</h2>
         <div
           id="gallery-preview-grid"
           class="gallery-grid reveal reveal-delay-2"
@@ -1126,10 +1126,51 @@
 
       <!-- FOOTER -->
       <footer class="reveal">
+        <!-- Bookend: the letter goes back into its envelope (footer-env.js).
+             Same component classes as the opening envelope; tap = reopen. -->
+        <div
+          class="footer-env"
+          id="footer-env"
+          role="button"
+          tabindex="0"
+          aria-label="เปิดซองอีกครั้ง"
+        >
+          <div class="env-back"></div>
+          <div class="env-letter" aria-hidden="true">
+            <div class="env-letter-inner">
+              <p class="env-letter-names">นนท์ &amp; เมย์</p>
+              <span class="env-letter-rule"></span>
+              <p class="env-letter-sub">Wedding Invitation</p>
+            </div>
+          </div>
+          <div class="env-pocket"></div>
+          <div class="env-address" aria-hidden="true">
+            <p class="env-to" style="display: none"></p>
+            <p class="env-couple">นนท์ &amp; เมย์</p>
+          </div>
+          <div class="env-flap" aria-hidden="true">
+            <div class="env-flap-face env-flap-front">
+              <div class="flap-dot flap-dot-c"></div>
+              <div class="flap-dot flap-dot-l"></div>
+              <div class="flap-dot flap-dot-r"></div>
+            </div>
+            <div class="env-flap-face env-flap-liner"></div>
+          </div>
+          <div class="env-seal" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 20.5l-1.3-1.2C6 15.1 3 12.3 3 8.9 3 6.1 5.2 4 7.9 4c1.6 0 3.1.7 4.1 1.9C13 4.7 14.5 4 16.1 4 18.8 4 21 6.1 21 8.9c0 3.4-3 6.2-7.7 10.5L12 20.5z"
+                fill="white"
+                opacity="0.95"
+              />
+            </svg>
+          </div>
+        </div>
+        <p class="footer-farewell" id="footer-farewell"></p>
         <div class="footer-divider"></div>
         <p class="footer-text">
           With love,
-          <span id="footer-names" class="footer-names">นนท์ &amp; เมย์</span>
+          <span id="footer-names" class="footer-names foil">นนท์ &amp; เมย์</span>
         </p>
         <p id="footer-date" class="footer-sub">15 · 03 · 2569</p>
         <button id="share-btn" class="footer-share-btn">
