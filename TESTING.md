@@ -45,7 +45,7 @@ test: {
       "src/js/scroll-nav.js",
       "src/js/reveal.js",
       "src/js/fullscreen.js",
-      "src/js/card-export.js",
+      "src/js/send-invites.js",
     ],
     reporter: ["text", "html"],
     thresholds: { lines: 70, functions: 70 },
@@ -478,5 +478,5 @@ Upload artifacts on failure (screenshots + traces)
 | `scroll-nav.js` | Scroll event only |
 | `reveal.js` | IntersectionObserver only |
 | `fullscreen.js` | Browser API wrapper only |
-| `card-export.js` | html2canvas wrapper |
+| `send-invites.js` | canvas-drawn invite card + LINE share (E2E) |
 | `music.js` | Audio API — cover with Playwright instead of unit tests |

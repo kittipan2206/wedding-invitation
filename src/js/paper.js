@@ -79,20 +79,20 @@ function cardEdge(w, h) {
 
 // Couple's names pressed in rose-gold foil, top centre — the envelope's foil again
 export const MONOGRAM_Y = 30; // CSS px from the top edge (baseline)
-function foilMonogram(ctx, w, text) {
-  const font = `italic 400 19px "Cormorant Garamond", "Trirong", serif`;
+export function foilMonogram(ctx, w, text, size = 19, y = MONOGRAM_Y) {
+  const font = `italic 400 ${size}px "Cormorant Garamond", "Trirong", serif`;
   ctx.save();
   ctx.font = font;
   ctx.textAlign = "center";
   // the foil is pressed in: a hairline shadow under, a light edge above
   ctx.fillStyle = "rgba(90,60,55,0.18)";
-  ctx.fillText(text, w / 2, MONOGRAM_Y + 0.6);
-  const g = ctx.createLinearGradient(0, MONOGRAM_Y - 16, 0, MONOGRAM_Y + 4);
+  ctx.fillText(text, w / 2, y + size * 0.03);
+  const g = ctx.createLinearGradient(0, y - size * 0.84, 0, y + size * 0.21);
   g.addColorStop(0, "#ecc9bd");
   g.addColorStop(0.5, "#c98f80");
   g.addColorStop(1, "#a86f63");
   ctx.fillStyle = g;
-  ctx.fillText(text, w / 2, MONOGRAM_Y);
+  ctx.fillText(text, w / 2, y);
   ctx.restore();
 }
 

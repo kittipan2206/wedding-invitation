@@ -25,6 +25,21 @@ export function salutation(guestName) {
   return name ? (/^คุณ/.test(name) ? `ถึง ${name}` : `ถึง คุณ${name}`) : "";
 }
 
+// Link-preview title — api/og.js serves it, the send-invites page (card.html)
+// shows it in its LINE preview
+export function previewTitle(couple, dateDisplay, guestName) {
+  const to = salutation(guestName);
+  return to
+    ? `${to} — ${couple} ขอเรียนเชิญร่วมงานแต่งงาน`
+    : `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน ${dateDisplay}`;
+}
+
+// The guest's own invite link (bare site link without a name)
+export function inviteLink(origin, guestName) {
+  const name = clipName(guestName);
+  return name ? `${origin}/?to=${encodeURIComponent(name)}` : `${origin}/`;
+}
+
 export function letterContent(cfg, guestName) {
   const groom = cfg?.groom_name || "นนท์";
   const bride = cfg?.bride_name || "เมย์";
