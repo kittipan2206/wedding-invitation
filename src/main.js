@@ -2,7 +2,7 @@ import "./styles/main.css";
 import { initEnvelope } from "./js/envelope.js";
 import { initPetals } from "./js/petals.js";
 import { initCountdown } from "./js/countdown.js";
-import { initFooterEnvelope } from "./js/footer-env.js";
+import { initFinale } from "./js/finale.js";
 import { initReveal } from "./js/reveal.js";
 import { initRsvp } from "./js/rsvp.js";
 import { initMusic } from "./js/music.js";
@@ -23,23 +23,9 @@ import { initSmartCalendar } from "./js/smart-calendar.js";
 import { initPetalNames, assembleNames } from "./js/petal-names.js";
 import { applyPaperVars } from "./js/paper.js";
 import { salutation } from "./js/letter.js";
+import { want3D } from "./js/platform.js";
 
 const THREE_D_BUDGET_MS = 4000; // past this, the classic CSS envelope plays
-
-function want3D() {
-  // E2E runners drive the classic envelope; a dedicated test opts into 3D
-  if (window.__ENVELOPE_MODE) return window.__ENVELOPE_MODE === "3d";
-  if (navigator.webdriver) return false;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-    return false;
-  try {
-    const gl = document.createElement("canvas").getContext("webgl2");
-    gl?.getExtension("WEBGL_lose_context")?.loseContext();
-    return !!gl;
-  } catch {
-    return false;
-  }
-}
 
 function afterEnvelope() {
   initPetals();
@@ -97,7 +83,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (cfg) applyMemoryMode(window.__weddingConfig);
 
   initCountdown();
-  initFooterEnvelope();
+  initFinale();
   initReveal();
   initRsvp();
   initScrollNav();

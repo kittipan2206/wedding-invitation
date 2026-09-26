@@ -286,13 +286,26 @@
 
 ### Footer
 
-- The page closes the way it opened: when the footer scrolls into view a
-  small envelope is waiting open, the letter slides back into it, the flap
-  folds shut and the wax seal stamps it closed; then a handwritten line
-  appears — "แล้วพบกันวันที่ {day} {month} ♡" before the wedding,
-  "แล้วพบกันวันนี้นะ ♡" on the day, "ขอบคุณที่มาร่วมงานของเรา ♡" after it.
-  With `?to=NAME` the envelope is addressed to the guest. It plays once per
-  page load; reduced-motion shows it already sealed
+- The page closes the way it opened. Its last screen is a letter sheet —
+  a blind-embossed monogram crest with the couple's initials, a handwritten
+  "ขอบคุณที่อ่านจดหมายของเราจนจบนะ", "With love, {groom} & {bride}" in foil
+  and the date
+- With 3D available (same rules as the opening envelope), scrolling on folds
+  the sheet in thirds (the outer thirds fold back, so "With love, …" stays
+  facing the guest), it floats over the SAME 3D envelope as the opening,
+  slides into the pocket, the flap shuts and the wax seal presses down
+  (haptic tick); then "แล้วพบกันวันที่ {day} {month} ♡" is handwritten below
+  and a hint reads "เลื่อนขึ้นเพื่อเปิดซองอีกครั้ง ↑". The motion follows the
+  scroll both ways — scrolling back up cracks the seal, opens the flap and
+  unfolds the sheet. Three snap stops: the sheet, folded over the open
+  envelope, sealed. The 3D scene loads only as the guest nears the end and
+  draws frames only while something moves
+- Without 3D (no WebGL, reduced motion): a CSS envelope below the sheet
+  plays the same story once when it scrolls into view — letter slides in,
+  flap folds shut, seal stamps, farewell is handwritten ("แล้วพบกันวันนี้นะ ♡"
+  on the day, "ขอบคุณที่มาร่วมงานของเรา ♡" after it); reduced-motion shows it
+  already sealed
+- With `?to=NAME` the envelope is addressed to the guest
 - Tapping the sealed envelope (or Enter/Space) replays the opening envelope,
   same as "เปิดซองอีกครั้ง"
 - Couple names and date are displayed

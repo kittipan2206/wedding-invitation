@@ -104,3 +104,64 @@
     mask-size: 260% 520%, 300% 560%, 240% 500%;
   }
 }
+
+/* ── Letterpress: headings are inked AND pressed into the paper — the
+   lower lip of each stroke catches the light, the upper edge falls in
+   shadow. Legible as plain ink; the relief is felt, not read. ── */
+.ink {
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 -0.6px 0 rgba(60, 40, 45, 0.16);
+}
+
+/* ── Foil pressed in: the couple's names sit in a hot-stamped hollow.
+   (Foil text is transparent, so text-shadow would show through — the
+   relief is a drop-shadow on the rendered glyphs instead.) Small labels
+   stay flat: relief at 13px only blurs Thai marks. ── */
+.hero-name.foil,
+.footer-names.foil {
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.8))
+    drop-shadow(0 -0.6px 0.4px rgba(90, 55, 50, 0.28));
+}
+
+/* ── Blind-embossed monogram crest — the letterhead of the closing letter
+   (footer). No ink: a double ring and the couple's initials exist only as
+   raised edges (highlight top-left, shadow bottom-right). config.js fills
+   the initials. ── */
+.monogram-crest {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    -1px -1px 0 rgba(255, 255, 255, 0.9),
+    1px 1.2px 1.2px rgba(90, 60, 60, 0.16),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.9),
+    inset -1px -1.2px 1.2px rgba(90, 60, 60, 0.14);
+}
+
+.monogram-crest::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  box-shadow:
+    -0.8px -0.8px 0 rgba(255, 255, 255, 0.9),
+    0.8px 1px 1px rgba(90, 60, 60, 0.14);
+}
+
+.monogram-crest-letters {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 30px;
+  line-height: 1;
+  white-space: nowrap;
+  color: transparent;
+  text-shadow:
+    -0.8px -0.8px 0 rgba(255, 255, 255, 0.95),
+    0.9px 1.1px 1px rgba(90, 60, 60, 0.22);
+}

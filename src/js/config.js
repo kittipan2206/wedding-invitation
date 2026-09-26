@@ -206,6 +206,7 @@ export function injectConfig(cfg) {
   // Hero couple names
   const heroNames = document.querySelector(".hero-names");
   if (heroNames) {
+
     heroNames.innerHTML = `
       <span class="hero-name hero-name--first foil">${c.groom_name}</span>
       <span class="ampersand-wrap" aria-hidden="true">
@@ -215,6 +216,14 @@ export function injectConfig(cfg) {
       </span>
       <span class="hero-name hero-name--second foil">${c.bride_name}</span>
     `;
+  }
+
+  // Embossed monogram crest (footer letterhead): the couple's initials
+  const crest = document.querySelector(".monogram-crest-letters");
+  if (crest) {
+    const seg = new Intl.Segmenter("th", { granularity: "grapheme" });
+    const initial = (n) => seg.segment(String(n)).containing(0)?.segment ?? "";
+    crest.textContent = `${initial(c.groom_name)}♡${initial(c.bride_name)}`;
   }
 
   // Footer names + date

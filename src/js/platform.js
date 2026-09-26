@@ -31,3 +31,19 @@ export function isInAppBrowser(ua = navigator.userAgent) {
     isLineApp(ua) || /FBAN|FBAV|FB_IAB|Instagram|MessengerForiOS/i.test(ua)
   );
 }
+
+// Real-3D (WebGL2) envelope scenes — the opening and the closing letter.
+// E2E runners drive the CSS versions; a dedicated test opts into 3D.
+export function want3D() {
+  if (window.__ENVELOPE_MODE) return window.__ENVELOPE_MODE === "3d";
+  if (navigator.webdriver) return false;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+    return false;
+  try {
+    const gl = document.createElement("canvas").getContext("webgl2");
+    gl?.getExtension("WEBGL_lose_context")?.loseContext();
+    return !!gl;
+  } catch {
+    return false;
+  }
+}

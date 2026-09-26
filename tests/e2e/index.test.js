@@ -567,4 +567,32 @@ test.describe("Stationery touches", () => {
     await expect(card).toHaveAttribute("href", nav);
     await expect(card).toContainText("ไม่ตามมาตราส่วน");
   });
+
+  test("3D finale: the letter folds into the envelope and seals on scroll, and reopens back up", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => (window.__ENVELOPE_MODE = "3d"));
+    await mockGAS(page);
+    await page.goto("/?goto=gallery");
+    const finale = page.locator("#finale");
+    await expect(finale).toHaveClass(/finale--3d/, { timeout: 10_000 });
+    const scrollTo = (screens) =>
+      page.evaluate((k) => {
+        const w = document.querySelector(".snap-wrap");
+        const f = document.getElementById("finale");
+        w.scrollTo({ top: f.offsetTop + innerHeight * k, behavior: "instant" });
+      }, screens);
+    await scrollTo(0);
+    // the drawn sheet (same canvas as the WebGL sheet) stands in for the text
+    await expect(page.locator("#finale-letter")).toHaveClass(
+      /finale-letter--drawn/,
+      { timeout: 15_000 },
+    );
+    await expect(finale.locator("canvas")).toHaveCount(1);
+    await scrollTo(2);
+    await expect(finale).toHaveClass(/finale--sealed/, { timeout: 10_000 });
+    await expect(page.locator("#footer-farewell")).toHaveText(/แล้วพบกันวันที่/);
+    await scrollTo(0);
+    await expect(finale).not.toHaveClass(/finale--sealed/, { timeout: 10_000 });
+  });
 });
