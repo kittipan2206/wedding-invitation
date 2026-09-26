@@ -21,7 +21,9 @@ export function farewellLine(iso, now = new Date()) {
   return `แล้วพบกันวันที่ ${d} ${TH_MONTHS[m - 1]} ♡`;
 }
 
-export function initFooterEnvelope() {
+// animate:false → 3D finale mode: only the address, the tap-to-reopen and
+// the farewell line are wired; returns { write } for the farewell
+export function initFooterEnvelope({ animate = true } = {}) {
   const env = document.getElementById("footer-env");
   const line = document.getElementById("footer-farewell");
   if (!env || !line) return;
@@ -47,12 +49,21 @@ export function initFooterEnvelope() {
     reopen();
   });
 
+  let written = false;
+  const write = () => {
+    if (written) return;
+    written = true;
+    loadScriptFont();
+    writeTween(line, text);
+  };
+  if (!animate) return { write };
+
   const reduceMotion =
     typeof IntersectionObserver === "undefined" ||
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   if (reduceMotion) {
     line.textContent = text; // already sealed (the CSS resting state)
-    return;
+    return { write };
   }
 
   const flap = env.querySelector(".env-flap");
@@ -81,9 +92,10 @@ export function initFooterEnvelope() {
         )
         .add(() => navigator.vibrate?.(10), 1.75)
         // measured now, when the line is laid out and the font is in
-        .add(() => writeTween(line, text), 2.1);
+        .add(write, 2.1);
     },
     { threshold: 0.6 },
   );
   io.observe(env);
+  return { write };
 }

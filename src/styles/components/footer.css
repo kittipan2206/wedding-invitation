@@ -111,3 +111,148 @@ footer {
   line-height: 1.5;
   color: #4e3e44;
 }
+
+/* ══════════════════════════════
+   FINALE — the closing letter (finale.js)
+   ══════════════════════════════ */
+#finale {
+  position: relative;
+  width: 100%;
+}
+
+.finale-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  min-height: 100svh;
+  padding: 56px 24px 24px;
+  text-align: center;
+}
+
+.finale-letter {
+  width: min(84vw, 340px);
+  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px 22px;
+  background: var(--paper-cotton, none) 0 0 / var(--paper-tile, 256px)
+    #fffdf9;
+  background-size: 100% 100%;
+  border: 1px solid rgba(80, 60, 70, 0.1);
+  border-radius: 1.5px;
+  box-shadow:
+    0 1px 2px rgba(60, 40, 50, 0.06),
+    0 16px 48px rgba(60, 40, 50, 0.1);
+}
+
+.finale-letter .monogram-crest {
+  margin-bottom: 8px;
+}
+
+.finale-note {
+  font-family: "Charm", "Trirong", serif;
+  font-size: 19px;
+  color: #4e3e44;
+}
+
+/* the drawn sheet (same canvas as the WebGL sheet) replaces the live text;
+   the text stays in the DOM for screen readers */
+.finale-letter--drawn > * {
+  opacity: 0;
+}
+
+.finale-hint,
+.finale-snap {
+  display: none;
+}
+
+/* ── 3D mode: a 300svh runway with a sticky stage and three snap stops ── */
+#finale.finale--3d {
+  display: block;
+  height: 300svh;
+  min-height: 0;
+}
+
+.finale--3d .finale-stage {
+  position: sticky;
+  top: 0;
+  display: block;
+  height: 100svh;
+  min-height: 0;
+  padding: 0;
+}
+
+.finale--3d .finale-letter {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -54%);
+}
+
+/* the envelope's resting place — the 3D envelope is drawn exactly here;
+   this invisible box stays the tap-to-reopen target once sealed */
+.finale--3d .footer-env {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -130px 0 0 -140px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.finale--sealed .footer-env {
+  pointer-events: auto;
+}
+
+/* (a wrapper: the handwriting pen forces position:relative on the line) */
+.finale--3d .finale-farewell {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + 92px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.finale--sealed .finale-farewell {
+  opacity: 1;
+}
+
+.finale--3d .finale-hint {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  font-size: 12px;
+  color: var(--color-muted);
+  opacity: 0;
+  transition: opacity 0.6s ease 0.8s;
+}
+
+.finale--sealed .finale-hint {
+  opacity: 0.8;
+}
+
+.finale--3d .finale-snap {
+  display: block;
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.finale-snap--mid {
+  top: 100svh;
+}
+
+.finale-snap--end {
+  top: 200svh;
+}

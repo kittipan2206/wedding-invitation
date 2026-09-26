@@ -344,8 +344,11 @@ const BG_FRAG = /* glsl */ `
 `;
 
 // ── Scene ─────────────────────────────────────────────────────────────────
-export async function createEnvelopeScene(overlay) {
-  const body = overlay.querySelector(".envelope-body");
+// opts.closing = { sheetEl, sheetCanvas, onStamped } → the finale's scrubbed
+// closing scene (see closingControls); opts.anchor = the element the
+// envelope rests on (defaults to the overlay's .envelope-body)
+export async function createEnvelopeScene(overlay, opts = {}) {
+  const body = opts.anchor || overlay.querySelector(".envelope-body");
   if (!body) return null;
   const coupleText = overlay.querySelector(".env-couple")?.textContent || "";
   const toEl = overlay.querySelector(".env-to");
@@ -971,6 +974,7 @@ export async function createEnvelopeScene(overlay) {
   envMats.forEach((m) => (m.transparent = true));
   layout();
   renderer.compile(scene, camera);
+  if (opts.closing) return closingControls(opts.closing);
 
   overlay.appendChild(canvas);
   overlay.classList.add("env3d");
@@ -1167,6 +1171,213 @@ export async function createEnvelopeScene(overlay) {
     renderer.forceContextLoss();
     canvas.remove();
     overlay.classList.remove("env3d");
+  }
+
+  // ── Closing (finale.js): the page's last sheet folds in thirds, slides
+  // into this same envelope, the flap shuts and the wax seal presses — all
+  // scrubbed by scroll progress 0..1; scrolling back reverses it and the
+  // seal cracks. Nothing idles: frames render only while something moves.
+  function closingControls({ sheetEl, sheetCanvas, onStamped }) {
+    idle = false;
+    card.visible = false;
+    overlay.appendChild(canvas);
+    canvas.style.visibility = "hidden";
+
+    // the envelope waits open and empty
+    flap.rotation.x = -Math.PI * 1.1;
+    flap.position.z = -0.6;
+    linerMat.color.setScalar(1);
+    flapShadowMat.opacity = 0;
+    seal.scale.setScalar(0.001);
+    sealShadowMat.opacity = 0;
+
+    // the sheet: three panels hinged at the thirds — front = the letter
+    // (the very canvas the DOM sheet shows), back = blank stock. Unlit, so
+    // the hand-over frame is pixel-identical to the DOM. Both outer thirds
+    // fold BACK, so "With love, …" in foil stays facing the guest all the
+    // way into the envelope.
+    const sheetTex = track(tex(sheetCanvas));
+    const panels = [];
+    const panel = (v0) => {
+      const geo = track(new PlaneGeometry(1, 1));
+      const uv = geo.attributes.uv;
+      for (let i = 0; i < uv.count; i++) uv.setY(i, v0 + uv.getY(i) / 3);
+      const front = track(new MeshBasicMaterial({ map: sheetTex, toneMapped: false }));
+      const back = track(
+        new MeshBasicMaterial({ color: 0xfffdf9, toneMapped: false, side: BackSide }),
+      );
+      const g = new Group();
+      g.add(new Mesh(geo, front), new Mesh(geo, back));
+      panels.push([
+        [front, front.color.clone()],
+        [back, back.color.clone()],
+      ]);
+      return g;
+    };
+    const sheet = new Group();
+    const mid = panel(1 / 3);
+    const topHinge = new Group();
+    const top = panel(2 / 3);
+    const botHinge = new Group();
+    const bot = panel(0);
+    topHinge.add(top);
+    botHinge.add(bot);
+    // stacked behind the middle third (top folds last → furthest back)
+    topHinge.position.z = -0.6;
+    botHinge.position.z = -0.3;
+    sheet.add(mid, topHinge, botHinge);
+    sheet.visible = false;
+    scene.add(sheet);
+
+    // scrubbed state, 0..1 each; transforms are derived live in apply()
+    const st = { lift: 0, fb: 0, ft: 0, rise: 0, travel: 0, drop: 0, flap: 0 };
+    const tl = gsap
+      .timeline({ paused: true })
+      .to(st, { lift: 1, duration: 0.04, ease: "power1.out" }, 0)
+      .to(st, { fb: 1, duration: 0.15, ease: "power2.inOut" }, 0.04)
+      .to(st, { ft: 1, duration: 0.15, ease: "power2.inOut" }, 0.17)
+      .to(st, { rise: 1, duration: 0.24, ease: "power2.out" }, 0.26)
+      .to(st, { travel: 1, duration: 0.2, ease: "power2.inOut" }, 0.31)
+      .to(st, { drop: 1, duration: 0.16, ease: "power2.in" }, 0.55)
+      .to(st, { flap: 1, duration: 0.16, ease: "power2.inOut" }, 0.72)
+      .to({}, { duration: 0.12 }, 0.88); // settle → timeline ends at 1.0
+
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const smooth = (a, b, x) => {
+      const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+      return t * t * (3 - 2 * t);
+    };
+    function apply() {
+      const r = sheetEl.getBoundingClientRect();
+      const a = body.getBoundingClientRect();
+      const hx = a.left + a.width / 2 - vw / 2;
+      const hy = vh / 2 - (a.top + a.height / 2);
+      const w = r.width;
+      const h = r.height;
+      // envelope: rises from below the screen to its resting place
+      env.visible = st.rise > 0.001;
+      env.position.set(hx, hy - (1 - st.rise) * vh * 0.8, 0);
+      env.rotation.set(0, 0, 0);
+      glint.position.set(hx - 90, hy + 150, 300);
+      flap.rotation.x = -Math.PI * 1.1 * (1 - st.flap);
+      flap.position.z = st.flap > 0.45 ? Z_FLAP : -0.6; // past vertical
+      linerMat.color.setScalar(1 - 0.14 * st.flap);
+      flapShadowMat.opacity = smooth(0.8, 1, st.flap);
+      // sheet: thirds, hinged; each panel darkens as it turns from the light
+      [mid, top, bot].forEach((m) => m.scale.set(w, h / 3, 1));
+      top.position.y = h / 6;
+      bot.position.y = -h / 6;
+      topHinge.position.y = h / 6;
+      botHinge.position.y = -h / 6;
+      // (nearly flat against the back: a panel tip left standing would poke
+      // through the pocket in front of it)
+      const tb = (Math.PI - 0.004) * st.fb;
+      const tt = (Math.PI - 0.004) * st.ft;
+      botHinge.rotation.x = tb;
+      topHinge.rotation.x = -tt;
+      const shade = (i, t) =>
+        panels[i].forEach(([m, base]) =>
+          m.color.copy(base).multiplyScalar(1 - 0.22 * Math.sin(t)),
+        );
+      shade(2, tb);
+      shade(1, tt);
+      // …then it travels over the envelope's mouth and drops into the pocket
+      const fit = Math.min(1, (CARD_W - 10) / w);
+      const x0 = r.left + w / 2 - vw / 2;
+      const y0 = vh / 2 - (r.top + h / 2);
+      const hover = hy + H / 2 + (h / 3) * fit * 0.5 + 18;
+      const inside = hy - 8;
+      const y = lerp(lerp(y0, hover, st.travel), inside, st.drop);
+      // inside: between the envelope's back (z 0) and its pocket (z 2)
+      sheet.position.set(lerp(x0, hx, st.travel), y, lerp(30 * st.lift, 1.5, st.drop));
+      sheet.scale.setScalar(lerp(1, fit, st.travel));
+      sheet.rotation.x = -0.12 * st.lift * (1 - st.travel);
+    }
+
+    let renderUntil = 0;
+    const dirty = (ms = 120) => (renderUntil = Math.max(renderUntil, performance.now() + ms));
+    const tick = () => {
+      if (performance.now() > renderUntil) return;
+      apply();
+      renderer.render(scene, camera);
+    };
+    gsap.ticker.add(tick);
+
+    // the seal is pressed (and cracked) in real time, not scrubbed
+    let stamped = false;
+    const [lh, rh] = sealHalves;
+    function stamp() {
+      stamped = true;
+      gsap.killTweensOf([seal.scale, sealMat, sealShadowMat, lh.position, rh.position]);
+      sealHalves.forEach((m) => {
+        m.visible = false;
+        m.position.set(0, 0, 0);
+        m.rotation.set(0, 0, 0);
+      });
+      sealWhole.visible = true;
+      sealMat.opacity = 1;
+      gsap.fromTo(
+        seal.scale,
+        { x: 1.8, y: 1.8, z: 1.8 },
+        { x: 1, y: 1, z: 1, duration: 0.42, ease: "back.out(2.4)" },
+      );
+      gsap.fromTo(sealShadowMat, { opacity: 0 }, { opacity: 1, duration: 0.3, delay: 0.15 });
+      navigator.vibrate?.(12);
+      dirty(900);
+      onStamped?.();
+    }
+    function crack() {
+      stamped = false;
+      burst();
+      sealWhole.visible = false;
+      sealHalves.forEach((m) => (m.visible = true));
+      gsap.to(lh.position, { x: -8, y: -5, z: 5, duration: 0.4, ease: "power2.out" });
+      gsap.to(rh.position, { x: 8, y: -3, z: 5, duration: 0.4, ease: "power2.out" });
+      gsap.to(sealShadowMat, { opacity: 0, duration: 0.2 });
+      gsap.to(sealMat, { opacity: 0, duration: 0.35, delay: 0.15 });
+      gsap.to(seal.scale, {
+        x: 0.001,
+        y: 0.001,
+        z: 0.001,
+        duration: 0.3,
+        delay: 0.3,
+        ease: "back.in(1.8)",
+      });
+      navigator.vibrate?.(8);
+      dirty(1000);
+    }
+
+    let last = 0;
+    function setProgress(p) {
+      const shown = p > 0.003;
+      sheet.visible = shown;
+      canvas.style.visibility = shown ? "visible" : "hidden";
+      sheetEl.style.visibility = shown ? "hidden" : ""; // swap in one frame
+      tl.progress(p);
+      if (!stamped && p >= 0.9) stamp();
+      if (stamped && p < 0.86) crack();
+      last = p;
+      dirty();
+      tick(); // paint in the same task the DOM sheet hides
+    }
+
+    return {
+      setProgress,
+      // the page moved under a still scene (past the runway): repaint
+      redraw: () => dirty(),
+      get progress() {
+        return last;
+      },
+      get stamped() {
+        return stamped;
+      },
+      dispose() {
+        gsap.ticker.remove(tick);
+        tl.kill();
+        sheetEl.style.visibility = "";
+        dispose();
+      },
+    };
   }
 
   // The open letter's sheet (paper.js letterPaper) — the card lands as it

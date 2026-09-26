@@ -72,6 +72,13 @@ body {
   overflow-x: hidden;
   /* changed to mandatory to prevent skipping sections on mobile/desktop scrolling */
   scroll-snap-type: y mandatory;
+  /* no native scrollbar: the page reads as one sheet of paper; the scroll-nav
+     dots show where you are, and wheel / touch / keys still scroll */
+  scrollbar-width: none;
+}
+
+.snap-wrap::-webkit-scrollbar {
+  display: none;
 }
 
 img,
@@ -139,6 +146,7 @@ canvas {
 #rsvp,
 #guestbook,
 #gallery,
+#finale,
 footer {
   scroll-snap-align: start;
   scroll-snap-stop: always;
