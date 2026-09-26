@@ -45,6 +45,7 @@ import {
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import gsap from "gsap";
 import { LETTER_MARGIN } from "./paper.js";
+import { INK_PEN } from "./letter.js";
 
 const W = 280;
 const H = 200;
@@ -64,10 +65,17 @@ const MUTED = "#8a7f7a";
 const WAX = 0x9c4862; // dusty raspberry
 const SERIF = `"Cormorant Garamond", "Trirong", Georgia, serif`;
 const SANS = `"DM Sans", "IBM Plex Sans Thai Looped", sans-serif`;
+const SCRIPT = `"Charm", "Trirong", serif`; // handwritten address (letter hand)
+
+
+// Link-preview capture (scripts/og-capture.mjs): a still, bigger, sharper
+// envelope — { zoom, y, tilt: [x, y], reserveTo } — never set for guests
+const OG = typeof window !== "undefined" ? window.__OG_CAPTURE : null;
 const PARTICLE_COLORS = [0xf2d3db, 0xd9a3b3, 0x9c4862, 0xd9cfe6];
 
 // ── Canvas helpers ────────────────────────────────────────────────────────
 function makeCanvas(w, h, scale = 2) {
+  if (OG) scale *= 3; // the capture zooms in ~2.7×
   const c = document.createElement("canvas");
   c.width = Math.round(w * scale);
   c.height = Math.round(h * scale);
@@ -348,7 +356,7 @@ export async function createEnvelopeScene(overlay) {
   // Thai glyphs come from Trirong / Plex Thai — load them before painting
   await Promise.all([
     document.fonts.load(`italic 500 19px ${SERIF}`, coupleText),
-    document.fonts.load(`400 12px ${SANS}`, toText || "ถึง"),
+    document.fonts.load(`400 16px ${SCRIPT}`, toText || "ถึง"),
     document.fonts.ready,
   ]).catch(() => {});
 
@@ -390,7 +398,7 @@ export async function createEnvelopeScene(overlay) {
   env.add(key);
   env.add(key.target);
   // follows the tilt — this is what sweeps across the foil and wax
-  const glint = new PointLight(0xfff1ea, 0.8, 0, 0);
+  const glint = new PointLight(0xfff1ea, OG ? OG.glint ?? 1.8 : 0.8, 0, 0);
   scene.add(glint);
 
   const disposables = [];
@@ -508,18 +516,24 @@ export async function createEnvelopeScene(overlay) {
     pbr.ctx.fillStyle = "rgb(0,235,0)";
     pbr.ctx.fillRect(0, 0, W, H);
 
-    const textY = toText ? 176 : 170;
+    // with a recipient: handwritten "ถึง คุณ…" under the seal, foil names
+    // below it. The capture reserves the line (blank) for api/og-image.
+    const addressed = !!toText || !!OG?.reserveTo;
+    const T = OG
+      ? { to: 21, toY: 161, names: addressed ? 23 : 27, namesY: addressed ? 191 : 180 }
+      : { to: 16, toY: 158, names: addressed ? 17 : 19, namesY: addressed ? 180 : 170 };
+    const textY = T.namesY;
     ctx.textAlign = pbr.ctx.textAlign = b.textAlign = "center";
     if (toText) {
-      // letterpress ink: slightly transparent so the paper tooth shows
-      ctx.fillStyle = "rgba(110,96,98,0.9)";
-      ctx.font = `400 12px ${SANS}`;
-      ctx.fillText(toText, W / 2, 155, W - 40);
-      b.fillStyle = "rgba(0,0,0,0.35)";
+      // pen ink: slightly transparent so the paper tooth shows
+      ctx.fillStyle = INK_PEN;
+      ctx.font = `400 ${T.to}px ${SCRIPT}`;
+      ctx.fillText(toText, W / 2, T.toY, W - 40);
+      b.fillStyle = "rgba(0,0,0,0.2)";
       b.font = ctx.font;
-      b.fillText(toText, W / 2, 155, W - 40);
+      b.fillText(toText, W / 2, T.toY, W - 40);
     }
-    const fs = toText ? 17 : 19;
+    const fs = T.names;
     const font = `italic 500 ${fs}px ${SERIF}`;
     ctx.font = pbr.ctx.font = b.font = font;
     // foil: warm rose-gold; env reflections do the rest
@@ -905,6 +919,11 @@ export async function createEnvelopeScene(overlay) {
     home.y = vh / 2 - (r.top + r.height / 2);
     bg.scale.set(vw, vh, 1);
     [cardU, bgU].forEach((u) => u.uView.value.set(vw, vh));
+    if (OG) {
+      home.x = 0;
+      home.y = OG.y ?? 0;
+      env.scale.setScalar(OG.zoom ?? 1);
+    }
   }
   layout();
   addEventListener("resize", layout);
@@ -913,7 +932,7 @@ export async function createEnvelopeScene(overlay) {
   let idle = true;
   let paused = false;
   const tilt = { x: 0, y: 0, tx: 0, ty: 0 };
-  const idleLift = { v: 1 };
+  const idleLift = { v: OG ? 0 : 1 };
   let raf = 0;
   const t0 = performance.now();
   function frame(now) {
@@ -932,6 +951,9 @@ export async function createEnvelopeScene(overlay) {
       home.y + 150 + tilt.y * 220,
       300,
     );
+    // capture: a still photo needs the foil caught mid-glint — a soft lamp
+    // just above the names, near the lens axis, so the metal reads rose-gold
+    if (OG) glint.position.set(home.x + 40, home.y - 230, 900);
     if (!paused) renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);
   }
@@ -953,6 +975,7 @@ export async function createEnvelopeScene(overlay) {
   overlay.appendChild(canvas);
   overlay.classList.add("env3d");
   raf = requestAnimationFrame(frame);
+  if (OG?.tilt) setTilt(...OG.tilt);
 
   // ── API ──
   function setTilt(nx, ny) {

@@ -20,7 +20,7 @@ export const CONFIG_DEFAULTS = {
   travel_airport: "ระยะทางประมาณ 1-2 ชั่วโมงจากสนามบิน",
   travel_hotel: "โรงแรมในตัวเมือง ห่างจากงานประมาณ 20 นาที",
   travel_car: "มีที่จอดรถสำหรับแขก ไม่มีค่าใช้จ่าย",
-  og_image: "https://non-may.vercel.app/og-image.png",
+  og_image: "https://siriwan.kittipan.net/og-envelope.png",
 };
 
 // Normalize values that Google Sheets auto-converted to ISO datetime strings.

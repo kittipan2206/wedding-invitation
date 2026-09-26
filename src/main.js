@@ -21,6 +21,7 @@ import { initIcsButton } from "./js/ics.js";
 import { initSmartCalendar } from "./js/smart-calendar.js";
 import { initPetalNames, assembleNames } from "./js/petal-names.js";
 import { applyPaperVars } from "./js/paper.js";
+import { salutation } from "./js/letter.js";
 
 const THREE_D_BUDGET_MS = 4000; // past this, the classic CSS envelope plays
 
@@ -80,10 +81,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       greet.style.display = "block";
     }
     // Address the envelope front to the guest — first thing they see
+    // (handwritten "ถึง คุณ…", same rule as the letter and link previews)
     const envTo = document.querySelector(".env-to");
-    const envToName = document.querySelector(".env-to-name");
-    if (envTo && envToName) {
-      envToName.textContent = guestName;
+    if (envTo) {
+      envTo.textContent = salutation(guestName);
       envTo.style.display = "block";
     }
     document.title = `${guestName} — นนท์ & เมย์ Wedding Invitation`;

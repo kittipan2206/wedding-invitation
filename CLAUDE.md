@@ -20,6 +20,8 @@
 - **HTML files**: multiple entry pages (`index.html`, `card.html`, `gallery.html`, `admin.html`, `display.html`) — see `vite.config.js`.
 - **Build quirk**: the `static-og` plugin in `vite.config.js` copies `dist/index.html` → `dist/_template.html` (placeholders kept, template for `api/og.js`) and fills the static `dist/index.html` OG tags from `CONFIG_DEFAULTS`. On Vercel (`$VERCEL` set) `postbuild` deletes `dist/index.html` so `/` goes through the `/api/og` rewrite (live config embedded). Cloudflare Pages keeps the static file — it can't run `api/*` (no `/api/ics`, no live OG).
 
+- **Link-preview images**: `public/og-envelope.png` and `og/envelope-to.png` are captured from the real 3D envelope (`window.__OG_CAPTURE` mode in `envelope3d.js`). After changing the envelope's look, run the dev server on 5199 and `npm run og:capture`, then bump the `envelope-N` tag in `api/og.js` so crawlers refetch. `api/og-image.js` writes `?to=` names onto `og/envelope-to.png` with `og/Charm-Regular.ttf` (resvg — shapes Thai correctly).
+
 ## Commands
 
 ```bash

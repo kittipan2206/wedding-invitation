@@ -5,6 +5,7 @@ import {
   normalizeConfigValues,
   validateConfig,
 } from "../src/js/config.js";
+import { clipName, salutation } from "../src/js/letter.js";
 
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
@@ -78,7 +79,9 @@ function shortHash(str) {
 // Fills the {{og_*}} placeholders. Also run at build time with the defaults
 // (vite.config.js) so hosts without this function — Cloudflare Pages serves
 // the static index.html — still give crawlers a real title and image.
-export function renderPage(html, cfg, live = null) {
+// `to` = the ?to= guest: their name heads the title and the image is the
+// envelope addressed to them (api/og-image.js).
+export function renderPage(html, cfg, live = null, to = "") {
   // After the wedding day, shared links read as a memory album, not an invite
   // (GAS may return event_date_iso as a full ISO datetime — take the date part)
   const datePart = String(cfg.event_date_iso || "").slice(0, 10);
@@ -87,10 +90,13 @@ export function renderPage(html, cfg, live = null) {
     new Date() > new Date(`${datePart}T23:59:59+07:00`);
 
   const couple = `${cfg.groom_name} & ${cfg.bride_name}`;
+  const guest = postEvent ? "" : clipName(to);
   const title = escAttr(
     postEvent
       ? `${couple} — ขอบคุณที่ร่วมงานแต่งงานของเรา`
-      : `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน ${cfg.event_date_display}`,
+      : guest
+        ? `${salutation(guest)} — ${couple} ขอเรียนเชิญร่วมงานแต่งงาน`
+        : `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน ${cfg.event_date_display}`,
   );
   const description = escAttr(
     postEvent
@@ -112,10 +118,14 @@ export function renderPage(html, cfg, live = null) {
       cfg.venue_name,
       cfg.rsvp_deadline_display,
       postEvent ? "post" : "pre",
+      "envelope-1", // bump when the envelope capture changes
     ].join("|"),
   );
-  const sep = baseImage.includes("?") ? "&" : "?";
-  const ogImage = escAttr(`${baseImage}${sep}v=${ver}`);
+  const image = guest
+    ? `${new URL(baseImage).origin}/api/og-image?to=${encodeURIComponent(guest)}`
+    : baseImage;
+  const sep = image.includes("?") ? "&" : "?";
+  const ogImage = escAttr(`${image}${sep}v=${ver}`);
 
   return html
     .replaceAll("{{og_title}}", title)
@@ -146,7 +156,7 @@ export default async function handler(req, res) {
   }
 
   const { cfg, live } = await getConfig();
-  html = renderPage(html, cfg, live);
+  html = renderPage(html, cfg, live, req.query?.to);
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   // CDN-level cache: 5 min fresh, then keep serving the cached page instantly
