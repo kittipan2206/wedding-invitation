@@ -82,3 +82,32 @@ footer {
   opacity: 1;
 }
 
+
+/* ── Closing envelope (footer-env.js) — same 280×200 component as the
+   opening envelope; resting state is sealed ── */
+.footer-env {
+  position: relative;
+  width: 280px;
+  height: 200px;
+  margin: 8px auto 26px;
+  perspective: 900px;
+  cursor: pointer;
+  border-radius: 6px;
+  filter: drop-shadow(0 12px 22px rgba(60, 40, 50, 0.12));
+}
+
+.footer-env:focus-visible {
+  outline: 2px solid var(--color-plum);
+  outline-offset: 6px;
+}
+
+/* inline-block: the handwriting canvas is laid over the text's own box */
+.footer-farewell {
+  display: inline-block;
+  min-height: 1.5em;
+  margin: 0 auto 36px;
+  font-family: "Charm", "Trirong", serif;
+  font-size: 26px;
+  line-height: 1.5;
+  color: #4e3e44;
+}

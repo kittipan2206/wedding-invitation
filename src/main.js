@@ -2,6 +2,7 @@ import "./styles/main.css";
 import { initEnvelope } from "./js/envelope.js";
 import { initPetals } from "./js/petals.js";
 import { initCountdown } from "./js/countdown.js";
+import { initFooterEnvelope } from "./js/footer-env.js";
 import { initReveal } from "./js/reveal.js";
 import { initRsvp } from "./js/rsvp.js";
 import { initMusic } from "./js/music.js";
@@ -96,6 +97,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (cfg) applyMemoryMode(window.__weddingConfig);
 
   initCountdown();
+  initFooterEnvelope();
   initReveal();
   initRsvp();
   initScrollNav();

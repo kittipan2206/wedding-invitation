@@ -131,3 +131,64 @@
   color: var(--color-muted);
   margin: 0;
 }
+
+/* ── Split-flap cards (countdown.js flip()) ── */
+.flap {
+  --flap-pad: 6px clamp(8px, 2.4vw, 16px) 4px;
+  position: relative;
+  width: 100%;
+  max-width: 124px;
+  perspective: 360px;
+  padding: var(--flap-pad);
+  background: var(--paper-cotton, none) 0 0 / var(--paper-tile, 256px)
+    var(--color-ivory);
+  border: 1px solid var(--hairline);
+  border-radius: 5px;
+  box-shadow:
+    0 1px 2px rgba(46, 42, 40, 0.06),
+    0 8px 20px rgba(46, 42, 40, 0.06);
+}
+
+/* the fold line across the middle of the card */
+.flap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(46, 42, 40, 0.1);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.flap .countdown-number {
+  padding-bottom: 0;
+}
+
+.flap .countdown-number::after {
+  display: none; /* the card replaces the old hairline underline */
+}
+
+.flap-leaf {
+  position: absolute;
+  inset: 0;
+  padding: var(--flap-pad);
+  background: var(--paper-cotton, none) 0 0 / var(--paper-tile, 256px)
+    var(--color-ivory);
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  backface-visibility: hidden;
+  transform-origin: 50% 50%;
+  z-index: 2;
+}
+
+.flap-leaf--top {
+  clip-path: inset(0 0 50% 0);
+}
+
+.flap-leaf--bottom {
+  clip-path: inset(50% 0 0 0);
+}

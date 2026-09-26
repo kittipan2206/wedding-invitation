@@ -1,0 +1,106 @@
+/* ══════════════════════════════
+   STATIONERY FX — foil + ink
+   (imported last: it restyles component text colours)
+   ══════════════════════════════ */
+
+/* Rose-gold foil (same stops as the envelope's foil). A pale glint band
+   sweeps across as the element travels through the viewport — tilting a
+   real card under a lamp. Scroll-driven, so it costs no JS; browsers
+   without view() timelines keep still foil. */
+.foil {
+  /* a narrow glint on deep rose-gold — small text must stay readable
+     even while the glint passes over it */
+  background: linear-gradient(
+    100deg,
+    #9c6558 0%,
+    #b57d70 40%,
+    #efd2c6 50%,
+    #b57d70 60%,
+    #9c6558 100%
+  );
+  background-size: 400% 100%;
+  background-position: 50% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* Thai tone marks rise above the line box — give the gradient room */
+  padding-block: 0.2em;
+}
+
+/* labels hug their text, so the glint is sized to the words */
+.section-label.foil {
+  display: inline-block;
+}
+
+.hero-name.foil {
+  margin-block: -0.2em; /* keep the names' stacked rhythm */
+}
+
+@keyframes foil-sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .foil {
+      animation: foil-sweep linear both;
+      animation-timeline: view();
+    }
+    /* the hero names already fade up on load — run both */
+    .hero-name--first.foil {
+      animation:
+        fadeInUp 1.1s cubic-bezier(0.23, 1, 0.32, 1) 0.15s both,
+        foil-sweep linear both;
+      animation-timeline: auto, view();
+    }
+    .hero-name--second.foil {
+      animation:
+        fadeInUp 1.1s cubic-bezier(0.23, 1, 0.32, 1) 0.45s both,
+        foil-sweep linear both;
+      animation-timeline: auto, view();
+    }
+  }
+}
+
+/* Ink headings: soak into the paper when revealed — three soft blots grow
+   from different points while the blur settles into crisp letterpress */
+@media (prefers-reduced-motion: no-preference) {
+  .ink.reveal {
+    transform: none;
+    filter: blur(7px);
+    color: var(--color-rose);
+    -webkit-mask-image:
+      radial-gradient(closest-side, #000 55%, transparent),
+      radial-gradient(closest-side, #000 55%, transparent),
+      radial-gradient(closest-side, #000 55%, transparent);
+    mask-image:
+      radial-gradient(closest-side, #000 55%, transparent),
+      radial-gradient(closest-side, #000 55%, transparent),
+      radial-gradient(closest-side, #000 55%, transparent);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 22% 55%, 55% 40%, 85% 60%;
+    mask-position: 22% 55%, 55% 40%, 85% 60%;
+    -webkit-mask-size: 0% 0%, 0% 0%, 0% 0%;
+    mask-size: 0% 0%, 0% 0%, 0% 0%;
+    /* even curves: the soak should be seen, not snapped */
+    transition:
+      opacity 0.6s ease,
+      filter 1.6s cubic-bezier(0.4, 0, 0.3, 1),
+      color 1.8s ease,
+      -webkit-mask-size 1.9s cubic-bezier(0.45, 0, 0.3, 1),
+      mask-size 1.9s cubic-bezier(0.45, 0, 0.3, 1);
+  }
+
+  .ink.reveal.visible {
+    filter: blur(0);
+    color: var(--color-text);
+    -webkit-mask-size: 260% 520%, 300% 560%, 240% 500%;
+    mask-size: 260% 520%, 300% 560%, 240% 500%;
+  }
+}

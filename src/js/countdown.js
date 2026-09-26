@@ -18,6 +18,46 @@ export function headingCopy(days) {
   return "อีกไม่กี่ชั่วโมงแล้ว!";
 }
 
+// Split-flap card: the old top half folds down, then the new bottom half
+// drops into place. The leaves are siblings of the number (inside .flap),
+// so #cd-* always holds just the value.
+const FLIP_MS = 260;
+export function flip(card, oldV, newV) {
+  if (!card?.classList.contains("flap") || !oldV) return;
+  if (typeof card.animate !== "function") return; // jsdom / very old browsers
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  card.querySelectorAll(".flap-leaf").forEach((l) => l.remove()); // mid-flip
+  const leaf = (half, text) => {
+    const l = document.createElement("div");
+    l.className = `flap-leaf flap-leaf--${half}`;
+    l.setAttribute("aria-hidden", "true");
+    l.innerHTML = `<div class="countdown-number"></div>`;
+    l.firstChild.textContent = text;
+    card.append(l);
+    return l;
+  };
+  const oldBottom = leaf("bottom", oldV);
+  const top = leaf("top", oldV);
+  const newBottom = leaf("bottom", newV);
+  top.animate(
+    [
+      { transform: "rotateX(0deg)", filter: "brightness(1)" },
+      { transform: "rotateX(-90deg)", filter: "brightness(0.82)" },
+    ],
+    { duration: FLIP_MS, easing: "ease-in", fill: "forwards" },
+  );
+  newBottom
+    .animate(
+      [
+        { transform: "rotateX(90deg)", filter: "brightness(0.82)" },
+        { transform: "rotateX(0deg)", filter: "brightness(1)" },
+      ],
+      { duration: FLIP_MS, delay: FLIP_MS, easing: "ease-out", fill: "backwards" },
+    )
+    .finished.then(() => [oldBottom, top, newBottom].forEach((l) => l.remove()))
+    .catch(() => {});
+}
+
 export function initCountdown() {
   const cfg = window.__weddingConfig;
   const isoDate = cfg?.event_date_iso || CONFIG_DEFAULTS.event_date_iso;
@@ -71,13 +111,10 @@ export function initCountdown() {
 
   function updateValue(el, newVal) {
     const v = pad(newVal);
-    if (el.textContent === v) return;
+    const old = el.textContent;
+    if (old === v) return;
     el.textContent = v;
-
-    // Optional: add a subtle pop animation when number changes
-    el.classList.remove("num-pop");
-    void el.offsetWidth;
-    el.classList.add("num-pop");
+    flip(el.parentElement, old, v);
   }
 
   function render(diff) {
