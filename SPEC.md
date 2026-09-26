@@ -21,7 +21,7 @@
 | Page            | URL             | Who uses it              |
 | --------------- | --------------- | ------------------------ |
 | Main invitation | `/`             | Guest                    |
-| Digital card    | `/card.html`    | Guest (share/screenshot) |
+| Send invites    | `/card.html`    | Admin (couple)           |
 | Venue display   | `/display.html` | Display screen at venue  |
 | Photo gallery   | `/gallery.html` | Guest                    |
 | Admin panel     | `/admin.html`   | Admin                    |
@@ -284,15 +284,32 @@
 
 ---
 
-## Persona: Guest — Card Page (`/card.html`)
+## Persona: Admin — Send Invites (`/card.html`)
 
-- The card displays couple names, date, and venue
-- The design is suitable for screenshot/sharing
-- An export/download button generates an image of the card
-- The card shows a QR code linking back to the invitation (personalized with
-  `?to=` when a guest name is entered)
-- The QR code is generated locally in the wedding theme (rounded pastel style,
-  heart logo) — no third-party QR service, so exports never break on CORS
+The couple's tool for sending invitations one guest at a time (or one
+generic link for a group chat). Styled like the rest of the site: linen
+surface, ivory paper panels, rose-gold foil, Charm handwriting.
+
+- A single field "ชื่อแขก"; everything below updates as the couple types
+- **LINE preview**: shows what the chat message will look like — the
+  envelope addressed to the guest (`/api/og-image?to=`, same image LINE will
+  show) with the preview title "ถึง คุณNAME — {groom} & {bride}
+  ขอเรียนเชิญร่วมงานแต่งงาน" and the site's domain. With no name it shows the
+  plain envelope and the generic title (for group chats)
+- The invite link is shown (`{site}/?to=NAME`, or the bare site link with no
+  name) with two actions:
+  - **"ส่งทาง LINE"** (primary) opens LINE's share sheet with the link, so
+    the couple picks the friend and sends
+  - **"คัดลอกลิงก์"** copies it with a "คัดลอกแล้ว ✓" flash
+    ("คัดลอกไม่สำเร็จ" when the browser blocks the clipboard — never silent)
+- **Image card** (secondary, for printing or elders who prefer a picture):
+  a portrait ivory card in the letter's style — couple's names in rose-gold
+  foil, "ถึง คุณNAME" handwritten, date, times, venue, dress code, RSVP
+  deadline and a QR code to the guest's own link. A live thumbnail shows it;
+  "ดาวน์โหลดการ์ดรูปภาพ" shares it (iPhone share sheet) or downloads it
+- Nothing on the page is fetched from a third party (no html2canvas CDN, QR
+  generated locally), so it works inside LINE's in-app browser
+- The page is not indexed by search engines
 
 ---
 
@@ -446,7 +463,7 @@ flips to a keepsake album with no redeploy:
 - The preview text gets the same clean-up as the page (wrong weekday fixed,
   trailing punctuation dropped), and the image declares its 1200×630 size so
   Facebook shows it on the very first share
-- Links to `/card.html` and `/gallery.html` show the same preview image
+- Links to `/gallery.html` show the same preview image
 - A host that serves the static page without `api/og.js` (Cloudflare Pages)
   still shows a real title, description and image, built from the default
   config at build time — never raw `{{og_*}}` placeholders

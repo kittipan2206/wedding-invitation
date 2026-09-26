@@ -1,25 +1,60 @@
 import { test, expect } from "@playwright/test";
 import { mockGAS } from "./helpers/mock-gas.js";
 
-test.describe("Card page (/card.html)", () => {
-  test("loads and shows couple names", async ({ page }) => {
+test.describe("Send invites (/card.html)", () => {
+  test("previews the LINE message addressed to the typed guest", async ({
+    page,
+  }) => {
     await mockGAS(page);
     await page.goto("/card.html");
-    await expect(page.locator(".card-names")).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator(".card-names")).toContainText("นนท์");
-    await expect(page.locator(".card-names")).toContainText("เมย์");
+    await page.fill("#guest-name", "ต้น");
+    await expect(page.locator("#line-preview-title")).toHaveText(
+      "ถึง คุณต้น — นนท์ & เมย์ ขอเรียนเชิญร่วมงานแต่งงาน",
+    );
+    await expect(page.locator("#invite-link")).toContainText("/?to=ต้น");
+    const href = await page.locator("#send-line-btn").getAttribute("href");
+    expect(href).toMatch(/^https:\/\/line\.me\/R\/share\?text=/);
+    expect(decodeURIComponent(href)).toContain(
+      `?to=${encodeURIComponent("ต้น")}`,
+    );
   });
 
-  test("shows the date", async ({ page }) => {
+  test("no name gives the generic link for group chats", async ({ page }) => {
     await mockGAS(page);
     await page.goto("/card.html");
-    await expect(page.locator(".card-date")).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator("#line-preview-title")).toContainText(
+      "นนท์ & เมย์ — ขอเรียนเชิญร่วมงานแต่งงาน",
+    );
+    await expect(page.locator("#invite-link")).not.toContainText("?to=");
   });
 
-  test("export/download button is present", async ({ page }) => {
+  test("copy link confirms with a flash", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await mockGAS(page);
     await page.goto("/card.html");
-    await expect(page.locator("#share-btn")).toBeVisible({ timeout: 10_000 });
+    await page.fill("#guest-name", "ต้น");
+    await page.click("#copy-link-btn");
+    await expect(page.locator("#copy-link-btn")).toHaveText("คัดลอกแล้ว ✓");
+  });
+
+  test("draws the image card locally, no third-party scripts", async ({
+    page,
+  }) => {
+    const external = [];
+    page.on("request", (r) => {
+      const host = new URL(r.url()).host;
+      if (/cdnjs|qrserver|html2canvas/.test(host)) external.push(r.url());
+    });
+    await mockGAS(page);
+    await page.goto("/card.html");
+    await page.fill("#guest-name", "คุณสมชาย และครอบครัว");
+    await expect(page.locator("#card-thumb")).toHaveAttribute(
+      "src",
+      /^data:image\/png/,
+      { timeout: 15_000 },
+    );
+    await expect(page.locator("#download-card-btn")).toBeEnabled();
+    expect(external).toHaveLength(0);
   });
 });
 
@@ -148,16 +183,6 @@ test.describe("Admin page (/admin.html)", () => {
 });
 
 test.describe("Themed QR codes (local render)", () => {
-  test("card QR renders locally as a data URL", async ({ page }) => {
-    await mockGAS(page);
-    await page.goto("/card.html");
-    await expect(page.locator(".card-qr-image").first()).toHaveAttribute(
-      "src",
-      /^data:image\/png/,
-      { timeout: 15_000 },
-    );
-  });
-
   test("display QR renders locally as a data URL", async ({ page }) => {
     await mockGAS(page, { photos: [] });
     await page.goto("/display.html");

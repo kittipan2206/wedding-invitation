@@ -5,7 +5,7 @@ import {
   normalizeConfigValues,
   validateConfig,
 } from "../src/js/config.js";
-import { clipName, salutation } from "../src/js/letter.js";
+import { clipName, previewTitle } from "../src/js/letter.js";
 
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbx3xzXnYpTqjmhY7MjYrgQ03c_9TvtNgYtiP_afh9VbOTDt6E_8As_u32FSX7yKAoQG/exec";
@@ -94,9 +94,7 @@ export function renderPage(html, cfg, live = null, to = "") {
   const title = escAttr(
     postEvent
       ? `${couple} — ขอบคุณที่ร่วมงานแต่งงานของเรา`
-      : guest
-        ? `${salutation(guest)} — ${couple} ขอเรียนเชิญร่วมงานแต่งงาน`
-        : `${couple} — ขอเรียนเชิญร่วมงานแต่งงาน ${cfg.event_date_display}`,
+      : previewTitle(couple, cfg.event_date_display, guest),
   );
   const description = escAttr(
     postEvent

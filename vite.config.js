@@ -64,7 +64,7 @@ export default defineConfig({
         "src/js/scroll-nav.js",
         "src/js/reveal.js",
         "src/js/fullscreen.js",
-        "src/js/card-export.js",
+        "src/js/send-invites.js",
         // Covered by Playwright E2E, not unit tests
         "src/js/gallery.js",
         "src/js/display.js",

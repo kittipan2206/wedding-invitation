@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { clipName, letterContent } from "../../src/js/letter.js";
+import {
+  clipName,
+  inviteLink,
+  letterContent,
+  previewTitle,
+} from "../../src/js/letter.js";
 
 describe("letterContent", () => {
   const cfg = {
@@ -51,5 +56,26 @@ describe("clipName — ?to= values made safe to show", () => {
 
   it("drops control characters", () => {
     expect(clipName("ต้น\n\u0007")).toBe("ต้น");
+  });
+});
+
+describe("invite links + preview titles (og.js and the send-invites page)", () => {
+  it("addresses the preview title to the guest", () => {
+    expect(previewTitle("นนท์ & เมย์", "วันอาทิตย์ที่ 28", "ต้น")).toBe(
+      "ถึง คุณต้น — นนท์ & เมย์ ขอเรียนเชิญร่วมงานแต่งงาน",
+    );
+  });
+
+  it("keeps the date in the generic title", () => {
+    expect(previewTitle("นนท์ & เมย์", "วันอาทิตย์ที่ 28", " ")).toBe(
+      "นนท์ & เมย์ — ขอเรียนเชิญร่วมงานแต่งงาน วันอาทิตย์ที่ 28",
+    );
+  });
+
+  it("builds the guest's link, or the bare site link", () => {
+    expect(inviteLink("https://x.test", "ต้น")).toBe(
+      `https://x.test/?to=${encodeURIComponent("ต้น")}`,
+    );
+    expect(inviteLink("https://x.test", "")).toBe("https://x.test/");
   });
 });
