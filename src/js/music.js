@@ -24,7 +24,11 @@ export function initMusic() {
   }
 
   const musicUrl = resolveAudioUrl(rawUrl);
-  const audio = new Audio(musicUrl);
+  const audio = new Audio();
+  // nothing downloads until the first play (the envelope tap / ♪ button) —
+  // Chrome/Android otherwise fetch the whole track while the page loads
+  audio.preload = "none";
+  audio.src = musicUrl;
   audio.loop = true;
 
   // iOS ignores audio.volume (read-only), so fades go through a Web Audio

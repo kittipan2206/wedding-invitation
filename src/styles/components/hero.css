@@ -56,7 +56,9 @@
 }
 
 .hero-photo img {
-  width: clamp(124px, 30vw, 168px);
+  /* capped by height too: a wide-but-short laptop window (~800px tall)
+     otherwise pushed the date into the scroll hint */
+  width: min(clamp(124px, 30vw, 168px), 19svh);
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: 999px 999px 16px 16px;
@@ -93,7 +95,7 @@
 .hero-names {
   font-family: var(--font-serif);
   font-weight: 300;
-  font-size: clamp(64px, 14vw, 112px);
+  font-size: min(clamp(64px, 14vw, 112px), 12svh);
   line-height: 0.95;
   letter-spacing: -0.01em;
   color: var(--color-text);
@@ -167,6 +169,8 @@
   font-family: var(--font-serif);
   font-style: italic;
   font-size: clamp(17px, 3vw, 24px);
+  /* upright numerals: Cormorant's old-style "28"/"2570" sank below the Thai */
+  font-variant-numeric: lining-nums;
   font-weight: 400;
   color: var(--color-text);
   /* Thai — no tracking */
@@ -244,5 +248,13 @@
   }
   .hero-badge-line {
     width: 18px;
+  }
+}
+
+/* Wide but short windows (laptops): the wheel and the nav dots already say
+   "scroll", and the hint would sit on the date */
+@media (min-width: 768px) and (max-height: 860px) {
+  .hero-scroll-hint {
+    display: none;
   }
 }

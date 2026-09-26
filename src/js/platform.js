@@ -34,8 +34,14 @@ export function isInAppBrowser(ua = navigator.userAgent) {
 
 // Real-3D (WebGL2) envelope scenes — the opening and the closing letter.
 // E2E runners drive the CSS versions; a dedicated test opts into 3D.
+// (probed once per page: creating even a throwaway WebGL context is one of
+// the costliest things the page does on load)
+let has3D;
 export function want3D() {
   if (window.__ENVELOPE_MODE) return window.__ENVELOPE_MODE === "3d";
+  return (has3D ??= probe3D());
+}
+function probe3D() {
   if (navigator.webdriver) return false;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
     return false;
@@ -46,4 +52,11 @@ export function want3D() {
   } catch {
     return false;
   }
+}
+
+// index.html loads the web-font CSS without blocking first paint and
+// exposes window.__fontsCss. Until it lands, document.fonts.ready resolves
+// at once (no faces declared yet) — so wait for the stylesheet first.
+export function fontsReady() {
+  return Promise.resolve(window.__fontsCss).then(() => document.fonts.ready);
 }

@@ -27,9 +27,18 @@
   padding-block: 0.2em;
 }
 
-/* labels hug their text, so the glint is sized to the words */
+/* labels hug their text, so the glint is sized to the words — and at 13px
+   the foil runs deeper (≥4.5:1 on the paper), glint kept narrow */
 .section-label.foil {
   display: inline-block;
+  background-image: linear-gradient(
+    100deg,
+    #7e4c42 0%,
+    #93594d 42%,
+    #c99585 50%,
+    #93594d 58%,
+    #7e4c42 100%
+  );
 }
 
 .hero-name.foil {

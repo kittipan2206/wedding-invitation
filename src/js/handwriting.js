@@ -17,7 +17,9 @@ const PEN_LIFT = 20; // extra "distance" spent between strokes
 // Charm is declared in index.html's font link; this just makes sure the
 // face is fetched before the pen needs it (fonts load lazily on first use)
 export function loadScriptFont() {
-  return document.fonts.load(`400 24px ${SCRIPT_FONT}`, "ถึงคุณ").catch(() => {});
+  return Promise.resolve(window.__fontsCss)
+    .then(() => document.fonts.load(`400 24px ${SCRIPT_FONT}`, "ถึงคุณ"))
+    .catch(() => {});
 }
 
 // ── Zhang–Suen thinning on a binary grid (1 = ink) ──

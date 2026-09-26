@@ -21,9 +21,10 @@ import { initHearts } from "./js/hearts.js";
 import { initIcsButton } from "./js/ics.js";
 import { initSmartCalendar } from "./js/smart-calendar.js";
 import { initPetalNames, assembleNames } from "./js/petal-names.js";
-import { applyPaperVars } from "./js/paper.js";
+import { applyPaperVars, whenIdle } from "./js/paper.js";
 import { salutation } from "./js/letter.js";
-import { want3D } from "./js/platform.js";
+import { fontsReady, want3D } from "./js/platform.js";
+
 
 const THREE_D_BUDGET_MS = 4000; // past this, the classic CSS envelope plays
 
@@ -36,7 +37,8 @@ function afterEnvelope() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const t0 = performance.now();
-  applyPaperVars(); // cotton stock for the page's paper surfaces
+  // cotton stock for the page's paper surfaces (below the fold — idle time)
+  whenIdle(applyPaperVars);
   const params = new URLSearchParams(window.location.search);
   // If ?goto=<sectionId> is in the URL, OR the envelope was already opened
   // this session, skip the envelope animation entirely. Session-scoped on
@@ -54,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   injectConfig(cfg);
 
   const hideLoader = () =>
-    document.fonts.ready.then(() => {
+    fontsReady().then(() => {
       const loader = document.getElementById("page-loader");
       if (loader) loader.classList.add("loader--hidden");
     });
@@ -121,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const wrap = document.querySelector(".snap-wrap");
       if (target && wrap) {
         // Wait for fonts to load and ScrollTrigger to refresh, then scroll
-        document.fonts.ready.then(() => {
+        fontsReady().then(() => {
           setTimeout(
             () => wrap.scrollTo({ top: target.offsetTop, behavior: "auto" }),
             350,

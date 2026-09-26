@@ -16,6 +16,25 @@ describe("music autoplay + remembered mute", () => {
     HTMLMediaElement.prototype.pause = vi.fn();
   });
 
+  it("does not download the track before the first play", async () => {
+    const { initMusic } = await load();
+    const created = [];
+    const Orig = window.Audio;
+    window.Audio = class extends Orig {
+      constructor(...a) {
+        super(...a);
+        created.push(this);
+      }
+    };
+    try {
+      initMusic();
+    } finally {
+      window.Audio = Orig;
+    }
+    expect(created).toHaveLength(1);
+    expect(created[0].preload).toBe("none");
+  });
+
   it("envelope tap starts the music", async () => {
     const { initMusic, autoplayMusic } = await load();
     initMusic();

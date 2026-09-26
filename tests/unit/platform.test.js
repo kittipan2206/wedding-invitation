@@ -83,3 +83,18 @@ describe("isInAppBrowser", () => {
     expect(isInAppBrowser(UA.windowsChrome)).toBe(false);
   });
 });
+
+describe("want3D — WebGL probe", () => {
+  it("creates the throwaway WebGL context only once per page", async () => {
+    vi.resetModules();
+    const { want3D } = await import("../../src/js/platform.js");
+    window.matchMedia = () => ({ matches: false });
+    const getContext = vi
+      .spyOn(HTMLCanvasElement.prototype, "getContext")
+      .mockReturnValue(null);
+    want3D();
+    want3D();
+    expect(getContext).toHaveBeenCalledTimes(1);
+    getContext.mockRestore();
+  });
+});

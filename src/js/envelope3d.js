@@ -357,6 +357,8 @@ export async function createEnvelopeScene(overlay, opts = {}) {
   const cardNames =
     overlay.querySelector(".env-letter-names")?.textContent || coupleText;
   // Thai glyphs come from Trirong / Plex Thai — load them before painting
+  // (after the async web-font stylesheet has declared them)
+  await window.__fontsCss;
   await Promise.all([
     document.fonts.load(`italic 500 19px ${SERIF}`, coupleText),
     document.fonts.load(`400 16px ${SCRIPT}`, toText || "ถึง"),
