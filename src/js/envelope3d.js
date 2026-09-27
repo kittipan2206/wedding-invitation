@@ -1244,6 +1244,9 @@ export async function createEnvelopeScene(overlay, opts = {}) {
       .to(st, { flap: 1, duration: 0.16, ease: "power2.inOut" }, 0.72)
       .to({}, { duration: 0.12 }, 0.88); // settle → timeline ends at 1.0
 
+    // phone/pointer tilt, only while sealed (finale.js feeds it); eased so
+    // it settles level again before the letter unfolds
+    const tilt = { x: 0, y: 0, tx: 0, ty: 0 };
     const lerp = (a, b, t) => a + (b - a) * t;
     const smooth = (a, b, x) => {
       const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -1259,8 +1262,12 @@ export async function createEnvelopeScene(overlay, opts = {}) {
       // envelope: rises from below the screen to its resting place
       env.visible = st.rise > 0.001;
       env.position.set(hx, hy - (1 - st.rise) * vh * 0.8, 0);
-      env.rotation.set(0, 0, 0);
-      glint.position.set(hx - 90, hy + 150, 300);
+      const sealed = last >= 0.999 ? 1 : 0;
+      tilt.x += (tilt.tx * sealed - tilt.x) * 0.12;
+      tilt.y += (tilt.ty * sealed - tilt.y) * 0.12;
+      // half the opening's lean: it rests under the handwritten farewell
+      env.rotation.set(tilt.y * 0.09, tilt.x * 0.11, 0);
+      glint.position.set(hx - 90 - tilt.x * 260, hy + 150 + tilt.y * 220, 300);
       flap.rotation.x = -Math.PI * 1.1 * (1 - st.flap);
       flap.position.z = st.flap > 0.45 ? Z_FLAP : -0.6; // past vertical
       linerMat.color.setScalar(1 - 0.14 * st.flap);
@@ -1352,7 +1359,9 @@ export async function createEnvelopeScene(overlay, opts = {}) {
     let last = 0;
     function setProgress(p) {
       const shown = p > 0.003;
-      sheet.visible = shown;
+      // sealed inside a leaning envelope, the (unrotated) sheet would poke
+      // through the paper — it's hidden anyway once the flap is shut
+      sheet.visible = shown && p < 0.88;
       canvas.style.visibility = shown ? "visible" : "hidden";
       sheetEl.style.visibility = shown ? "hidden" : ""; // swap in one frame
       tl.progress(p);
@@ -1367,6 +1376,12 @@ export async function createEnvelopeScene(overlay, opts = {}) {
       setProgress,
       // the page moved under a still scene (past the runway): repaint
       redraw: () => dirty(),
+      // phone / pointer tilt, honoured only while sealed
+      setTilt(nx, ny) {
+        tilt.tx = Math.max(-1, Math.min(1, nx));
+        tilt.ty = Math.max(-1, Math.min(1, ny));
+        dirty(500);
+      },
       get progress() {
         return last;
       },

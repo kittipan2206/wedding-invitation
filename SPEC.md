@@ -60,8 +60,21 @@
 - While idle, the envelope floats gently and tilts toward the pointer
   (desktop) — it faces the pointer: pointer up-right tips it up and to the
   right — or follows a finger drag (touch); light sweeps across the foil
-  names and the wax as it tilts. Android also tilts with the phone's
-  gyroscope; iOS never shows a motion-permission prompt
+  names and the wax as it tilts
+- **Tilting the phone** tilts the envelope too:
+  - Android (and any browser that allows it without asking) follows the
+    phone's tilt automatically — including browsers such as Brave that
+    expose a permission call but grant it silently
+  - iPhone/iPad: a small pill under "แตะเพื่อเปิดซอง" reads
+    "เอียงมือถือดูซอง"; tapping it asks iOS for motion access (system
+    prompt). Granted → the pill fades, the envelope gives a small wiggle and
+    follows the phone. Denied (or no prompt, e.g. an in-app browser that
+    blocks it) → the pill quietly disappears and finger-drag still works
+  - The pill never shows on Android/desktop, with reduced motion, after
+    it was declined this session, or once tilt readings are already
+    arriving (permission remembered)
+  - Holding the phone still at a new angle drifts back to level within
+    ~2–3 s, so any grip reads as "flat"
 - Dragging the envelope does not open it — only a tap does
 - The 3D envelope loads in the background while the page loader is showing;
   if WebGL is unavailable or the 3D module hasn't loaded within 4 seconds,
@@ -101,8 +114,8 @@
 - The signature is handwritten the same way, then a small heart stamp
   presses down beside it
 - While reading, the sheet leans toward the pointer (desktop) or a finger
-  drag (touch; Android also follows the gyroscope) with a light sheen and
-  shadow that move with it; no iOS motion-permission prompt
+  drag (touch) with a light sheen and shadow that move with it; it also
+  follows the phone's tilt whenever the envelope does (see above)
 - Tapping anywhere on the paper completes all text instantly — the reveal
   never holds the guest hostage
 - With reduced-motion preference all text is simply shown at once
@@ -294,7 +307,10 @@
   the sheet in thirds (the outer thirds fold back, so "With love, …" stays
   facing the guest), it floats over the SAME 3D envelope as the opening,
   slides into the pocket, the flap shuts and the wax seal presses down
-  (haptic tick); then "แล้วพบกันวันที่ {day} {month} ♡" is handwritten below
+  (haptic tick); then "แล้วพบกันวันที่ {day} {month} ♡" is handwritten below.
+  Once sealed, the envelope leans gently (about half the opening's angle)
+  with the phone's tilt — or the pointer on desktop — the light moving
+  across foil and wax; it eases back level before the letter unfolds
   and a hint reads "เลื่อนขึ้นเพื่อเปิดซองอีกครั้ง ↑". The motion follows the
   scroll both ways — scrolling back up cracks the seal, opens the flap and
   unfolds the sheet. Three snap stops: the sheet, folded over the open

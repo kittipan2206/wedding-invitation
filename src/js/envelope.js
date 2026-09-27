@@ -19,6 +19,12 @@ import { playCrack, playFlap, playSlide, preloadSfx } from "./sfx.js";
 import { autoplayMusic } from "./music.js";
 import { letterPaper, canvasURL, whenIdle } from "./paper.js";
 import { fontsReady } from "./platform.js";
+import {
+  needsMotionPrompt,
+  onTilt,
+  primeMotion,
+  requestMotion,
+} from "./tilt.js";
 import { writeTween, loadScriptFont } from "./handwriting.js";
 
 gsap.registerPlugin(Flip);
@@ -125,17 +131,15 @@ export function initEnvelope(onComplete, { scene = null, onClosing } = {}) {
     drag = null;
     setTilt(0, 0);
   }
-  // Android tilts with the phone for free; iOS would need a permission
-  // prompt (requestPermission) — deliberately never asked
-  let gyro0 = null;
-  function onOrient(e) {
-    if (opened || drag || e.gamma == null) return;
-    if (!gyro0) gyro0 = { g: e.gamma, b: e.beta };
-    setTilt((e.gamma - gyro0.g) / 22, (e.beta - gyro0.b) / 22);
+  // Phone tilt (tilt.js): Android follows for free; iPhone after the pill
+  let offEnvTilt = null;
+  if (!reduceMotion) {
+    primeMotion();
+    offEnvTilt = onTilt((x, y) => {
+      if (!opened && !drag) setTilt(x, y);
+    });
+    initTiltPill();
   }
-  const hasGyro =
-    "DeviceOrientationEvent" in window &&
-    typeof DeviceOrientationEvent.requestPermission !== "function";
   if (!reduceMotion) {
     overlay.addEventListener("pointermove", onMove);
     overlay.addEventListener("pointerdown", onDown);
@@ -144,7 +148,49 @@ export function initEnvelope(onComplete, { scene = null, onClosing } = {}) {
     overlay.addEventListener("pointercancel", onUp);
     // pointer events keep flowing during a drag instead of turning into a pan
     overlay.style.touchAction = "none";
-    if (hasGyro) window.addEventListener("deviceorientation", onOrient);
+  }
+
+  // iPhone opt-in: "เอียงมือถือดูซอง" → iOS prompt. Granted: the pill fades
+  // and the envelope wiggles hello; declined / blocked: it just fades.
+  function initTiltPill() {
+    const pill = document.getElementById("env-tilt-btn");
+    if (!pill || !needsMotionPrompt()) return;
+    if (sessionStorage.getItem("motion_asked") === "denied") return;
+    pill.hidden = false;
+    const hide = () => fadePill(pill);
+    // permission remembered from earlier in the session → readings flow
+    const off = onTilt(() => {
+      off();
+      if (!pill.hidden) hide();
+    });
+    pill.addEventListener("click", async (e) => {
+      e.stopPropagation(); // never opens the envelope
+      const ok = await requestMotion();
+      try {
+        sessionStorage.setItem("motion_asked", ok ? "granted" : "denied");
+      } catch {}
+      hide();
+      if (!ok) return;
+      const w = { t: 0 };
+      gsap.to(w, {
+        t: 1,
+        duration: 0.7,
+        ease: "power1.out",
+        onUpdate: () =>
+          setTilt(Math.sin(w.t * Math.PI * 2) * 0.55 * (1 - w.t), 0),
+      });
+    });
+  }
+  // (its CSS entrance holds opacity via fill-mode — release it first, as
+  // with the label)
+  function fadePill(pill) {
+    if (!pill || pill.hidden) return;
+    pill.style.animation = "none";
+    gsap.fromTo(
+      pill,
+      { opacity: 1 },
+      { opacity: 0, duration: 0.35, onComplete: () => (pill.hidden = true) },
+    );
   }
 
   // Decode the foley while the guest looks at the envelope
@@ -219,7 +265,7 @@ export function initEnvelope(onComplete, { scene = null, onClosing } = {}) {
     });
   }
   let letterDrag = null;
-  let letterGyro0 = null;
+  let offLetterTilt = null;
   function onLetterMove(e) {
     if (e.pointerType === "mouse") {
       const r = letter.getBoundingClientRect();
@@ -242,11 +288,7 @@ export function initEnvelope(onComplete, { scene = null, onClosing } = {}) {
     letterDrag = null;
     letterTiltTo(0, 0, 0.9);
   }
-  function onLetterOrient(e) {
-    if (letterDrag || e.gamma == null) return;
-    if (!letterGyro0) letterGyro0 = { g: e.gamma, b: e.beta };
-    letterTiltTo((e.gamma - letterGyro0.g) / 20, (e.beta - letterGyro0.b) / 20);
-  }
+
   function wireLetterTilt(on) {
     if (reduceMotion) return;
     const fn = on ? "addEventListener" : "removeEventListener";
@@ -254,7 +296,10 @@ export function initEnvelope(onComplete, { scene = null, onClosing } = {}) {
     overlay[fn]("pointerdown", onLetterDown);
     overlay[fn]("pointerup", onLetterUp);
     overlay[fn]("pointercancel", onLetterUp);
-    if (hasGyro) window[fn]("deviceorientation", onLetterOrient);
+    offLetterTilt?.();
+    offLetterTilt = on
+      ? onTilt((x, y) => !letterDrag && letterTiltTo(x * 1.1, y * 1.1))
+      : null;
     overlay.style.touchAction = on ? "none" : "";
   }
 
@@ -273,7 +318,8 @@ export function initEnvelope(onComplete, { scene = null, onClosing } = {}) {
     overlay.removeEventListener("pointermove", onDrag);
     overlay.removeEventListener("pointerup", onUp);
     overlay.removeEventListener("pointercancel", onUp);
-    window.removeEventListener("deviceorientation", onOrient);
+    offEnvTilt?.();
+    fadePill(document.getElementById("env-tilt-btn"));
     overlay.style.touchAction = "";
     idle.kill();
     body.style.cursor = "default";

@@ -595,4 +595,36 @@ test.describe("Stationery touches", () => {
     await scrollTo(0);
     await expect(finale).not.toHaveClass(/finale--sealed/, { timeout: 10_000 });
   });
+
+  test("iPhone: the tilt pill asks for motion access and never opens the envelope", async ({
+    page,
+  }, testInfo) => {
+    await page.addInitScript(() => {
+      window.__motionAsked = 0;
+      window.DeviceOrientationEvent ??= function () {};
+      DeviceOrientationEvent.requestPermission = async () => {
+        window.__motionAsked++;
+        return "granted";
+      };
+    });
+    await mockGAS(page);
+    await page.goto("/");
+    await expect(page.locator("#envelope-overlay")).toBeVisible({
+      timeout: 15_000,
+    });
+    const pill = page.locator("#env-tilt-btn");
+    if (testInfo.project.name !== "mobile") {
+      // desktop / Android: no pill (tilt follows the pointer / phone freely)
+      await expect(pill).toBeHidden();
+      return;
+    }
+    await expect(pill).toBeVisible({ timeout: 5_000 });
+    await expect(pill).toContainText("เอียงมือถือดูซอง");
+    await pill.click();
+    await expect(pill).toBeHidden({ timeout: 3_000 });
+    expect(await page.evaluate(() => window.__motionAsked)).toBe(1);
+    // still the sealed envelope: the pill is not the tap that opens it
+    await expect(page.locator(".env-letter--open")).toHaveCount(0);
+    await expect(page.locator("#envelope-overlay")).toBeVisible();
+  });
 });
