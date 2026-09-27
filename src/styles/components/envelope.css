@@ -466,3 +466,27 @@
   font-size: 21px;
   clip-path: none; /* the pen reveals it now */
 }
+
+/* ── iPhone opt-in: tilt the phone to tilt the envelope (tilt.js) ── */
+.env-tilt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: -16px; /* sits close under "แตะเพื่อเปิดซอง" */
+  min-height: 36px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(74, 58, 72, 0.18);
+  background: rgba(255, 253, 249, 0.6);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-muted);
+  cursor: pointer;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 1.4s forwards;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.env-tilt[hidden] {
+  display: none;
+}

@@ -14,6 +14,7 @@ import { INK_PEN } from "./letter.js";
 import { canvasURL, foilMonogram, letterPaper } from "./paper.js";
 import { fontsReady, want3D } from "./platform.js";
 import { playFlap, playSlide, preloadSfx } from "./sfx.js";
+import { onTilt } from "./tilt.js";
 
 const SERIF = `"Cormorant Garamond", "Trirong", serif`;
 const SANS = `"DM Sans", "IBM Plex Sans Thai Looped", sans-serif`;
@@ -160,8 +161,33 @@ export function initFinale() {
   const SECONDS_PER_HALF = 2.5;
   const anim = { p: 0 };
   let stop = 0;
+  // sealed → the envelope leans with the phone (or the pointer on desktop)
+  let offTilt = null;
+  const onPointer = (e) => {
+    if (e.pointerType !== "mouse") return;
+    scene?.setTilt(
+      ((e.clientX - innerWidth / 2) / innerWidth) * 2.2,
+      ((e.clientY - innerHeight / 2) / innerHeight) * 2.2,
+    );
+  };
+  const followTilt = (on) => {
+    if (on === !!offTilt) return;
+    if (on) {
+      const off = onTilt((x, y) => scene?.setTilt(x, y));
+      addEventListener("pointermove", onPointer);
+      offTilt = () => {
+        off();
+        removeEventListener("pointermove", onPointer);
+      };
+    } else {
+      offTilt();
+      offTilt = null;
+      scene?.setTilt(0, 0);
+    }
+  };
   const onFrame = () => {
     const p = anim.p;
+    followTilt(p >= 0.999);
     // paper sounds on the way in only
     if (progress < 0.55 && p >= 0.55) playSlide();
     if (progress < 0.72 && p >= 0.72) playFlap();
