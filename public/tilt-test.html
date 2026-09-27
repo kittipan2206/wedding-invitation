@@ -76,6 +76,7 @@
       <tr><td>เบราว์เซอร์</td><td id="where"></td></tr>
       <tr><td>มี DeviceOrientation</td><td id="api"></td></tr>
       <tr><td>ต้องขออนุญาต (iOS)</td><td id="needs"></td></tr>
+      <tr><td>ได้ค่าก่อนกดปุ่ม</td><td id="pre">ยังไม่ได้รับ (ลองเอียงก่อนกด)</td></tr>
       <tr><td>ได้รับค่าจริง</td><td id="events">ยังไม่ได้รับ</td></tr>
     </table>
 
@@ -99,6 +100,15 @@
       $("api").textContent = hasApi ? "มี" : "ไม่มี";
       $("needs").textContent = needs ? "ใช่" : "ไม่ต้อง";
 
+      // do readings arrive with NO permission call at all? (Android: they
+      // should — even where requestPermission exists, e.g. Brave/Chrome)
+      let pre = 0;
+      if (hasApi)
+        window.addEventListener("deviceorientation", (e) => {
+          if (e.beta == null || got) return;
+          pre++;
+          $("pre").textContent = `ได้ (${pre}) — ไม่ต้องขออนุญาต`;
+        });
       let got = 0;
       let base = null;
       function onOrient(e) {
