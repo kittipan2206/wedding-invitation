@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ทดสอบการเอียงเครื่อง</title>
+    <!-- Throwaway feasibility check: can guests' phones (esp. iPhone in the
+         LINE in-app browser) feed the envelope with device tilt? -->
+    <meta name="robots" content="noindex" />
+    <style>
+      body {
+        margin: 0;
+        padding: 24px 16px 48px;
+        font-family: -apple-system, "IBM Plex Sans Thai Looped", sans-serif;
+        background: #f7f2ec;
+        color: #2e2a28;
+        text-align: center;
+      }
+      h1 { font-size: 20px; margin: 0 0 4px; }
+      .sub { font-size: 13px; color: #8a7f7a; margin: 0 0 20px; }
+      .stage { perspective: 600px; margin: 28px auto; }
+      .card {
+        width: 220px;
+        height: 150px;
+        margin: 0 auto;
+        border-radius: 6px;
+        background: #fffdf9;
+        border: 1px solid rgba(80, 60, 70, 0.12);
+        box-shadow: 0 12px 30px rgba(60, 40, 50, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: #9c4862;
+        transition: transform 0.08s linear;
+      }
+      button {
+        font: inherit;
+        font-size: 17px;
+        padding: 14px 22px;
+        border-radius: 10px;
+        border: none;
+        background: #4a3a48;
+        color: #fdfaf4;
+      }
+      .result {
+        font-size: 22px;
+        font-weight: 600;
+        margin: 18px 0 6px;
+        min-height: 1.4em;
+      }
+      .ok { color: #3f7a4e; }
+      .bad { color: #a4455e; }
+      .live { font: 14px ui-monospace, monospace; color: #6a5a66; }
+      table {
+        margin: 20px auto 0;
+        font-size: 13px;
+        border-collapse: collapse;
+        text-align: left;
+      }
+      td { padding: 4px 8px; border-top: 1px solid rgba(0, 0, 0, 0.06); }
+      td:first-child { color: #8a7f7a; }
+    </style>
+  </head>
+  <body>
+    <h1>ทดสอบการเอียงเครื่อง</h1>
+    <p class="sub">แตะปุ่มด้านล่าง แล้วเอียงมือถือไปมา — แคปหน้าจอผลส่งกลับมาได้เลย</p>
+
+    <button id="ask" type="button">ขออนุญาตใช้การเอียงเครื่อง</button>
+    <p class="result" id="result">ยังไม่ได้ทดสอบ</p>
+    <p class="live" id="live">β – · γ –</p>
+
+    <div class="stage"><div class="card" id="card">♡</div></div>
+
+    <table>
+      <tr><td>เบราว์เซอร์</td><td id="where"></td></tr>
+      <tr><td>มี DeviceOrientation</td><td id="api"></td></tr>
+      <tr><td>ต้องขออนุญาต (iOS)</td><td id="needs"></td></tr>
+      <tr><td>ได้รับค่าจริง</td><td id="events">ยังไม่ได้รับ</td></tr>
+    </table>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const ua = navigator.userAgent;
+      const where = /\bLine\//i.test(ua)
+        ? "LINE (in-app)"
+        : /FBAN|FBAV|Instagram/i.test(ua)
+          ? "Facebook/Instagram (in-app)"
+          : /CriOS/i.test(ua)
+            ? "Chrome (iOS)"
+            : /iPhone|iPad/i.test(ua)
+              ? "Safari (iOS)"
+              : /Android/i.test(ua)
+                ? "Android"
+                : "อื่นๆ";
+      $("where").textContent = where;
+      const hasApi = "DeviceOrientationEvent" in window;
+      const needs = hasApi && typeof DeviceOrientationEvent.requestPermission === "function";
+      $("api").textContent = hasApi ? "มี" : "ไม่มี";
+      $("needs").textContent = needs ? "ใช่" : "ไม่ต้อง";
+
+      let got = 0;
+      let base = null;
+      function onOrient(e) {
+        if (e.beta == null || e.gamma == null) return;
+        got++;
+        if (!base) base = { b: e.beta, g: e.gamma };
+        const b = e.beta - base.b;
+        const g = e.gamma - base.g;
+        $("live").textContent = `β ${e.beta.toFixed(1)}° · γ ${e.gamma.toFixed(1)}°`;
+        $("events").textContent = `ได้แล้ว (${got})`;
+        $("card").style.transform = `rotateX(${(-b * 0.8).toFixed(1)}deg) rotateY(${(g * 0.9).toFixed(1)}deg)`;
+        if (got === 1) show("✅ ใช้ได้ — เอียงมือถือดูการ์ดได้เลย", true);
+      }
+      function show(text, ok) {
+        const r = $("result");
+        r.textContent = text;
+        r.className = "result " + (ok ? "ok" : "bad");
+      }
+
+      $("ask").addEventListener("click", async () => {
+        if (!hasApi) return show("❌ เครื่องนี้ไม่รองรับ", false);
+        let state = "granted";
+        if (needs) {
+          try {
+            state = await DeviceOrientationEvent.requestPermission();
+          } catch (err) {
+            return show("❌ ขออนุญาตไม่สำเร็จ: " + (err && err.name), false);
+          }
+        }
+        if (state !== "granted")
+          return show(`❌ ถูกปฏิเสธ (${state}) — ไม่มีกล่องให้กดอนุญาต?`, false);
+        window.addEventListener("deviceorientation", onOrient);
+        show("⏳ อนุญาตแล้ว — ลองเอียงมือถือ…", true);
+        setTimeout(() => {
+          if (!got) show("❌ อนุญาตแล้วแต่ไม่มีค่าส่งมา", false);
+        }, 3000);
+      });
+    </script>
+  </body>
+</html>
