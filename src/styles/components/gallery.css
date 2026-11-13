@@ -44,10 +44,10 @@
   /* the linen table the envelope rests on — edge to edge of the section */
   margin: 0 -24px 12px;
   padding: 34px 32px 40px;
-  background: radial-gradient(ellipse at center, #ece7e1 0%, #d9d1c9 100%);
+  background: radial-gradient(ellipse at center, #f3ede5 0%, #e7ded4 100%);
   box-shadow:
-    inset 0 10px 18px -14px rgba(60, 40, 50, 0.25),
-    inset 0 -10px 18px -14px rgba(60, 40, 50, 0.25);
+    inset 0 10px 18px -14px rgba(60, 40, 50, 0.18),
+    inset 0 -10px 18px -14px rgba(60, 40, 50, 0.18);
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -55,6 +55,15 @@
 
 .gallery-grid.polaroid-strip::-webkit-scrollbar {
   display: none;
+}
+
+/* Desktop: the strip no longer spans the window, so let the table (and any
+   polaroid cut by the scroll edge) fade out instead of ending in a hard line */
+@media (min-width: 768px) {
+  .gallery-grid.polaroid-strip {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 56px, #000 calc(100% - 56px), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 56px, #000 calc(100% - 56px), transparent);
+  }
 }
 
 .polaroid {
@@ -224,6 +233,9 @@
 .gallery-item img.loading {
   opacity: 0;
   transition: opacity 0.3s;
+  /* hold a tile open until the photo's real ratio is known — otherwise the
+     whole grid is 0px tall (a blank page) while the images download */
+  aspect-ratio: 3 / 4;
 }
 .gallery-item img:not(.loading) {
   opacity: 1;
@@ -390,7 +402,7 @@
   position: fixed;
   inset: 0;
   z-index: 1100;
-  background: linear-gradient(135deg, #fff8fa 0%, #fdf0ff 50%, #f0f8ff 100%);
+  background: var(--color-paper);
   transform: translateY(100%);
   transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
   display: flex;
@@ -422,10 +434,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px clamp(20px, 5vw, 60px);
-  background: rgba(255, 252, 254, 0.92);
+  background: rgba(252, 249, 244, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(201, 184, 232, 0.2);
+  border-bottom: 1px solid var(--hairline);
   flex-shrink: 0;
 }
 
@@ -471,22 +483,21 @@
   font-weight: 500;
   padding: 7px 18px;
   border-radius: 999px;
-  border: 1.5px solid rgba(201, 184, 232, 0.4);
-  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(46, 42, 40, 0.28);
+  background: transparent;
   color: var(--color-muted);
   cursor: pointer;
   transition: all 0.2s;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
 .overlay-filter-btn:hover {
-  border-color: var(--color-lavender);
+  border-color: var(--color-plum);
   color: var(--color-text);
 }
-.overlay-filter--active {
-  background: rgba(201, 184, 232, 0.3);
-  border-color: var(--color-lavender);
-  color: var(--color-text);
+.overlay-filter--active,
+.overlay-filter--active:hover {
+  background: var(--color-plum);
+  border-color: var(--color-plum);
+  color: var(--color-ivory);
 }
 
 /* ── Overlay lightbox ──
