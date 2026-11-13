@@ -251,9 +251,10 @@
   }
 }
 
-/* Wide but short windows (laptops): the wheel and the nav dots already say
-   "scroll", and the hint would sit on the date */
-@media (min-width: 768px) and (max-height: 860px) {
+/* Short viewports — laptops, and phones with the browser bars showing (worse
+   with the extra "เรียน NAME" line): the hint would sit on the date, and the
+   wheel / nav dots already say "scroll" */
+@media (max-height: 740px), (min-width: 768px) and (max-height: 860px) {
   .hero-scroll-hint {
     display: none;
   }
